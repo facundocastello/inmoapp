@@ -1,0 +1,8 @@
+**/node_modules/*
+**/.prisma/*
+**/generated/*
+**/dist/*
+**/build/*
+.cache/**
+**/tsconfig.json
+**/public/** 

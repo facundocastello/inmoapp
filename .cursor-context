@@ -1,0 +1,128 @@
+# Multi-Tenant Project Context
+
+## Core Architecture
+- Next.js application with route groups:
+  - (super-admin): Tenant and shared DB management
+  - (admin): Tenant-specific administration
+  - (public): Public tenant content access
+- Subdomain-based tenant routing
+  - Tenant panel: {tenant}.domain.com/admin
+  - Public website: {tenant}.domain.com
+- File Storage: Digital Ocean Spaces
+- State Management: React Context + Server Actions
+- Form Handling: React Hook Form + Zod validation
+
+## Database Design
+- PostgreSQL with Prisma
+- Two database types:
+  1. sharedDB: Tenant info and super-admin data
+  2. tenantDB: Individual tenant databases
+- Each tenant gets their own isolated database
+
+## Development Guidelines
+1. Code Style:
+   - No inline styles in className
+   - Define styles in a single-level object at file bottom
+   - Example: const styles = { container: "..." }
+   - Use CSS variables for tenant-specific theming
+   - Follow color system structure for consistency
+   - Use TypeScript strict mode
+   - Prefer named exports over default exports
+   - Use barrel exports (index.ts) for cleaner imports
+
+2. Architecture Patterns:
+   - Server Actions preferred over API routes
+   - Modular component design
+   - Route groups for access control
+   - Package manager: Yarn
+   - Tenant context management through React Context
+   - Component Wrapping Strategy:
+     - Always wrap Next.js components in custom components
+     - Wrap common HTML elements in reusable components
+     - Examples: Image, Link, Button, Input, Label, PageContainer
+     - Only use basic HTML elements (div, span) when no reusable component exists
+     - Follow atomic design principles (atoms, molecules, organisms, templates, pages)
+     - Keep components focused and single-responsibility
+
+3. Image Handling:
+   - Always use Next.js Image component (wrapped in custom component)
+   - Digital Ocean Spaces for file storage
+   - Optimized image loading and delivery
+   - Don't use the vercel Image optimization.
+   - Implement proper image sizing and formats
+   - Use blur placeholder for better UX
+   - Implement proper error handling and fallbacks
+
+4. Authentication Rules:
+   - Super-Admin: sharedDB access with full tenant management
+   - Admin: tenantDB access
+   - Public: tenantDB access
+   - Implement proper session management
+   - Use secure HTTP-only cookies
+   - Implement rate limiting
+   - Add CSRF protection
+
+5. Error Handling:
+   - Use custom error boundaries
+   - Implement proper error logging
+   - Show user-friendly error messages
+   - Handle network errors gracefully
+   - Implement retry mechanisms for failed operations
+
+6. Performance Guidelines:
+   - Implement proper code splitting
+   - Use React Suspense for loading states
+   - Optimize bundle size
+   - Implement proper caching strategies
+   - Use proper image optimization
+   - Implement proper lazy loading
+
+7. Testing Guidelines:
+   - Write unit tests for utilities
+   - Write component tests for UI components
+   - Write integration tests for critical flows
+   - Use React Testing Library
+   - Implement E2E tests for critical paths
+   - Use MSW for API mocking
+
+## UI Standards
+1. Color System:
+   - Use CSS variables with fallbacks
+   - Follow color scale structure (100-900)
+   - Support dark/light modes
+   - Tenant-specific customization
+   - Default presets for new tenants
+
+2. Component Rules:
+   - Modular and reusable
+   - Consistent spacing and sizing
+   - Responsive by default
+   - Accessible design patterns
+
+## Project Structure
+- /prisma: Database schemas and migrations
+- /app: Next.js application routes
+- /components: Reusable UI components
+  - /ui: Base UI components (Button, Input, etc.)
+  - /layout: Layout components
+  - /shared: Shared components across features
+  - /section/{section}: Section components. e.g. /section/admin/dashboard
+  - /forms: Form-related components
+  - /feedback: Toast, Modal, Alert components
+- /lib: Utility functions and shared logic
+  - /hooks: Custom React hooks
+  - /utils: Helper functions
+  - /constants: Application constants
+  - /types: TypeScript types
+- /actions: Server actions
+- /services: External service integrations
+  - /storage: Digital Ocean integration
+  - /email: Email service
+  - /analytics: Analytics service
+- /config: Configuration files
+- /public: Static assets
+- /styles: Global styles and theme configuration
+- /theme: Color presets and theme utilities
+- /tests: Test utilities and setup
+- /middleware: Next.js middleware
+- /providers: React context providers
