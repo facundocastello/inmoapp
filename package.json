@@ -2,6 +2,7 @@
   "name": "multi-tenant",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
@@ -9,10 +10,21 @@
     "lint": "next lint",
     "studio": "prisma studio",
     "tenant-studio": "prisma studio --schema=./prisma/tenant-schema.prisma",
-    "setup-db": "ts-node scripts/setup-db.ts"
+    "generate": "prisma generate --schema=./prisma/schema.prisma",
+    "generate:tenant": "prisma generate --schema=./prisma/tenant-schema.prisma",
+    "db:push": "prisma db push",
+    "db:push:tenant": "prisma db push --schema=./prisma/tenant-schema.prisma",
+    "db:seed": "ts-node --esm prisma/seeders/shared-seed.ts",
+    "db:seed:tenant": "ts-node --esm --project tsconfig.node.json prisma/seeders/tenant-seed.ts",
+    "db:reset": "prisma db push --force-reset && npm run db:seed",
+    "db:reset:tenant": "prisma db push --force-reset --schema=./prisma/tenant-schema.prisma && npm run db:seed:tenant",
+    "db:setup": "npm run db:push && npm run db:push:tenant && npm run db:seed && npm run db:seed:tenant",
+    "db:studio": "prisma studio & prisma studio --schema=./prisma/tenant-schema.prisma --port=5556"
   },
   "dependencies": {
     "@prisma/client": "^6.5.0",
+    "@types/bcryptjs": "^3.0.0",
+    "bcryptjs": "^3.0.2",
     "next": "15.2.4",
     "prisma": "^6.5.0",
     "react": "^19.0.0",
@@ -34,6 +46,7 @@
     "eslint-plugin-simple-import-sort": "^12.0.0",
     "prettier": "^3.2.0",
     "tailwindcss": "^4",
+    "ts-node": "^10.9.2",
     "typescript": "^5"
   }
 }

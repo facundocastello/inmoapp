@@ -15,9 +15,15 @@
 ## Database Design
 - PostgreSQL with Prisma
 - Two database types:
-  1. sharedDB: Tenant info and super-admin data
-  2. tenantDB: Individual tenant databases
+  1. sharedDB: Tenant info and super-admin data (implemented)
+  2. tenantDB: Individual tenant databases (implemented)
 - Each tenant gets their own isolated database
+- Database Configuration:
+  - Environment variables for connection settings (DB_HOST, DB_USER, DB_PASSWORD)
+  - Separate Prisma schema files for shared and tenant databases
+  - Using Prisma db push for rapid development schema changes
+  - Seeding strategy for both shared and tenant databases
+  - Scripts for database management operations in package.json
 
 ## Development Guidelines
 1. Code Style:
@@ -101,6 +107,14 @@
 
 ## Project Structure
 - /prisma: Database schemas and migrations
+  - schema.prisma: Shared database schema
+  - tenant-schema.prisma: Tenant database schema
+  - /seeders: Database seed scripts
+    - shared-seed.ts: Seed data for shared database
+    - tenant-seed.ts: Seed data for tenant database
+- /scripts: Utility scripts
+  - setup-db.sh: Database setup script
+  - seed-db.sh: Database seeding script
 - /app: Next.js application routes
 - /components: Reusable UI components
   - /ui: Base UI components (Button, Input, etc.)
@@ -110,6 +124,7 @@
   - /forms: Form-related components
   - /feedback: Toast, Modal, Alert components
 - /lib: Utility functions and shared logic
+  - /db: Database utilities and management functions
   - /hooks: Custom React hooks
   - /utils: Helper functions
   - /constants: Application constants
@@ -126,3 +141,21 @@
 - /tests: Test utilities and setup
 - /middleware: Next.js middleware
 - /providers: React context providers
+
+## Database Operations
+- Package.json Scripts:
+  - db:push: Push shared database schema changes
+  - db:push:tenant: Push tenant database schema changes
+  - db:seed: Run shared database seeder
+  - db:seed:tenant: Run tenant database seeder
+  - db:reset: Reset and reseed shared database
+  - db:reset:tenant: Reset and reseed tenant database
+  - db:setup: Set up both databases from scratch
+  - studio: Open Prisma Studio for shared database
+  - tenant-studio: Open Prisma Studio for tenant database
+
+- Environment Variables:
+  - DB_HOST: Database host address
+  - DB_USER: Database username
+  - DB_PASSWORD: Database password
+  - DB_NAME: Primary database name

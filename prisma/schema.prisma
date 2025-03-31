@@ -1,0 +1,53 @@
+// This is your Prisma schema file for the shared database
+// Learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../.prisma/shared"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("SHARED_DATABASE_URL")
+}
+
+// Tenant model to store information about each tenant
+model Tenant {
+  id           String      @id @default(cuid())
+  name         String
+  subdomain    String      @unique
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  isActive     Boolean     @default(true)
+  theme        Json? // Stores tenant-specific theme settings
+  databaseName String      @unique // Name of the tenant's database
+  superAdmin   SuperAdmin?
+  admins       Admin[]
+}
+
+// Super Admin model for system-wide administration
+model SuperAdmin {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  tenantId  String   @unique
+}
+
+// Admin model for tenant-specific administration
+model Admin {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  tenantId  String
+}

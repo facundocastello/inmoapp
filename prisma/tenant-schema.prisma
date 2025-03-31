@@ -1,0 +1,42 @@
+// This is your Prisma schema file for tenant-specific databases
+// Learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../.prisma/tenant-client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("TENANT_DATABASE_URL")
+}
+
+// User model for tenant-specific users
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      UserRole
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  content   Content[]
+}
+
+// Content model for tenant-specific content
+model Content {
+  id        String   @id @default(cuid())
+  title     String
+  body      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  author    User     @relation(fields: [authorId], references: [id])
+  authorId  String
+}
+
+// Enum for user roles
+enum UserRole {
+  ADMIN
+  EDITOR
+  VIEWER
+} 
