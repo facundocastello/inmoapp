@@ -27,9 +27,32 @@
 
 ## Development Guidelines
 1. Code Style:
-   - No inline styles in className
-   - Define styles in a single-level object at file bottom
-   - Example: const styles = { container: "..." }
+   - IMPORTANT: NO inline styles in className attributes. NO INLINE CLASSNAMES. use the styles object instead.
+   - IMPORTANT: All styles MUST be defined in a single-level object at the bottom of each file
+   - Example structure:
+     ```typescript
+     // Component definition here
+     
+     const styles = {
+       container: "flex items-center",
+       title: "text-lg font-bold",
+       // other style keys
+     }
+     ```
+   - When using cva for variants, move it into the styles object like:
+     ```typescript
+     const styles = {
+       variants: cva(
+         // base styles
+         {
+           variants: {
+             // variant definitions
+           }
+         }
+       ),
+       // other style keys
+     }
+     ```
    - Use CSS variables for tenant-specific theming
    - Follow color system structure for consistency
    - Use TypeScript strict mode
@@ -47,7 +70,6 @@
      - Wrap common HTML elements in reusable components
      - Examples: Image, Link, Button, Input, Label, PageContainer
      - Only use basic HTML elements (div, span) when no reusable component exists
-     - Follow atomic design principles (atoms, molecules, organisms, templates, pages)
      - Keep components focused and single-responsibility
 
 3. Image Handling:
@@ -95,7 +117,6 @@
 1. Color System:
    - Use CSS variables with fallbacks
    - Follow color scale structure (100-900)
-   - Support dark/light modes
    - Tenant-specific customization
    - Default presets for new tenants
 
@@ -115,32 +136,32 @@
 - /scripts: Utility scripts
   - setup-db.sh: Database setup script
   - seed-db.sh: Database seeding script
-- /app: Next.js application routes
-- /components: Reusable UI components
+- /src/app: Next.js application routes
+- /src/components: Reusable UI components
   - /ui: Base UI components (Button, Input, etc.)
   - /layout: Layout components
   - /shared: Shared components across features
   - /section/{section}: Section components. e.g. /section/admin/dashboard
   - /forms: Form-related components
   - /feedback: Toast, Modal, Alert components
-- /lib: Utility functions and shared logic
+- /src/lib: Utility functions and shared logic
   - /db: Database utilities and management functions
-  - /hooks: Custom React hooks
+  - /hooks: Custom React hooks (see useTheme, useTenantTheme)
   - /utils: Helper functions
   - /constants: Application constants
   - /types: TypeScript types
-- /actions: Server actions
-- /services: External service integrations
+- /src/actions: Server actions
+- /src/services: External service integrations
   - /storage: Digital Ocean integration
   - /email: Email service
   - /analytics: Analytics service
-- /config: Configuration files
+- /src/config: Configuration files
 - /public: Static assets
-- /styles: Global styles and theme configuration
-- /theme: Color presets and theme utilities
-- /tests: Test utilities and setup
-- /middleware: Next.js middleware
-- /providers: React context providers
+- /src/styles: Global styles and theme configuration
+- /src/theme: Color presets and theme utilities
+- /src/tests: Test utilities and setup
+- /src/middleware: Next.js middleware
+- /src/providers: React context providers
 
 ## Database Operations
 - Package.json Scripts:
@@ -155,7 +176,6 @@
   - tenant-studio: Open Prisma Studio for tenant database
 
 - Environment Variables:
+  - SHARED_DATABASE_URL: Shared database connection string
+  - TENANT_DATABASE_URL: Tenant database connection string
   - DB_HOST: Database host address
-  - DB_USER: Database username
-  - DB_PASSWORD: Database password
-  - DB_NAME: Primary database name
