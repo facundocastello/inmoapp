@@ -21,8 +21,12 @@ async function main() {
   // Create an admin user
   const adminPassword = await hash('AdminSecure123!', 12);
   const prismaClient = getTenantPrismaClient(defaultDb);
-  const admin = await prismaClient.user.create({
-    data: {
+    const admin = await prismaClient.user.upsert({
+      where: {
+        email: 'admin@tenant.example.com',
+    },
+    update: {},
+    create: {
       email: 'admin@tenant.example.com',
       password: adminPassword,
       name: 'Tenant Admin',
@@ -32,8 +36,12 @@ async function main() {
 
   // Create an editor user
   const editorPassword = await hash('EditorSecure123!', 12);
-  const editor = await prismaClient.user.create({
-    data: {
+  const editor = await prismaClient.user.upsert({
+    where: {
+      email: 'editor@tenant.example.com',
+    },
+    update: {},
+    create: {
       email: 'editor@tenant.example.com',
       password: editorPassword,
       name: 'Content Editor',
@@ -42,8 +50,12 @@ async function main() {
   });
 
   // Create some sample content
-  await prismaClient.content.create({
-    data: {
+  await prismaClient.content.upsert({
+    where: {
+      title: 'Welcome to Your New Site',
+    },
+    update: {},
+    create: {
       title: 'Welcome to Your New Site',
       body: `
         <h1>Welcome to Your New Site</h1>
@@ -54,8 +66,12 @@ async function main() {
     },
   });
 
-  await prismaClient.content.create({
-    data: {
+  await prismaClient.content.upsert({
+    where: {
+      title: 'About Us',
+    },
+    update: {},
+    create: {
       title: 'About Us',
       body: `
         <h1>About Us</h1>

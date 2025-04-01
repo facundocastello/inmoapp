@@ -15,8 +15,12 @@ async function main() {
   const prisma = getPrismaClient();
   try {
     // Create a test tenant
-    const tenant = await prisma.tenant.create({
-      data: {
+    const tenant = await prisma.tenant.upsert({
+      where: {
+        subdomain: 'test',
+      },
+      update: {},
+      create: {
         name: 'Test Tenant',
         subdomain: 'test',
         isActive: true,
@@ -31,8 +35,12 @@ async function main() {
 
     // Create a super admin for the test tenant
     const hashedPassword = await hash('SuperSecure123!', 12);
-    await prisma.superAdmin.create({
-      data: {
+    await prisma.superAdmin.upsert({
+      where: {
+        email: 'superadmin@example.com',
+      },
+      update: {},
+      create: {
         email: 'superadmin@example.com',
         password: hashedPassword,
         name: 'Super Admin',
@@ -42,8 +50,12 @@ async function main() {
 
     // Create a regular admin for the test tenant
     const adminPassword = await hash('AdminSecure123!', 12);
-    await prisma.admin.create({
-      data: {
+    await prisma.admin.upsert({
+      where: {
+        email: 'admin@test.example.com',
+      },
+      update: {},
+      create: {
         email: 'admin@test.example.com',
         password: adminPassword,
         name: 'Test Admin',

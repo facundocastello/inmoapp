@@ -19,7 +19,8 @@
     "db:reset": "prisma db push --force-reset && npm run db:seed",
     "db:reset:tenant": "prisma db push --force-reset --schema=./prisma/tenant-schema.prisma && npm run db:seed:tenant",
     "db:setup": "npm run db:push && npm run db:push:tenant && npm run db:seed && npm run db:seed:tenant",
-    "db:studio": "prisma studio & prisma studio --schema=./prisma/tenant-schema.prisma --port=5556"
+    "db:studio": "prisma studio & prisma studio --schema=./prisma/tenant-schema.prisma --port=5556",
+    "initialize": "(yarn generate & yarn generate:tenant) && (yarn db:reset & yarn db:reset:tenant) && (yarn db:seed & yarn db:seed:tenant)"
   },
   "dependencies": {
     "@prisma/client": "^6.5.0",
