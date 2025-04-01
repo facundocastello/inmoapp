@@ -1,6 +1,8 @@
 import { useEffect } from 'react'
-import { useTheme } from './useTheme'
+
 import { convertThemeSettingsToPreset } from '@/utils/theme'
+
+import { useTheme } from './useTheme'
 import { ThemeSettings } from '.prisma/shared'
 
 export function useTenantTheme(themeSettings?: ThemeSettings | null) {
@@ -15,6 +17,6 @@ export function useTenantTheme(themeSettings?: ThemeSettings | null) {
 
   return {
     isDark,
-    toggleTheme
+    toggleTheme,
   }
-} 
+}

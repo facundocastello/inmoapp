@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
-import { updateColorScheme, setThemeMode } from '@/utils/theme'
-import { darkColorsPreset, lightColorsPreset } from '@/theme/colors'
+
 import type { ColorPreset } from '@/theme/colors'
+import { darkColorsPreset, lightColorsPreset } from '@/theme/colors'
+import { setThemeMode, updateColorScheme } from '@/utils/theme'
 
 export interface UseThemeReturn {
   isDark: boolean
@@ -22,7 +23,9 @@ export function useTheme(tenantColors?: ColorPreset): UseThemeReturn {
   const handleThemeChange = (isDarkMode: boolean) => {
     setIsDark(isDarkMode)
     setThemeMode(isDarkMode ? 'dark' : 'light')
-    updateColorScheme(tenantColors || (isDarkMode ? darkColorsPreset : lightColorsPreset))
+    updateColorScheme(
+      tenantColors || (isDarkMode ? darkColorsPreset : lightColorsPreset),
+    )
   }
 
   const toggleTheme = () => {
@@ -36,6 +39,6 @@ export function useTheme(tenantColors?: ColorPreset): UseThemeReturn {
   return {
     isDark,
     toggleTheme,
-    updateThemeColors
+    updateThemeColors,
   }
-} 
+}

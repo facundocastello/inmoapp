@@ -1,10 +1,17 @@
 'use client'
 
-import { ThemeToggle } from '@/components/ui/ThemeToggle'
 import React from 'react'
 
+import { ThemeToggle } from '@/components/ui/ThemeToggle'
+
 type ColorShade = 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900
-type ColorType = 'primary' | 'secondary' | 'neutral' | 'success' | 'warning' | 'error'
+type ColorType =
+  | 'primary'
+  | 'secondary'
+  | 'neutral'
+  | 'success'
+  | 'warning'
+  | 'error'
 
 type Styles = {
   container: string
@@ -89,72 +96,72 @@ export default function DesignTest() {
 }
 
 const styles: Styles = {
-  container: "min-h-screen bg-background-100 p-8 text-neutral-900",
-  header: "mb-8 flex items-center justify-between",
-  title: "text-3xl font-bold",
-  section: "mb-12",
-  sectionTitle: "mb-4 text-xl font-semibold",
-  colorGrid: "grid grid-cols-3 gap-4 md:grid-cols-6 lg:grid-cols-9",
-  colorCard: "flex flex-col items-center gap-2",
-  colorLabel: "text-sm",
+  container: 'min-h-screen bg-background-100 p-8 text-neutral-900',
+  header: 'mb-8 flex items-center justify-between',
+  title: 'text-3xl font-bold',
+  section: 'mb-12',
+  sectionTitle: 'mb-4 text-xl font-semibold',
+  colorGrid: 'grid grid-cols-3 gap-4 md:grid-cols-6 lg:grid-cols-9',
+  colorCard: 'flex flex-col items-center gap-2',
+  colorLabel: 'text-sm',
   // Primary colors
-  primary100: "h-16 w-16 rounded-lg shadow-md bg-primary-100",
-  primary200: "h-16 w-16 rounded-lg shadow-md bg-primary-200",
-  primary300: "h-16 w-16 rounded-lg shadow-md bg-primary-300",
-  primary400: "h-16 w-16 rounded-lg shadow-md bg-primary-400",
-  primary500: "h-16 w-16 rounded-lg shadow-md bg-primary-500",
-  primary600: "h-16 w-16 rounded-lg shadow-md bg-primary-600",
-  primary700: "h-16 w-16 rounded-lg shadow-md bg-primary-700",
-  primary800: "h-16 w-16 rounded-lg shadow-md bg-primary-800",
-  primary900: "h-16 w-16 rounded-lg shadow-md bg-primary-900",
+  primary100: 'h-16 w-16 rounded-lg shadow-md bg-primary-100',
+  primary200: 'h-16 w-16 rounded-lg shadow-md bg-primary-200',
+  primary300: 'h-16 w-16 rounded-lg shadow-md bg-primary-300',
+  primary400: 'h-16 w-16 rounded-lg shadow-md bg-primary-400',
+  primary500: 'h-16 w-16 rounded-lg shadow-md bg-primary-500',
+  primary600: 'h-16 w-16 rounded-lg shadow-md bg-primary-600',
+  primary700: 'h-16 w-16 rounded-lg shadow-md bg-primary-700',
+  primary800: 'h-16 w-16 rounded-lg shadow-md bg-primary-800',
+  primary900: 'h-16 w-16 rounded-lg shadow-md bg-primary-900',
   // Secondary colors
-  secondary100: "h-16 w-16 rounded-lg shadow-md bg-secondary-100",
-  secondary200: "h-16 w-16 rounded-lg shadow-md bg-secondary-200",
-  secondary300: "h-16 w-16 rounded-lg shadow-md bg-secondary-300",
-  secondary400: "h-16 w-16 rounded-lg shadow-md bg-secondary-400",
-  secondary500: "h-16 w-16 rounded-lg shadow-md bg-secondary-500",
-  secondary600: "h-16 w-16 rounded-lg shadow-md bg-secondary-600",
-  secondary700: "h-16 w-16 rounded-lg shadow-md bg-secondary-700",
-  secondary800: "h-16 w-16 rounded-lg shadow-md bg-secondary-800",
-  secondary900: "h-16 w-16 rounded-lg shadow-md bg-secondary-900",
+  secondary100: 'h-16 w-16 rounded-lg shadow-md bg-secondary-100',
+  secondary200: 'h-16 w-16 rounded-lg shadow-md bg-secondary-200',
+  secondary300: 'h-16 w-16 rounded-lg shadow-md bg-secondary-300',
+  secondary400: 'h-16 w-16 rounded-lg shadow-md bg-secondary-400',
+  secondary500: 'h-16 w-16 rounded-lg shadow-md bg-secondary-500',
+  secondary600: 'h-16 w-16 rounded-lg shadow-md bg-secondary-600',
+  secondary700: 'h-16 w-16 rounded-lg shadow-md bg-secondary-700',
+  secondary800: 'h-16 w-16 rounded-lg shadow-md bg-secondary-800',
+  secondary900: 'h-16 w-16 rounded-lg shadow-md bg-secondary-900',
   // Neutral colors
-  neutral100: "h-16 w-16 rounded-lg shadow-md bg-neutral-100",
-  neutral200: "h-16 w-16 rounded-lg shadow-md bg-neutral-200",
-  neutral300: "h-16 w-16 rounded-lg shadow-md bg-neutral-300",
-  neutral400: "h-16 w-16 rounded-lg shadow-md bg-neutral-400",
-  neutral500: "h-16 w-16 rounded-lg shadow-md bg-neutral-500",
-  neutral600: "h-16 w-16 rounded-lg shadow-md bg-neutral-600",
-  neutral700: "h-16 w-16 rounded-lg shadow-md bg-neutral-700",
-  neutral800: "h-16 w-16 rounded-lg shadow-md bg-neutral-800",
-  neutral900: "h-16 w-16 rounded-lg shadow-md bg-neutral-900",
+  neutral100: 'h-16 w-16 rounded-lg shadow-md bg-neutral-100',
+  neutral200: 'h-16 w-16 rounded-lg shadow-md bg-neutral-200',
+  neutral300: 'h-16 w-16 rounded-lg shadow-md bg-neutral-300',
+  neutral400: 'h-16 w-16 rounded-lg shadow-md bg-neutral-400',
+  neutral500: 'h-16 w-16 rounded-lg shadow-md bg-neutral-500',
+  neutral600: 'h-16 w-16 rounded-lg shadow-md bg-neutral-600',
+  neutral700: 'h-16 w-16 rounded-lg shadow-md bg-neutral-700',
+  neutral800: 'h-16 w-16 rounded-lg shadow-md bg-neutral-800',
+  neutral900: 'h-16 w-16 rounded-lg shadow-md bg-neutral-900',
   // Success colors
-  success100: "h-16 w-16 rounded-lg shadow-md bg-success-100",
-  success200: "h-16 w-16 rounded-lg shadow-md bg-success-200",
-  success300: "h-16 w-16 rounded-lg shadow-md bg-success-300",
-  success400: "h-16 w-16 rounded-lg shadow-md bg-success-400",
-  success500: "h-16 w-16 rounded-lg shadow-md bg-success-500",
-  success600: "h-16 w-16 rounded-lg shadow-md bg-success-600",
-  success700: "h-16 w-16 rounded-lg shadow-md bg-success-700",
-  success800: "h-16 w-16 rounded-lg shadow-md bg-success-800",
-  success900: "h-16 w-16 rounded-lg shadow-md bg-success-900",
+  success100: 'h-16 w-16 rounded-lg shadow-md bg-success-100',
+  success200: 'h-16 w-16 rounded-lg shadow-md bg-success-200',
+  success300: 'h-16 w-16 rounded-lg shadow-md bg-success-300',
+  success400: 'h-16 w-16 rounded-lg shadow-md bg-success-400',
+  success500: 'h-16 w-16 rounded-lg shadow-md bg-success-500',
+  success600: 'h-16 w-16 rounded-lg shadow-md bg-success-600',
+  success700: 'h-16 w-16 rounded-lg shadow-md bg-success-700',
+  success800: 'h-16 w-16 rounded-lg shadow-md bg-success-800',
+  success900: 'h-16 w-16 rounded-lg shadow-md bg-success-900',
   // Warning colors
-  warning100: "h-16 w-16 rounded-lg shadow-md bg-warning-100",
-  warning200: "h-16 w-16 rounded-lg shadow-md bg-warning-200",
-  warning300: "h-16 w-16 rounded-lg shadow-md bg-warning-300",
-  warning400: "h-16 w-16 rounded-lg shadow-md bg-warning-400",
-  warning500: "h-16 w-16 rounded-lg shadow-md bg-warning-500",
-  warning600: "h-16 w-16 rounded-lg shadow-md bg-warning-600",
-  warning700: "h-16 w-16 rounded-lg shadow-md bg-warning-700",
-  warning800: "h-16 w-16 rounded-lg shadow-md bg-warning-800",
-  warning900: "h-16 w-16 rounded-lg shadow-md bg-warning-900",
+  warning100: 'h-16 w-16 rounded-lg shadow-md bg-warning-100',
+  warning200: 'h-16 w-16 rounded-lg shadow-md bg-warning-200',
+  warning300: 'h-16 w-16 rounded-lg shadow-md bg-warning-300',
+  warning400: 'h-16 w-16 rounded-lg shadow-md bg-warning-400',
+  warning500: 'h-16 w-16 rounded-lg shadow-md bg-warning-500',
+  warning600: 'h-16 w-16 rounded-lg shadow-md bg-warning-600',
+  warning700: 'h-16 w-16 rounded-lg shadow-md bg-warning-700',
+  warning800: 'h-16 w-16 rounded-lg shadow-md bg-warning-800',
+  warning900: 'h-16 w-16 rounded-lg shadow-md bg-warning-900',
   // Error colors
-  error100: "h-16 w-16 rounded-lg shadow-md bg-error-100",
-  error200: "h-16 w-16 rounded-lg shadow-md bg-error-200",
-  error300: "h-16 w-16 rounded-lg shadow-md bg-error-300",
-  error400: "h-16 w-16 rounded-lg shadow-md bg-error-400",
-  error500: "h-16 w-16 rounded-lg shadow-md bg-error-500",
-  error600: "h-16 w-16 rounded-lg shadow-md bg-error-600",
-  error700: "h-16 w-16 rounded-lg shadow-md bg-error-700",
-  error800: "h-16 w-16 rounded-lg shadow-md bg-error-800",
-  error900: "h-16 w-16 rounded-lg shadow-md bg-error-900"
-} 
+  error100: 'h-16 w-16 rounded-lg shadow-md bg-error-100',
+  error200: 'h-16 w-16 rounded-lg shadow-md bg-error-200',
+  error300: 'h-16 w-16 rounded-lg shadow-md bg-error-300',
+  error400: 'h-16 w-16 rounded-lg shadow-md bg-error-400',
+  error500: 'h-16 w-16 rounded-lg shadow-md bg-error-500',
+  error600: 'h-16 w-16 rounded-lg shadow-md bg-error-600',
+  error700: 'h-16 w-16 rounded-lg shadow-md bg-error-700',
+  error800: 'h-16 w-16 rounded-lg shadow-md bg-error-800',
+  error900: 'h-16 w-16 rounded-lg shadow-md bg-error-900',
+}

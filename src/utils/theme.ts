@@ -1,14 +1,20 @@
 import type { ColorPreset } from '@/theme/colors'
 
 export function updateColorScheme(colorScheme: ColorPreset) {
-  const flattenColors = (obj: Record<string, any>, prefix = ''): Record<string, string> => {
-    return Object.entries(obj).reduce((acc, [key, value]) => {
-      const newKey = prefix ? `${prefix}-${key}` : key
-      if (typeof value === 'object' && value !== null) {
-        return { ...acc, ...flattenColors(value, newKey) }
-      }
-      return { ...acc, [newKey]: value }
-    }, {} as Record<string, string>)
+  const flattenColors = (
+    obj: Record<string, any>,
+    prefix = '',
+  ): Record<string, string> => {
+    return Object.entries(obj).reduce(
+      (acc, [key, value]) => {
+        const newKey = prefix ? `${prefix}-${key}` : key
+        if (typeof value === 'object' && value !== null) {
+          return { ...acc, ...flattenColors(value, newKey) }
+        }
+        return { ...acc, [newKey]: value }
+      },
+      {} as Record<string, string>,
+    )
   }
 
   const flattenedColors = flattenColors(colorScheme)
@@ -114,4 +120,4 @@ export function convertThemeSettingsToPreset(settings: any): ColorPreset {
       '900': settings.error900,
     },
   }
-} 
+}

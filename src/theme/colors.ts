@@ -8,7 +8,7 @@ export const lightColorsPreset = {
     600: '#0967D2',
     700: '#0552B5',
     800: '#03449E',
-    900: '#01337D'
+    900: '#01337D',
   },
   secondary: {
     100: '#F0F9FF',
@@ -19,7 +19,7 @@ export const lightColorsPreset = {
     600: '#0EA5E9',
     700: '#0284C7',
     800: '#0369A1',
-    900: '#075985'
+    900: '#075985',
   },
   tertiary: {
     100: '#FDF4FF',
@@ -30,7 +30,7 @@ export const lightColorsPreset = {
     600: '#D946EF',
     700: '#C026D3',
     800: '#A21CAF',
-    900: '#86198F'
+    900: '#86198F',
   },
   neutral: {
     100: '#F8FAFC',
@@ -41,13 +41,13 @@ export const lightColorsPreset = {
     600: '#64748B',
     700: '#475569',
     800: '#334155',
-    900: '#1E293B'
+    900: '#1E293B',
   },
   background: {
     100: '#FFFFFF',
     200: '#F8FAFC',
     300: '#F1F5F9',
-    400: '#E2E8F0'
+    400: '#E2E8F0',
   },
   success: {
     100: '#F0FDF4',
@@ -58,7 +58,7 @@ export const lightColorsPreset = {
     600: '#22C55E',
     700: '#16A34A',
     800: '#15803D',
-    900: '#166534'
+    900: '#166534',
   },
   warning: {
     100: '#FFFBEB',
@@ -69,7 +69,7 @@ export const lightColorsPreset = {
     600: '#F59E0B',
     700: '#D97706',
     800: '#B45309',
-    900: '#92400E'
+    900: '#92400E',
   },
   error: {
     100: '#FEF2F2',
@@ -80,8 +80,8 @@ export const lightColorsPreset = {
     600: '#EF4444',
     700: '#DC2626',
     800: '#B91C1C',
-    900: '#991B1B'
-  }
+    900: '#991B1B',
+  },
 }
 
 export const darkColorsPreset = {
@@ -94,7 +94,7 @@ export const darkColorsPreset = {
     600: '#38BDF8',
     700: '#7DD3FC',
     800: '#BAE6FD',
-    900: '#E0F2FE'
+    900: '#E0F2FE',
   },
   secondary: {
     100: '#0F172A',
@@ -105,7 +105,7 @@ export const darkColorsPreset = {
     600: '#94A3B8',
     700: '#CBD5E1',
     800: '#E2E8F0',
-    900: '#F1F5F9'
+    900: '#F1F5F9',
   },
   tertiary: {
     100: '#581C87',
@@ -116,7 +116,7 @@ export const darkColorsPreset = {
     600: '#C084FC',
     700: '#D8B4FE',
     800: '#E9D5FF',
-    900: '#F3E8FF'
+    900: '#F3E8FF',
   },
   neutral: {
     100: '#0F172A',
@@ -127,13 +127,13 @@ export const darkColorsPreset = {
     600: '#94A3B8',
     700: '#CBD5E1',
     800: '#E2E8F0',
-    900: '#F1F5F9'
+    900: '#F1F5F9',
   },
   background: {
     100: '#0F172A',
     200: '#1E293B',
     300: '#334155',
-    400: '#475569'
+    400: '#475569',
   },
   success: {
     100: '#052E16',
@@ -144,7 +144,7 @@ export const darkColorsPreset = {
     600: '#059669',
     700: '#10B981',
     800: '#34D399',
-    900: '#6EE7B7'
+    900: '#6EE7B7',
   },
   warning: {
     100: '#451A03',
@@ -155,7 +155,7 @@ export const darkColorsPreset = {
     600: '#FB923C',
     700: '#FED7AA',
     800: '#FFEDD5',
-    900: '#FFFBEB'
+    900: '#FFFBEB',
   },
   error: {
     100: '#450A0A',
@@ -166,8 +166,8 @@ export const darkColorsPreset = {
     600: '#EF4444',
     700: '#F87171',
     800: '#FCA5A5',
-    900: '#FEE2E2'
-  }
+    900: '#FEE2E2',
+  },
 }
 
 export const defaultPreset = lightColorsPreset
@@ -183,7 +183,7 @@ const colors = {
     600: `var(--color-primary-600, ${defaultPreset.primary[600]})`,
     700: `var(--color-primary-700, ${defaultPreset.primary[700]})`,
     800: `var(--color-primary-800, ${defaultPreset.primary[800]})`,
-    900: `var(--color-primary-900, ${defaultPreset.primary[900]})`
+    900: `var(--color-primary-900, ${defaultPreset.primary[900]})`,
   },
   secondary: {
     100: `var(--color-secondary-100, ${defaultPreset.secondary[100]})`,
@@ -194,7 +194,7 @@ const colors = {
     600: `var(--color-secondary-600, ${defaultPreset.secondary[600]})`,
     700: `var(--color-secondary-700, ${defaultPreset.secondary[700]})`,
     800: `var(--color-secondary-800, ${defaultPreset.secondary[800]})`,
-    900: `var(--color-secondary-900, ${defaultPreset.secondary[900]})`
+    900: `var(--color-secondary-900, ${defaultPreset.secondary[900]})`,
   },
   tertiary: {
     100: `var(--color-tertiary-100, ${defaultPreset.tertiary[100]})`,
@@ -205,7 +205,7 @@ const colors = {
     600: `var(--color-tertiary-600, ${defaultPreset.tertiary[600]})`,
     700: `var(--color-tertiary-700, ${defaultPreset.tertiary[700]})`,
     800: `var(--color-tertiary-800, ${defaultPreset.tertiary[800]})`,
-    900: `var(--color-tertiary-900, ${defaultPreset.tertiary[900]})`
+    900: `var(--color-tertiary-900, ${defaultPreset.tertiary[900]})`,
   },
   neutral: {
     100: `var(--color-neutral-100, ${defaultPreset.neutral[100]})`,
@@ -216,13 +216,13 @@ const colors = {
     600: `var(--color-neutral-600, ${defaultPreset.neutral[600]})`,
     700: `var(--color-neutral-700, ${defaultPreset.neutral[700]})`,
     800: `var(--color-neutral-800, ${defaultPreset.neutral[800]})`,
-    900: `var(--color-neutral-900, ${defaultPreset.neutral[900]})`
+    900: `var(--color-neutral-900, ${defaultPreset.neutral[900]})`,
   },
   background: {
     100: `var(--color-background-100, ${defaultPreset.background[100]})`,
     200: `var(--color-background-200, ${defaultPreset.background[200]})`,
     300: `var(--color-background-300, ${defaultPreset.background[300]})`,
-    400: `var(--color-background-400, ${defaultPreset.background[400]})`
+    400: `var(--color-background-400, ${defaultPreset.background[400]})`,
   },
   success: {
     100: `var(--color-success-100, ${defaultPreset.success[100]})`,
@@ -233,7 +233,7 @@ const colors = {
     600: `var(--color-success-600, ${defaultPreset.success[600]})`,
     700: `var(--color-success-700, ${defaultPreset.success[700]})`,
     800: `var(--color-success-800, ${defaultPreset.success[800]})`,
-    900: `var(--color-success-900, ${defaultPreset.success[900]})`
+    900: `var(--color-success-900, ${defaultPreset.success[900]})`,
   },
   warning: {
     100: `var(--color-warning-100, ${defaultPreset.warning[100]})`,
@@ -244,7 +244,7 @@ const colors = {
     600: `var(--color-warning-600, ${defaultPreset.warning[600]})`,
     700: `var(--color-warning-700, ${defaultPreset.warning[700]})`,
     800: `var(--color-warning-800, ${defaultPreset.warning[800]})`,
-    900: `var(--color-warning-900, ${defaultPreset.warning[900]})`
+    900: `var(--color-warning-900, ${defaultPreset.warning[900]})`,
   },
   error: {
     100: `var(--color-error-100, ${defaultPreset.error[100]})`,
@@ -255,22 +255,22 @@ const colors = {
     600: `var(--color-error-600, ${defaultPreset.error[600]})`,
     700: `var(--color-error-700, ${defaultPreset.error[700]})`,
     800: `var(--color-error-800, ${defaultPreset.error[800]})`,
-    900: `var(--color-error-900, ${defaultPreset.error[900]})`
-  }
+    900: `var(--color-error-900, ${defaultPreset.error[900]})`,
+  },
 }
 
-export const getHtmlStyleColors = (colorSchema: ColorPreset) =>  {
+export const getHtmlStyleColors = (colorSchema: ColorPreset) => {
   return Object.entries(colorSchema).reduce((acc, [colorName, value]) => {
     return {
       ...acc,
       ...Object.entries(value).reduce((acc, [shade, value]) => {
         return {
           ...acc,
-          [`--color-${colorName}-${shade}`]: value
+          [`--color-${colorName}-${shade}`]: value,
         }
-      }, {})
+      }, {}),
     }
   }, {})
 }
 
-export default colors 
+export default colors
