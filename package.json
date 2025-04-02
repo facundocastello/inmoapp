@@ -20,17 +20,22 @@
     "db:reset:tenant": "prisma db push --force-reset --schema=./prisma/tenant-schema.prisma && yarn db:seed:tenant",
     "db:setup": "yarn db:push && yarn db:push:tenant && yarn db:seed && yarn db:seed:tenant",
     "db:studio": "prisma studio & prisma studio --schema=./prisma/tenant-schema.prisma --port=5556",
-    "initialize": "(yarn generate & yarn generate:tenant) && (yarn db:reset & yarn db:reset:tenant) && (yarn db:seed & yarn db:seed:tenant)",
+    "prisma-initialize": "(yarn generate & yarn generate:tenant) && (yarn db:reset & yarn db:reset:tenant) && (yarn db:seed & yarn db:seed:tenant)",
     "type-check": "tsc --pretty --noEmit"
   },
   "dependencies": {
     "@prisma/client": "^6.5.0",
     "@types/bcryptjs": "^3.0.0",
     "bcryptjs": "^3.0.2",
+    "clsx": "^2.1.1",
+    "jwt-decode": "^4.0.0",
     "next": "15.2.4",
+    "next-auth": "^4.24.11",
     "prisma": "^6.5.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "react-hook-form": "^7.55.0",
+    "tailwind-merge": "^3.1.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

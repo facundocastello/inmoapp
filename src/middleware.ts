@@ -16,11 +16,6 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
-  // Handle super admin routes
-  if (pathname.startsWith('/admin')) {
-    return NextResponse.next()
-  }
-
   // Extract tenant identifier from subdomain or path
   let tenantId: string | null = null
 

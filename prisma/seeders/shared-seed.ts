@@ -29,7 +29,7 @@ async function main() {
           secondary: '#47A3F3',
           accent: '#7CC4FA',
         },
-        databaseName: 'tenant_test',
+        databaseName: 'test',
       },
     })
 

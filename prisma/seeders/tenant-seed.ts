@@ -15,11 +15,12 @@ const getTenantPrismaClient = (tenantSubdomain: string) => {
   return tenantPrismaClient
 }
 
-const defaultDb = 'multi_tenant_template'
+const defaultDb = 'test'
 
 async function main() {
   // Create an admin user
   const adminPassword = await hash('AdminSecure123!', 12)
+
   const prismaClient = getTenantPrismaClient(defaultDb)
   const admin = await prismaClient.user.upsert({
     where: {

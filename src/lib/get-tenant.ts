@@ -5,4 +5,4 @@ export async function getTenantId(): Promise<string | null> {
   const tenantId = headersList.get('x-tenant-id')
 
   return tenantId || null
-} 
+}

@@ -5,7 +5,6 @@ import { Geist, Geist_Mono } from 'next/font/google'
 
 import { getTenantColorSchema } from '@/lib/actions/tenant'
 import { getHtmlStyleColors } from '@/theme/colors'
-
 const geistSans = Geist({
   variable: '--font-geist-sans',
   subsets: ['latin'],
