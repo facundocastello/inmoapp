@@ -1,18 +1,18 @@
-import { hash } from 'bcryptjs';
+import { hash } from 'bcryptjs'
 
-import { PrismaClient } from "../../.prisma/shared/index.js";
+import { PrismaClient } from '../../.prisma/shared/index.js'
 
-let prismaClient: PrismaClient; 
+let prismaClient: PrismaClient
 
 const getPrismaClient = () => {
   if (!prismaClient) {
-    prismaClient = new PrismaClient();
+    prismaClient = new PrismaClient()
   }
-  return prismaClient;
-};
+  return prismaClient
+}
 
 async function main() {
-  const prisma = getPrismaClient();
+  const prisma = getPrismaClient()
   try {
     // Create a test tenant
     const tenant = await prisma.tenant.upsert({
@@ -31,10 +31,10 @@ async function main() {
         },
         databaseName: 'tenant_test',
       },
-    });
+    })
 
     // Create a super admin for the test tenant
-    const hashedPassword = await hash('SuperSecure123!', 12);
+    const hashedPassword = await hash('SuperSecure123!', 12)
     await prisma.superAdmin.upsert({
       where: {
         email: 'superadmin@example.com',
@@ -46,10 +46,10 @@ async function main() {
         name: 'Super Admin',
         tenantId: tenant.id,
       },
-    });
+    })
 
     // Create a regular admin for the test tenant
-    const adminPassword = await hash('AdminSecure123!', 12);
+    const adminPassword = await hash('AdminSecure123!', 12)
     await prisma.admin.upsert({
       where: {
         email: 'admin@test.example.com',
@@ -61,18 +61,18 @@ async function main() {
         name: 'Test Admin',
         tenantId: tenant.id,
       },
-    });
+    })
 
-    console.log('Shared database seeded successfully!');
+    console.log('Shared database seeded successfully!')
   } catch (error) {
-    console.error('Error seeding shared database:', error);
-    throw error;
+    console.error('Error seeding shared database:', error)
+    throw error
   } finally {
-    await prisma.$disconnect();
+    await prisma.$disconnect()
   }
 }
 
 main().catch((error) => {
-  console.error(error);
-  process.exit(1);
-}); 
+  console.error(error)
+  process.exit(1)
+})
