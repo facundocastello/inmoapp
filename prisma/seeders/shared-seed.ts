@@ -62,8 +62,6 @@ async function main() {
         tenantId: tenant.id,
       },
     })
-
-    console.log('Shared database seeded successfully!')
   } catch (error) {
     console.error('Error seeding shared database:', error)
     throw error

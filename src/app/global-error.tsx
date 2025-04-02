@@ -1,0 +1,58 @@
+'use client'
+
+import { useEffect } from 'react'
+
+export default function GlobalError({
+  error,
+  reset,
+}: {
+  error: Error & { digest?: string }
+  reset: () => void
+}) {
+  useEffect(() => {
+    // Log the error to an error reporting service
+    console.error(error)
+  }, [error])
+
+  return (
+    <html>
+      <body>
+        <div className={styles.container}>
+          <div className={styles.content}>
+            <div className={styles.icon}>⚠️</div>
+            <h2 className={styles.title}>Oops! Something went wrong</h2>
+            <p className={styles.message}>
+              {error.message || 'An unexpected error occurred'}
+            </p>
+            <div className={styles.actions}>
+              <button onClick={() => reset()} className={styles.button}>
+                Try again
+              </button>
+              <button
+                onClick={() => (window.location.href = '/')}
+                className={styles.secondaryButton}
+              >
+                Go to homepage
+              </button>
+            </div>
+          </div>
+        </div>
+      </body>
+    </html>
+  )
+}
+
+const styles = {
+  container:
+    'flex min-h-screen items-center justify-center bg-gradient-to-b from-neutral-50 to-white p-4',
+  content:
+    'w-full max-w-md rounded-xl bg-white p-8 shadow-xl border border-neutral-100',
+  icon: 'text-4xl mb-4 text-center',
+  title: 'text-2xl font-bold text-neutral-900 text-center mb-2',
+  message: 'text-neutral-600 text-center mb-6',
+  actions: 'flex flex-col gap-3',
+  button:
+    'w-full rounded-lg bg-primary-500 px-4 py-3 text-white font-medium hover:bg-primary-600 transition-colors',
+  secondaryButton:
+    'w-full rounded-lg bg-neutral-100 px-4 py-3 text-neutral-700 font-medium hover:bg-neutral-200 transition-colors',
+}

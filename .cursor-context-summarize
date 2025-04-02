@@ -1,0 +1,28 @@
+Project Context:
+- All code lives in /src directory
+- Use Prisma for database operations (types from .prisma)
+- Classnames must be defined in a styles object (e.g. styles.button)
+- React hooks must be wrapped in curly braces (e.g. {useState})
+- Project Structure:
+  - /app: Next.js app router pages and layouts
+  - /components: Reusable UI components
+  - /lib: Core utilities and configurations
+  - /hooks: Custom React hooks
+  - /theme: Theme configuration and colors
+- Use 'use client' directive for client components
+- Use @/ imports for absolute paths
+- Use react-hook-form for form handling
+- Use next-auth for authentication
+- Use Tailwind CSS for styling
+- Multi-tenant architecture:
+  - Two Prisma schemas: tenant and shared
+  - Each schema has its own types in .prisma directory
+  - Import shared types: import { Type } from '.prisma/shared'
+  - Import tenant types: import { Type } from '.prisma/tenant-client'
+  - Tenant-specific routes under /app/(tenant)/[tenant]
+  - Admin routes under /app/(admin)
+- Core utilities:
+  - Use cn() from @/lib/utils for class merging
+  - Use auth() from @/lib/auth for authentication
+  - Use prisma from @/lib/prisma for database access
+  - Use getTenantPrismaClient for tenant-specific database operations 

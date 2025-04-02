@@ -82,8 +82,6 @@ async function main() {
       authorId: editor.id,
     },
   })
-
-  console.log('Tenant template database seeded successfully!')
 }
 
 main()

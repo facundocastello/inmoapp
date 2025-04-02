@@ -10,30 +10,25 @@ export default async function TenantLayout({
   params: { tenant: string }
 }) {
   const tenantParams = (await params).tenant
-  try {
-    const tenant = await prisma.tenant.findUnique({
-      where: {
-        subdomain: tenantParams,
-        isActive: true,
-      },
-    })
+  const tenant = await prisma.tenant.findUnique({
+    where: {
+      subdomain: tenantParams,
+      isActive: true,
+    },
+  })
 
-    if (!tenant) redirect('/')
+  if (!tenant) return notFound()
 
-    return (
-      <div className={styles.container}>
-        <header className={styles.header}>
-          <div className={styles.headerTitle}>
-            <h1 className={styles.headerTitleText}>{tenant.name}</h1>
-          </div>
-        </header>
-        <main>{children}</main>
-      </div>
-    )
-  } catch (error) {
-    console.error(`[TenantLayout] Error loading tenant: ${tenantParams}`, error)
-    return notFound()
-  }
+  return (
+    <div className={styles.container}>
+      <header className={styles.header}>
+        <div className={styles.headerTitle}>
+          <h1 className={styles.headerTitleText}>{tenant.name}</h1>
+        </div>
+      </header>
+      <main>{children}</main>
+    </div>
+  )
 }
 
 const styles = {

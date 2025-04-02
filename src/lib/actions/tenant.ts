@@ -3,7 +3,9 @@
 import { getTenantId } from '@/lib/get-tenant'
 import { darkColorsPreset } from '@/theme/colors'
 
-export async function getTenantColorSchema() {
+import { Tenant } from '.prisma/shared'
+
+export async function getTenantColorSchema(): Promise<Tenant['theme']> {
   const tenantId = await getTenantId()
   if (!tenantId) return darkColorsPreset
   return darkColorsPreset
