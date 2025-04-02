@@ -1,11 +1,10 @@
-import { getPrismaClient } from '@/lib/db/prisma'
+import { prisma } from '@/lib/prisma'
 
 export default async function TenantPage({
   params,
 }: {
   params: { tenant: string }
 }) {
-  const prisma = getPrismaClient()
   const tenantParams = (await params).tenant
   const tenant = await prisma.tenant.findUnique({
     where: {
@@ -13,7 +12,6 @@ export default async function TenantPage({
       isActive: true,
     },
   })
-  console.log({ tenant })
 
   return (
     <div className="space-y-4">

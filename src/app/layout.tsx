@@ -26,7 +26,7 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-  const colorSchema = await getTenantColorSchema('test')
+  const colorSchema = await getTenantColorSchema()
   const htmlStyleColors = getHtmlStyleColors(colorSchema)
   return (
     <html lang="en" style={htmlStyleColors as React.CSSProperties}>

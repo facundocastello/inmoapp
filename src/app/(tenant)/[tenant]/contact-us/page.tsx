@@ -1,11 +1,10 @@
-import { getPrismaClient } from '@/lib/db/prisma'
+import { prisma } from '@/lib/prisma'
 
 export default async function ContactPage({
   params,
 }: {
   params: { tenant: string }
 }) {
-  const prisma = getPrismaClient()
   const tenantParams = (await params).tenant
   const tenant = await prisma.tenant.findUnique({
     where: {

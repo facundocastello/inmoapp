@@ -1,6 +1,6 @@
 import { notFound, redirect } from 'next/navigation'
 
-import { getPrismaClient } from '@/lib/db/prisma'
+import { prisma } from '@/lib/prisma'
 
 export default async function TenantLayout({
   children,
@@ -9,8 +9,6 @@ export default async function TenantLayout({
   children: React.ReactNode
   params: { tenant: string }
 }) {
-  const prisma = getPrismaClient()
-
   try {
     const tenantParams = (await params).tenant
     const tenant = await prisma.tenant.findUnique({
@@ -21,10 +19,7 @@ export default async function TenantLayout({
     })
 
     if (!tenant) {
-      console.log(
-        `[TenantLayout] Tenant not found or inactive: ${params.tenant}`,
-      )
-      console.log(process.env)
+      console.log(`[TenantLayout] Tenant not found or inactive: ${params.tenant}`)
       redirect('/')
     }
 

@@ -45,7 +45,6 @@ export async function middleware(request: NextRequest) {
     const firstPathSegment = pathname.split('/')[1]
     if (firstPathSegment && firstPathSegment !== 'admin') {
       tenantId = firstPathSegment
-    } else {
     }
   }
 
@@ -66,7 +65,11 @@ export async function middleware(request: NextRequest) {
     newUrl.pathname = `/${tenantId}${newUrl.pathname}`
   }
 
-  return NextResponse.rewrite(newUrl)
+  // Create response with tenant information
+  const response = NextResponse.rewrite(newUrl)
+  response.headers.set('x-tenant-id', tenantId)
+
+  return response
 }
 
 export const config = {
