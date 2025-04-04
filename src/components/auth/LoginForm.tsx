@@ -20,7 +20,7 @@ export function LoginForm() {
   const [error, setError] = useState<string | null>(null)
   const form = useForm<LoginFormValues>({
     defaultValues: {
-      email: tenantId ? 'admin@tenantId.example.com' : 'superadmin@example.com',
+      email: tenantId ? 'admin@tenant.example.com' : 'superadmin@example.com',
       password: tenantId ? 'AdminSecure123!' : 'SuperSecure123!',
     },
   })
@@ -89,7 +89,8 @@ export function LoginForm() {
 
 const styles = {
   form: 'w-full min-h-screen flex items-center justify-center bg-gray-50',
-  formContainer: 'w-full max-w-md p-8 space-y-6 bg-white rounded-xl shadow-lg',
+  formContainer:
+    'w-full max-w-md p-8 space-y-6 bg-primary-100 rounded-xl shadow-lg',
   title: 'text-2xl font-bold text-center text-gray-900',
   subtitle: 'text-sm text-center text-gray-600 mb-8',
   inputGroup: 'space-y-4',

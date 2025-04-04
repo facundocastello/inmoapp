@@ -48,6 +48,7 @@ export const authOptions: NextAuthOptions = {
             credentials.password,
             user.password,
           )
+
           if (!isPasswordValid) throw new Error('Invalid password')
 
           return {
@@ -83,8 +84,8 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async session({ session }) {
-      return session
+    async session({ session, token }) {
+      return { ...session, user: token.user }
     },
     async jwt({ token, user }) {
       if (user) token.user = user as unknown as User

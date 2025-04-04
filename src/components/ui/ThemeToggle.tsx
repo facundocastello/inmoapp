@@ -52,6 +52,6 @@ export function ThemeToggle() {
 
 const styles = {
   button:
-    'flex items-center justify-center rounded-md p-2 transition-colors hover:bg-neutral-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-background-100',
-  icon: 'h-5 w-5 text-neutral-600',
+    'flex items-center justify-center rounded-md p-2 transition-colors hover:bg-primary-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-background-100',
+  icon: 'h-5 w-5 text-primary-900',
 }

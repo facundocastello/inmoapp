@@ -5,5 +5,5 @@ export default function SuperAdminLayout({
 }: {
   children: React.ReactNode
 }) {
-  return <ProtectedSection>{children}</ProtectedSection>
+  return <ProtectedSection shouldBeAdmin>{children}</ProtectedSection>
 }

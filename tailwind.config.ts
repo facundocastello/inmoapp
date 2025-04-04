@@ -1,5 +1,6 @@
-import colors from './src/theme/colors'
 import type { Config } from 'tailwindcss'
+
+import colors from './src/theme/colors'
 
 const config: Config = {
   content: [
@@ -16,4 +17,4 @@ const config: Config = {
   plugins: [],
 }
 
-export default config 
+export default config

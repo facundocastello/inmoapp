@@ -1,14 +1,14 @@
 export const lightColorsPreset = {
   primary: {
-    100: '#E6F6FF',
-    200: '#BAE3FF',
-    300: '#7CC4FA',
-    400: '#47A3F3',
-    500: '#2186EB',
-    600: '#0967D2',
-    700: '#0552B5',
-    800: '#03449E',
-    900: '#01337D',
+    900: '#000000', // Very light background
+    800: '#111111',
+    700: '#222222', // Light interactive elements
+    600: '#333333', // Secondary buttons
+    500: '#D8B4A0', // Primary buttons
+    400: '#C4A08C', // Button hover
+    300: '#B08C78', // Button active
+    200: '#EFF1F3', // Darker text
+    100: '#EFF1F3', // Main text
   },
   secondary: {
     100: '#F0F9FF',
@@ -86,15 +86,15 @@ export const lightColorsPreset = {
 
 export const darkColorsPreset = {
   primary: {
-    100: '#0C4A6E',
-    200: '#075985',
-    300: '#0369A1',
-    400: '#0284C7',
-    500: '#0EA5E9',
-    600: '#38BDF8',
-    700: '#7DD3FC',
-    800: '#BAE6FD',
-    900: '#E0F2FE',
+    100: '#0F172A', // Darkest background
+    200: '#1E293B', // Slightly lighter
+    300: '#334155', // Medium dark
+    400: '#3B82F6', // Primary buttons
+    500: '#2563EB', // Button hover
+    600: '#1D4ED8', // Button active
+    700: '#E2E8F0', // Lighter text
+    800: '#F1F5F9', // Main text
+    900: '#F8FAFC', // Main text
   },
   secondary: {
     100: '#0F172A',
@@ -170,8 +170,8 @@ export const darkColorsPreset = {
   },
 }
 
-export const defaultPreset = lightColorsPreset
-export type ColorPreset = typeof defaultPreset
+export const defaultPreset = darkColorsPreset
+export type ColorPreset = typeof darkColorsPreset
 
 const colors = {
   primary: {

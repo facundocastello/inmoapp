@@ -16,17 +16,19 @@ datasource db {
 
 // Tenant model to store information about each tenant
 model Tenant {
-  id           String      @id @default(cuid())
-  name         String
-  subdomain    String      @unique
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
-  isActive     Boolean     @default(true)
-  theme        Json? // Stores tenant-specific theme settings
-  databaseName String      @unique // Name of the tenant's database
+  id            String         @id @default(cuid())
+  name          String
+  subdomain     String         @unique
+  description   String?
+  logo          String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  isActive      Boolean        @default(true)
+  theme         Json? // Stores tenant-specific theme settings
+  databaseName  String         @unique // Name of the tenant's database
   themeSettings ThemeSettings?
-  superAdmin   SuperAdmin?
-  admins       Admin[]
+  superAdmin    SuperAdmin?
+  admins        Admin[]
 }
 
 // Super Admin model for system-wide administration
@@ -52,7 +54,6 @@ model Admin {
   tenant    Tenant   @relation(fields: [tenantId], references: [id])
   tenantId  String
 }
-
 
 // Theme settings for tenant-specific color schemes
 model ThemeSettings {

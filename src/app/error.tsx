@@ -3,6 +3,8 @@
 import Link from 'next/link'
 import { useEffect } from 'react'
 
+import { Button } from '@/components/ui/Button'
+
 export default function Error({
   error,
   reset,
@@ -24,9 +26,9 @@ export default function Error({
           {error.message || 'An unexpected error occurred'}
         </p>
         <div className={styles.actions}>
-          <button onClick={() => reset()} className={styles.button}>
+          <Button onClick={() => reset()} className={styles.button}>
             Try again
-          </button>
+          </Button>
           <Link href="/" className={styles.secondaryButton}>
             Go to homepage
           </Link>
@@ -39,13 +41,13 @@ export default function Error({
 const styles = {
   container: 'flex min-h-[400px] items-center justify-center p-4',
   content:
-    'w-full max-w-md rounded-xl bg-white p-8 shadow-xl border border-neutral-100',
+    'w-full max-w-md rounded-xl bg-primary-100 p-8 shadow-xl border border-primary-100',
   icon: 'text-4xl mb-4 text-center',
-  title: 'text-2xl font-bold text-neutral-900 text-center mb-2',
-  message: 'text-neutral-600 text-center mb-6',
+  title: 'text-2xl font-bold text-primary-900 text-center mb-2',
+  message: 'text-primary-900 text-center mb-6',
   actions: 'flex flex-col gap-3',
   button:
     'w-full rounded-lg bg-primary-500 px-4 py-3 text-white font-medium hover:bg-primary-600 transition-colors',
   secondaryButton:
-    'w-full rounded-lg bg-neutral-100 px-4 py-3 text-neutral-700 font-medium hover:bg-neutral-200 transition-colors text-center',
+    'w-full rounded-lg bg-primary-100 px-4 py-3 text-primary-700 font-medium hover:bg-primary-200 transition-colors text-center',
 }

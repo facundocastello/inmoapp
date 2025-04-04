@@ -23,3 +23,13 @@ export function auth(
 ) {
   return getServerSession(...args, authOptions)
 }
+
+export const getIsSuperAdmin = async () => {
+  const session = await auth()
+  return session?.user.role === 'super-admin'
+}
+
+export const getIsAdmin = async () => {
+  const session = await auth()
+  return session?.user.role === 'ADMIN'
+}

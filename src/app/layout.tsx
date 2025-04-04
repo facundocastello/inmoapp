@@ -4,7 +4,7 @@ import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 
 import { getTenantColorSchema } from '@/lib/actions/tenant'
-import { getHtmlStyleColors } from '@/theme/colors'
+import { ColorPreset, getHtmlStyleColors } from '@/theme/colors'
 const geistSans = Geist({
   variable: '--font-geist-sans',
   subsets: ['latin'],
@@ -26,7 +26,7 @@ export default async function RootLayout({
   children: React.ReactNode
 }) {
   const colorSchema = await getTenantColorSchema()
-  const htmlStyleColors = getHtmlStyleColors(colorSchema)
+  const htmlStyleColors = getHtmlStyleColors(colorSchema as ColorPreset)
   return (
     <html lang="en" style={htmlStyleColors as React.CSSProperties}>
       <body
