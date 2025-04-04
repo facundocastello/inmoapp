@@ -12,8 +12,10 @@ export const Breadcrumb = () => {
       <ol className={styles.list}>
         <li className={styles.item}>
           <Link href="/admin" className={styles.link}>
-            Home
+            <span className={styles.icon}>🏠</span>
+            <span>Home</span>
           </Link>
+          <span className={styles.separator}>/</span>
         </li>
         {paths.map((path, index) => {
           const href = `/${paths.slice(0, index + 1).join('/')}`
@@ -28,9 +30,12 @@ export const Breadcrumb = () => {
               {isLast ? (
                 <span className={styles.current}>{label}</span>
               ) : (
-                <Link href={href} className={styles.link}>
-                  {label}
-                </Link>
+                <>
+                  <Link href={href} className={styles.link}>
+                    {label}
+                  </Link>
+                  <span className={styles.separator}>/</span>
+                </>
               )}
             </li>
           )
@@ -41,9 +46,15 @@ export const Breadcrumb = () => {
 }
 
 const styles = {
-  breadcrumb: 'flex',
-  list: 'flex items-center space-x-2',
+  breadcrumb: 'flex py-4',
+  list: 'flex items-center space-x-2 text-sm',
   item: 'flex items-center',
-  link: 'text-sm font-medium text-primary-900 hover:text-primary-900',
-  current: 'text-sm font-medium text-primary-900',
+  link: `
+    flex items-center space-x-1
+    text-primary-600 hover:text-primary-900
+    transition-colors duration-200
+  `,
+  current: 'text-primary-900 font-medium',
+  separator: 'mx-2 text-primary-400',
+  icon: 'text-base',
 }

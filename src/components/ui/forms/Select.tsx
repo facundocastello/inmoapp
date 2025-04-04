@@ -1,42 +1,40 @@
 'use client'
 
-import { HTMLAttributes } from 'react'
 import { useFormContext } from 'react-hook-form'
 
 import { cn } from '@/lib/utils'
 
-interface InputProps extends HTMLAttributes<HTMLInputElement> {
-  className?: string
+interface SelectOption {
+  value: string
+  label: string
+}
+
+interface SelectProps {
   name: string
   label: string
-  type?: 'text' | 'email' | 'password'
+  options: SelectOption[]
   error?: string
 }
 
-export const Input = ({
-  className,
-  name,
-  label,
-  type = 'text',
-  error,
-  ...props
-}: InputProps) => {
+export const Select = ({ name, label, options, error }: SelectProps) => {
   const { register } = useFormContext()
 
   return (
     <div className={styles.container}>
-      {label && (
-        <label htmlFor={name} className={styles.label}>
-          {label}
-        </label>
-      )}
-      <input
+      <label htmlFor={name} className={styles.label}>
+        {label}
+      </label>
+      <select
         id={name}
-        type={type}
-        className={cn(styles.input, error && styles.error, className)}
+        className={cn(styles.select, error && styles.error)}
         {...register(name)}
-        {...props}
-      />
+      >
+        {options.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
       {error && <p className={styles.errorMessage}>{error}</p>}
     </div>
   )
@@ -45,7 +43,7 @@ export const Input = ({
 const styles = {
   container: 'space-y-2',
   label: 'block text-sm font-medium text-primary-900',
-  input: `
+  select: `
     block w-full rounded-md border border-primary-300
     bg-primary-100 px-3 py-2 text-primary-900
     focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500

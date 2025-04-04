@@ -5,335 +5,69 @@ ITS SUPER IMPORTANT TO ALWAYS FOLLOW LINEMENTS ON .cursor-context. (inline style
 ## Project Status
 
 - Current Phase: Foundation
-- Last Updated: March 31, 2024
-- Next Milestone: Component Foundation
-- Current Focus: UI Components and Tenant Management
+- Last Updated: April 4, 2024
+- Next Milestone: Tenant Signup System
+- Current Focus: Tenant Onboarding and Subscription Management
 
 ## Completed Features
 
-### Documentation & Planning
-
-- Project initialization and structure planning
-- Database architecture design with multi-tenant approach
-- UI/UX guidelines and component architecture
-- Subdomain routing strategy
-- File storage strategy with Digital Ocean Spaces
-- Component wrapping strategy and best practices
-- Error handling and performance guidelines
-- Testing strategy and implementation plan
-
-### Development Environment
-
-- Project scaffolding with Next.js
-- Yarn package manager setup
-- Development environment configuration
-- TypeScript strict mode setup
-- ESLint and Prettier configuration
-- Git workflow setup
-
-### Database Setup
-
-- PostgreSQL configuration for multi-tenant architecture
-- Prisma setup with separate schema files for shared and tenant databases
-- Database schema design for shared and tenant databases
-- Environment variable integration for database configuration
-- Database seeding scripts and procedures
-- Database cleanup and setup scripts
-- Tenant database management system
-- Database isolation per tenant
-- Tenant database creation and deletion procedures
-
-### UI Foundation
-
-- Color System Implementation
-  - Default color presets with light/dark variants
-  - CSS variable system with fallbacks
-  - Tailwind configuration with dynamic colors
-  - Tenant color customization support
-  - Color scheme persistence through server-side rendering
-  - Dark/Light mode support with system preference detection
-  - Color system test page
-  - Complete color palette implementation (primary, secondary, neutral, success, warning, error)
-  - Responsive design system
-  - Theme-aware components
-  - Tenant theme context provider
-
-### Tenant Management
-
-- Subdomain-based routing implementation
-- Tenant context provider setup
-- Tenant database isolation
-- Tenant theme customization
-- Tenant-specific content management
-- Tenant user management system
-- Tenant authentication system
-- Tenant middleware for routing
-- Tenant layout implementation
-- Tenant-specific pages (home, contact)
+### Core Infrastructure
+- Project initialization and structure
+- Database architecture with multi-tenant approach
+- Authentication system (Super-admin, Tenant admin, Public)
+- Development environment setup (Next.js, TypeScript, ESLint, Prettier)
+- Color system and theme implementation
+- Base UI components and layouts
+- Admin interfaces (Super Admin and Tenant Admin)
 
 ## In Progress
 
-### Component Foundation
-
-- [ ] Base UI Components
-  - [x] Theme toggle component
-  - [x] Next.js component wrappers (Image)
-  - [x] HTML element wrappers (Button, Input)
-  - [ ] Layout components (PageContainer, Section)
-  - [x] Form components (Input, Form)
-  - [ ] Feedback components (Toast, Modal, Alert)
-  - [ ] Component documentation
-  - [ ] Component testing setup
-  - [ ] Storybook integration
+### Tenant Signup System
+- [ ] Public Signup Flow
+  - [ ] Signup form with validation
+  - [ ] Tenant database provisioning
+  - [ ] Initial setup configuration
+  - [ ] Welcome email and onboarding
+- [ ] Subscription Management
+  - [ ] Subscription status tracking
+  - [ ] Cron job for subscription checks
+  - [ ] Tenant deactivation process
+  - [ ] Grace period handling
+- [ ] Payment Integration (Future)
+  - [ ] Payment gateway setup
+  - [ ] Subscription plans
+  - [ ] Billing management
 
 ### File Storage Setup
-
 - [ ] Digital Ocean Integration
   - [ ] Spaces configuration
   - [ ] File upload service
   - [ ] File retrieval service
   - [ ] Image optimization pipeline
   - [ ] Security and access control
-  - [ ] Error handling and retries
-  - [ ] Progress tracking for uploads
-  - [ ] File type validation
-
-### Schema Management
-
-- [ ] Schema validation process
-- [ ] Schema backup procedures
-
-### Tenant Management
-
-- [ ] Tenant creation flow
-  - [ ] Tenant registration form
-  - [ ] Database provisioning
-  - [ ] Initial setup wizard
-- [ ] Tenant configuration
-  - [ ] Theme customization interface
-  - [ ] Branding settings
-  - [ ] Domain configuration
-- [ ] Tenant monitoring
-  - [ ] Usage statistics
-  - [ ] Performance metrics
-  - [ ] Resource utilization
 
 ## Upcoming Tasks
 
-### Phase 1: Foundation
-
-- [x] Authentication system
-
-  - [x] Super-admin authentication
-  - [x] Tenant admin authentication
-  - [x] Public access control
-
-- [ ] Tenant Management
-  - [ ] Tenant creation flow
-  - [ ] Tenant database generation
-  - [ ] Tenant configuration
-  - [ ] Tenant theme customization
-
 ### Phase 2: Core Features
-
-- [ ] Super-admin Panel
-
-  - [ ] Tenant management interface
-  - [ ] System monitoring
-  - [ ] User management
-
-- [ ] Admin Panel
-
-  - [ ] Tenant-specific settings
-  - [ ] User management
-  - [ ] Content management
-  - [ ] Theme customization interface
-
 - [ ] Public Interface
   - [ ] Tenant-specific content display
   - [ ] Public access controls
   - [ ] Content customization
+  - [ ] Tenant signup process
 
 ### Phase 3: Enhancement
-
 - [ ] Performance optimization
 - [ ] Security hardening
 - [ ] Monitoring and logging
 - [ ] Backup and recovery systems
 
 ## Technical Debt
-
 - None yet
 
 ## Recent Decisions
-
-- Using subdomain-based routing for tenant isolation
-- Implementing tenant context for state management
-- Super-admin has full tenant management capabilities
-- Yarn as the package manager for dependency management
-- Color system using CSS variables with fallbacks
-- Theme system supporting both light and dark modes per tenant
-- Component wrapping strategy for better maintainability
+- Subdomain-based routing for tenant isolation
+- Component-based architecture with clear separation
+- TypeScript strict mode and modern tooling
+- Flexible tenant signup system with future payment integration
+- Cron-based subscription management for tenant activation/deactivation
 - Digital Ocean Spaces for file storage
-- Next.js Image component for optimized image handling
-- Using Prisma db push for rapid database schema changes during development
-- Environment variable management for database connection configuration
-- Seeding strategy for shared and tenant databases
-- Tenant database isolation for better security and performance
-- Middleware-based tenant routing for flexible deployment options
-
-### Component Structure
-
-```typescript
-// components/ui/Image.tsx
-import NextImage from 'next/image'
-import { useState } from 'react'
-
-interface ImageProps extends React.ComponentProps<typeof NextImage> {
-  fallback?: string
-  loading?: 'lazy' | 'eager'
-}
-
-export const Image = ({
-  fallback = '/images/placeholder.png',
-  loading = 'lazy',
-  ...props
-}: ImageProps) => {
-  const [error, setError] = useState(false)
-
-  return (
-    <NextImage
-      {...props}
-      loading={loading}
-      onError={() => setError(true)}
-      src={error ? fallback : props.src}
-      blurDataURL={props.blurDataURL || props.src}
-      placeholder="blur"
-    />
-  )
-}
-
-// Styles defined as a single-level object at the bottom
-const styles = {
-  image: "object-cover",
-  placeholder: "bg-neutral-200"
-}
-```
-
-### File Storage Implementation
-
-```typescript
-// services/storage/types.ts
-export interface StorageConfig {
-  region: string
-  bucket: string
-  endpoint: string
-  accessKey: string
-  secretKey: string
-}
-
-export interface UploadOptions {
-  contentType?: string
-  cacheControl?: string
-  metadata?: Record<string, string>
-}
-
-export interface StorageService {
-  uploadFile(
-    file: File,
-    path: string,
-    options?: UploadOptions,
-  ): Promise<{ url: string; key: string }>
-
-  getFileUrl(path: string, expiresIn?: number): string
-
-  deleteFile(path: string): Promise<void>
-
-  listFiles(prefix?: string): Promise<string[]>
-}
-
-// services/storage/digital-ocean.ts
-import {
-  S3Client,
-  PutObjectCommand,
-  GetObjectCommand,
-  DeleteObjectCommand,
-  ListObjectsV2Command,
-} from '@aws-sdk/client-s3'
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
-import { StorageService, StorageConfig, UploadOptions } from './types'
-
-export class DigitalOceanStorage implements StorageService {
-  private client: S3Client
-  private bucket: string
-
-  constructor(config: StorageConfig) {
-    this.client = new S3Client({
-      region: config.region,
-      endpoint: config.endpoint,
-      credentials: {
-        accessKeyId: config.accessKey,
-        secretAccessKey: config.secretKey,
-      },
-    })
-    this.bucket = config.bucket
-  }
-
-  async uploadFile(
-    file: File,
-    path: string,
-    options?: UploadOptions,
-  ): Promise<{ url: string; key: string }> {
-    const command = new PutObjectCommand({
-      Bucket: this.bucket,
-      Key: path,
-      Body: file,
-      ContentType: options?.contentType || file.type,
-      CacheControl: options?.cacheControl,
-      Metadata: options?.metadata,
-    })
-
-    await this.client.send(command)
-    return {
-      url: this.getFileUrl(path),
-      key: path,
-    }
-  }
-
-  getFileUrl(path: string, expiresIn = 3600): string {
-    const command = new GetObjectCommand({
-      Bucket: this.bucket,
-      Key: path,
-    })
-
-    return getSignedUrl(this.client, command, { expiresIn })
-  }
-
-  async deleteFile(path: string): Promise<void> {
-    const command = new DeleteObjectCommand({
-      Bucket: this.bucket,
-      Key: path,
-    })
-
-    await this.client.send(command)
-  }
-
-  async listFiles(prefix?: string): Promise<string[]> {
-    const command = new ListObjectsV2Command({
-      Bucket: this.bucket,
-      Prefix: prefix,
-    })
-
-    const response = await this.client.send(command)
-    return response.Contents?.map((item) => item.Key || '') || []
-  }
-}
-```
-
-### Implementation Plan
-
-1. Create base color presets
-2. Set up CSS variable system
-3. Configure Tailwind with dynamic colors
-4. Create tenant theme customization interface
-5. Implement theme persistence
