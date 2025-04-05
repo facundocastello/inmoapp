@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 
+import { setThemeMode, updateColorScheme } from '@/lib/utils/theme'
 import type { ColorPreset } from '@/theme/colors'
 import { darkColorsPreset, lightColorsPreset } from '@/theme/colors'
-import { setThemeMode, updateColorScheme } from '@/utils/theme'
 
 export interface UseThemeReturn {
   isDark: boolean

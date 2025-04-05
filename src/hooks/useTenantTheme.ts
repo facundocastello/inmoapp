@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 
-import { convertThemeSettingsToPreset } from '@/utils/theme'
+import { convertThemeSettingsToPreset } from '@/lib/utils/theme'
 
 import { useTheme } from './useTheme'
 import { ThemeSettings } from '.prisma/shared'

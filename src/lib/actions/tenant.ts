@@ -84,7 +84,9 @@ export async function getTenant(id: string) {
 export async function createTenant(data: TenantFormData) {
   try {
     const parsedLogo =
-      data.logo instanceof File ? await uploadFile(data.logo) : data.logo
+      data.logo instanceof File
+        ? await uploadFile(data.logo, { shouldOptimize: true })
+        : data.logo
 
     const tenant = await prisma.tenant.create({
       data: {
@@ -116,7 +118,9 @@ export async function createTenant(data: TenantFormData) {
 export async function updateTenant(id: string, data: TenantFormData) {
   try {
     const parsedLogo =
-      data.logo instanceof File ? await uploadFile(data.logo) : data.logo
+      data.logo instanceof File
+        ? await uploadFile(data.logo, { shouldOptimize: true })
+        : data.logo
 
     const tenant = await prisma.tenant.update({
       where: { id },

@@ -17,9 +17,7 @@ export const Image = ({ fileKey, className, ...props }: ImageProps) => {
 
   useEffect(() => {
     if (fileKey) {
-      cachedGetSignedFileUrl(fileKey)
-        .then(setSrc)
-        .finally(() => setIsLoading(true))
+      cachedGetSignedFileUrl(fileKey).then(setSrc)
     }
   }, [fileKey])
 

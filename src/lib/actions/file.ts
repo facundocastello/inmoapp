@@ -8,6 +8,8 @@ import {
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { unstable_cache } from 'next/cache'
 
+import { type ImageOptimizationOptions, optimizeImage } from '@/lib/utils/image'
+
 const s3Client = new S3Client({
   region: 'us-east-1', // Digital Ocean Spaces uses this region
   endpoint: `https://${process.env.STORAGE_ENDPOINT}`,
@@ -20,22 +22,37 @@ const s3Client = new S3Client({
 
 export type FileKey = string
 
-export async function uploadFile(file: File): Promise<FileKey> {
-  const key = `${Date.now()}-${file.name}`
+export type UploadOptions = {
+  shouldOptimize?: boolean
+  optimizationOptions?: ImageOptimizationOptions
+}
+
+export async function uploadFile(
+  file: File,
+  options: UploadOptions = {},
+): Promise<FileKey> {
+  let fileToUpload = file
+
+  // Optimize image if requested
+  if (options.shouldOptimize && file.type.startsWith('image/')) {
+    fileToUpload = await optimizeImage(file, options.optimizationOptions)
+  }
+
+  const key = `${Date.now()}-${fileToUpload.name}`
 
   const command = new PutObjectCommand({
     Bucket: process.env.STORAGE_BUCKET!,
     Key: key,
-    ContentType: file.type,
+    ContentType: fileToUpload.type,
   })
 
   const signedUrl = await getSignedUrl(s3Client, command, { expiresIn: 3600 })
 
   await fetch(signedUrl, {
     method: 'PUT',
-    body: file,
+    body: fileToUpload,
     headers: {
-      'Content-Type': file.type,
+      'Content-Type': fileToUpload.type,
     },
   })
 
