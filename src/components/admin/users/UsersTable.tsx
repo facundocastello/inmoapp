@@ -8,7 +8,8 @@ import {
   TableHeader,
   TableHeaderCell,
   TableRow,
-} from '@/components/ui/table'
+} from '@/components/ui/table/Table'
+import { TableCellImage } from '@/components/ui/table/Table'
 import { deleteUser } from '@/lib/actions/user'
 import { TenantPrisma } from '@/lib/prisma/types/tenant'
 
@@ -27,6 +28,7 @@ export const UsersTable = ({ users }: UsersTableProps) => {
     <Table>
       <TableHeader>
         <TableRow>
+          <TableHeaderCell>Avatar</TableHeaderCell>
           <TableHeaderCell>Name</TableHeaderCell>
           <TableHeaderCell>Email</TableHeaderCell>
           <TableHeaderCell>Role</TableHeaderCell>
@@ -38,6 +40,7 @@ export const UsersTable = ({ users }: UsersTableProps) => {
       <TableBody>
         {users.map((user) => (
           <TableRow key={user.id}>
+            <TableCellImage fileKey={user.avatar as string} />
             <TableCell>{user.name}</TableCell>
             <TableCell>{user.email}</TableCell>
             <TableCell>

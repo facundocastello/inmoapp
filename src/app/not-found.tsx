@@ -1,6 +1,11 @@
+'use client'
 import Link from 'next/link'
 
 export default function NotFound() {
+  const handleGoBack = () => {
+    window.history.back()
+  }
+
   return (
     <div className={styles.container}>
       <div className={styles.content}>
@@ -10,6 +15,9 @@ export default function NotFound() {
           The page you're looking for doesn't exist or has been moved.
         </p>
         <div className={styles.actions}>
+          <button onClick={handleGoBack} className={styles.button}>
+            Go back
+          </button>
           <Link href="/" className={styles.button}>
             Go back home
           </Link>

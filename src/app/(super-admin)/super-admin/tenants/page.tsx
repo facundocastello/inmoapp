@@ -6,22 +6,23 @@ import { PageContainer } from '@/components/ui/layout/PageContainer'
 import { getTenants } from '@/lib/actions/tenant'
 
 interface TenantsPageProps {
-  searchParams: {
+  searchParams: Promise<{
     page?: string
     limit?: string
-  }
+  }>
 }
 
 export default async function TenantsPage({ searchParams }: TenantsPageProps) {
-  const page = Number(searchParams.page) || 1
-  const limit = Number(searchParams.limit) || 10
+  const awaitedParams = await searchParams
+  const page = Number(awaitedParams.page || 1)
+  const limit = Number(awaitedParams.limit || 10)
 
   const {
     data: tenants,
     total,
     totalPages,
   } = await getTenants({
-    page,
+    page: Number(page),
     limit,
   })
 

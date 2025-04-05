@@ -66,13 +66,7 @@ export function LoginForm() {
               type="password"
               name="password"
               placeholder="Password"
-              registerOptions={{
-                required: 'Password is required',
-                minLength: {
-                  value: 6,
-                  message: 'Password must be at least 6 characters',
-                },
-              }}
+              registerOptions={{}}
             />
           </div>
 

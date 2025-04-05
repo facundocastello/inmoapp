@@ -45,7 +45,7 @@ Button.displayName = 'Button'
 export { Button }
 
 const styles = {
-  base: 'inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 text-primary-900',
+  base: 'inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 text-primary-900 cursor-pointer',
   variants: {
     default: 'bg-primary-600 text-primary-900 hover:bg-primary-600/90',
     outline:

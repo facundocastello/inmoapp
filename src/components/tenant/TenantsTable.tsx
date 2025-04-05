@@ -5,10 +5,11 @@ import {
   Table,
   TableBody,
   TableCell,
+  TableCellImage,
   TableHeader,
   TableHeaderCell,
   TableRow,
-} from '@/components/ui/table'
+} from '@/components/ui/table/Table'
 import { deleteTenant, Tenants } from '@/lib/actions/tenant'
 
 interface TenantsTableProps {
@@ -20,6 +21,7 @@ export const TenantsTable = ({ tenants }: TenantsTableProps) => {
     <Table>
       <TableHeader>
         <TableRow>
+          <TableHeaderCell>Icon</TableHeaderCell>
           <TableHeaderCell>Name</TableHeaderCell>
           <TableHeaderCell>Subdomain</TableHeaderCell>
           <TableHeaderCell>Status</TableHeaderCell>
@@ -30,6 +32,7 @@ export const TenantsTable = ({ tenants }: TenantsTableProps) => {
       <TableBody>
         {tenants.map((tenant) => (
           <TableRow key={tenant.id}>
+            <TableCellImage fileKey={tenant.logo} />
             <TableCell>{tenant.name}</TableCell>
             <TableCell>{tenant.subdomain}</TableCell>
             <TableCell>

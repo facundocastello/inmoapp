@@ -7,31 +7,42 @@ import * as z from 'zod'
 
 import { Button } from '@/components/ui/Button'
 import { Checkbox } from '@/components/ui/forms/Checkbox'
+import { FileInput } from '@/components/ui/forms/FileInput'
 import { Input } from '@/components/ui/forms/Input'
 import { Textarea } from '@/components/ui/forms/Textarea'
-import {
-  createTenant,
-  type TenantFormData,
-  updateTenant,
-} from '@/lib/actions/tenant'
+import { createTenant, TenantTheme, updateTenant } from '@/lib/actions/tenant'
+
+import { Tenant } from '.prisma/shared'
 
 const tenantSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   subdomain: z.string().min(1, 'Subdomain is required'),
   description: z.string().optional().nullable(),
-  logo: z.string().optional().nullable(),
-  isActive: z.boolean(),
-  theme: z
-    .object({
-      primaryColor: z.string().optional(),
-      secondaryColor: z.string().optional(),
-    })
+  logo: z
+    .any()
+    .refine((val) => {
+      if (!val) return true // Allow null/undefined
+      return val instanceof File || typeof val === 'string'
+    }, 'Logo must be a File or string')
     .optional()
     .nullable(),
+  isActive: z.boolean(),
 })
 
+export type TenantFormData = {
+  name: string
+  subdomain: string
+  description?: string | null
+  logo?: File | string | null | undefined
+  isActive: boolean
+  theme?: TenantTheme
+}
+
 interface TenantFormProps {
-  initialData?: Partial<TenantFormData> & { id: string }
+  initialData?: Omit<
+    Tenant,
+    'createdAt' | 'updatedAt' | 'theme' | 'databaseName'
+  >
   isLoading?: boolean
 }
 
@@ -94,32 +105,17 @@ export const TenantForm = ({
         </div>
 
         <div>
-          <Input
+          <FileInput
             name="logo"
-            label="Logo URL"
+            label="Logo"
+            accept="image/*"
             error={errors.logo?.message?.toString()}
+            defaultValue={initialData?.logo}
           />
         </div>
 
         <div>
           <Checkbox name="isActive" label="Active" />
-        </div>
-
-        <div className={styles.grid}>
-          <div>
-            <Input
-              name="theme.primaryColor"
-              label="Primary Color"
-              error={errors.theme?.primaryColor?.message?.toString()}
-            />
-          </div>
-          <div>
-            <Input
-              name="theme.secondaryColor"
-              label="Secondary Color"
-              error={errors.theme?.secondaryColor?.message?.toString()}
-            />
-          </div>
         </div>
 
         <div className={styles.actions}>

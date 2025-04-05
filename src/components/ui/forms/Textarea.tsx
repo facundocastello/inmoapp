@@ -45,7 +45,7 @@ export const Textarea = ({
 
 const styles = {
   container: 'space-y-2',
-  label: 'block text-sm font-medium text-primary-100',
+  label: 'block text-sm font-medium text-primary-900',
   textarea:
     'w-full rounded-md border border-primary-200 bg-primary-100 px-3 py-2 text-sm placeholder:text-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent',
   textareaError: 'border-error-500 focus:ring-error-500',

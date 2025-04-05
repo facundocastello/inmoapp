@@ -2,6 +2,8 @@ import { HTMLAttributes } from 'react'
 
 import { cn } from '@/lib/utils'
 
+import { Image } from '../Image'
+
 interface TableProps extends HTMLAttributes<HTMLTableElement> {}
 
 export const Table = ({ className, ...props }: TableProps) => {
@@ -31,11 +33,31 @@ export const TableRow = ({ className, ...props }: TableRowProps) => {
 }
 
 interface TableCellProps extends HTMLAttributes<HTMLTableCellElement> {}
+interface TableCellImageProps extends HTMLAttributes<HTMLTableCellElement> {
+  fileKey: string | null
+}
 
 export const TableCell = ({ className, ...props }: TableCellProps) => {
   return <td className={cn(styles.cell, className)} {...props} />
 }
 
+export const TableCellImage = ({
+  className,
+  fileKey,
+  ...props
+}: TableCellImageProps) => {
+  return (
+    fileKey && (
+      <td className={cn(styles.cell, className)} {...props}>
+        <Image
+          className="w-12 h-12 rounded-full"
+          fileKey={fileKey}
+          alt="Preview"
+        />
+      </td>
+    )
+  )
+}
 interface TableHeaderCellProps extends HTMLAttributes<HTMLTableCellElement> {}
 
 export const TableHeaderCell = ({

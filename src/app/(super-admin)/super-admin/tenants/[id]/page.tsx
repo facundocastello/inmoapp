@@ -22,7 +22,7 @@ export default async function TenantPage({ params }: TenantPageProps) {
           <h1 className="text-2xl font-semibold">Edit Tenant</h1>
         </div>
 
-        <div className="rounded-lg border border-primary-200 bg-primary-900 p-6">
+        <div className="rounded-lg border border-primary-200 p-6">
           <TenantForm
             initialData={{
               id: tenant.id,
@@ -31,7 +31,6 @@ export default async function TenantPage({ params }: TenantPageProps) {
               description: tenant.description,
               logo: tenant.logo,
               isActive: tenant.isActive,
-              theme: tenant.theme,
             }}
           />
         </div>

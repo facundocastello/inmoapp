@@ -49,6 +49,6 @@ const styles = {
   checkbox:
     'h-4 w-4 rounded border-primary-300 text-primary-900 focus:ring-primary-500',
   checkboxError: 'border-error-500 focus:ring-error-500',
-  label: 'ml-2 block text-sm text-primary-100',
+  label: 'ml-2 block text-sm text-primary-900',
   error: 'text-sm text-error-500',
 }

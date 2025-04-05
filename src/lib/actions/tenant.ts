@@ -1,12 +1,13 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { z } from 'zod'
 
+import { TenantFormData } from '@/components/tenant/TenantForm'
 import { getTenantId } from '@/lib/get-tenant'
 import { prisma } from '@/lib/prisma'
 import { darkColorsPreset } from '@/theme/colors'
 
+import { uploadFile } from './file'
 import { Tenant as PrismaTenant } from '.prisma/shared'
 
 export async function getTenantColorSchema(): Promise<PrismaTenant['theme']> {
@@ -14,33 +15,6 @@ export async function getTenantColorSchema(): Promise<PrismaTenant['theme']> {
   if (!tenantId) return darkColorsPreset
   return darkColorsPreset
 }
-
-export type TenantFormData = {
-  name: string
-  subdomain: string
-  description?: string | null
-  logo?: string | null
-  isActive: boolean
-  theme?: {
-    primaryColor?: string
-    secondaryColor?: string
-  } | null
-}
-
-const tenantSchema = z.object({
-  name: z.string().min(1, 'Name is required'),
-  subdomain: z.string().min(1, 'Subdomain is required'),
-  description: z.string().optional().nullable(),
-  logo: z.string().optional().nullable(),
-  isActive: z.boolean().default(true),
-  theme: z
-    .object({
-      primaryColor: z.string().optional(),
-      secondaryColor: z.string().optional(),
-    })
-    .optional()
-    .nullable(),
-})
 
 const DEFAULT_SELECT = {
   id: true,
@@ -75,7 +49,6 @@ export async function getTenants({
     return {
       data: tenants.map((tenant) => ({
         ...tenant,
-        theme: tenant.theme as TenantFormData['theme'],
         createdAt: tenant.createdAt.toISOString(),
       })),
       total,
@@ -100,7 +73,6 @@ export async function getTenant(id: string) {
 
     return {
       ...tenant,
-      theme: tenant.theme as TenantFormData['theme'],
       createdAt: tenant.createdAt.toISOString(),
     }
   } catch (error) {
@@ -111,17 +83,18 @@ export async function getTenant(id: string) {
 
 export async function createTenant(data: TenantFormData) {
   try {
-    const validated = tenantSchema.parse(data)
+    const parsedLogo =
+      data.logo instanceof File ? await uploadFile(data.logo) : data.logo
 
     const tenant = await prisma.tenant.create({
       data: {
-        name: validated.name,
-        subdomain: validated.subdomain,
-        description: validated.description,
-        logo: validated.logo,
-        isActive: validated.isActive,
-        databaseName: validated.subdomain,
-        theme: validated.theme || {},
+        name: data.name,
+        subdomain: data.subdomain,
+        description: data.description,
+        logo: parsedLogo,
+        isActive: data.isActive,
+        databaseName: data.subdomain,
+        theme: data.theme || {},
       },
       select: DEFAULT_SELECT,
     })
@@ -131,7 +104,6 @@ export async function createTenant(data: TenantFormData) {
       success: true,
       data: {
         ...tenant,
-        theme: tenant.theme as TenantFormData['theme'],
         createdAt: tenant.createdAt.toISOString(),
       },
     }
@@ -143,18 +115,19 @@ export async function createTenant(data: TenantFormData) {
 
 export async function updateTenant(id: string, data: TenantFormData) {
   try {
-    const validated = tenantSchema.parse(data)
+    const parsedLogo =
+      data.logo instanceof File ? await uploadFile(data.logo) : data.logo
 
     const tenant = await prisma.tenant.update({
       where: { id },
       data: {
-        name: validated.name,
-        subdomain: validated.subdomain,
-        description: validated.description,
-        logo: validated.logo,
-        isActive: validated.isActive,
-        databaseName: validated.subdomain,
-        theme: validated.theme || {},
+        name: data.name,
+        subdomain: data.subdomain,
+        description: data.description,
+        logo: parsedLogo,
+        isActive: data.isActive,
+        databaseName: data.subdomain,
+        theme: data.theme || {},
       },
       select: DEFAULT_SELECT,
     })
@@ -165,7 +138,6 @@ export async function updateTenant(id: string, data: TenantFormData) {
       success: true,
       data: {
         ...tenant,
-        theme: tenant.theme as TenantFormData['theme'],
         createdAt: tenant.createdAt.toISOString(),
       },
     }

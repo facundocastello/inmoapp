@@ -6,9 +6,12 @@ import { FormProvider, useForm } from 'react-hook-form'
 import * as z from 'zod'
 
 import { Button } from '@/components/ui/Button'
+import { FileInput } from '@/components/ui/forms/FileInput'
 import { Input } from '@/components/ui/forms/Input'
 import { Select } from '@/components/ui/forms/Select'
 import { createUser, updateUser, type UserFormData } from '@/lib/actions/user'
+
+import { User } from '.prisma/tenant-client'
 
 const userSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -16,12 +19,17 @@ const userSchema = z.object({
   password: z
     .string()
     .min(6, 'Password must be at least 6 characters')
-    .optional(),
+    .optional()
+    .or(z.literal('')),
   role: z.enum(['ADMIN', 'EDITOR', 'VIEWER']),
+  avatar: z
+    .union([z.instanceof(File), z.string()])
+    .optional()
+    .nullable(),
 })
 
 interface UserFormProps {
-  initialData?: Partial<UserFormData> & { id: string }
+  initialData?: Omit<User, 'password' | 'createdAt' | 'updatedAt'>
   isLoading?: boolean
 }
 
@@ -32,6 +40,7 @@ export const UserForm = ({ initialData, isLoading = false }: UserFormProps) => {
       name: '',
       email: '',
       role: 'VIEWER',
+      avatar: undefined,
       ...initialData,
     },
   })
@@ -93,6 +102,16 @@ export const UserForm = ({ initialData, isLoading = false }: UserFormProps) => {
               error={errors.role?.message?.toString()}
             />
           </div>
+        </div>
+
+        <div>
+          <FileInput
+            name="avatar"
+            label="Avatar"
+            accept="image/*"
+            defaultValue={initialData?.avatar || undefined}
+            error={errors.avatar?.message?.toString()}
+          />
         </div>
 
         <div className={styles.actions}>
