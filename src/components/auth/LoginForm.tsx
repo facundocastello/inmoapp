@@ -20,8 +20,8 @@ export function LoginForm({ oneUseToken }: { oneUseToken?: string }) {
   const [error, setError] = useState<string | null>(null)
   const form = useForm<LoginFormValues>({
     defaultValues: {
-      email: tenantId ? 'admin@tenant.example.com' : 'superadmin@example.com',
-      password: tenantId ? 'AdminSecure123!' : 'SuperSecure123!',
+      email: tenantId ? 'test@test.com' : 'superadmin@example.com',
+      password: tenantId ? 'test' : 'SuperSecure123!',
     },
   })
 

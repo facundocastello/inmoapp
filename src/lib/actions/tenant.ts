@@ -9,9 +9,25 @@ import { getTenantId } from '@/lib/get-tenant'
 import { getTenantPrismaClient, prisma } from '@/lib/prisma'
 import { darkColorsPreset } from '@/theme/colors'
 
-import { createTenantDatabase } from '../prisma/db'
+import { createTenantDatabase, deleteTenantDatabase } from '../prisma/db'
 import { uploadFile } from './file'
 import { Tenant as PrismaTenant } from '.prisma/shared'
+
+export async function getCurrentTenant() {
+  // In a real application, you would get the tenant from the session or context
+  const tenantSubdomain = await getTenantId()
+  if (!tenantSubdomain) return null
+  const tenant = await prisma.tenant.findUnique({
+    where: {
+      subdomain: tenantSubdomain,
+    },
+    include: {
+      plan: true,
+    },
+  })
+
+  return tenant
+}
 
 export async function getTenantColorSchema(): Promise<PrismaTenant['theme']> {
   const tenantId = await getTenantId()
@@ -27,6 +43,8 @@ const DEFAULT_SELECT = {
   logo: true,
   isActive: true,
   theme: true,
+  planId: true,
+  subscriptionType: true,
   createdAt: true,
 }
 
@@ -44,7 +62,7 @@ export async function getTenants({
         skip,
         take: limit,
         orderBy: { createdAt: 'desc' },
-        select: DEFAULT_SELECT,
+        select: { ...DEFAULT_SELECT, plan: true },
       }),
       prisma.tenant.count(),
     ])
@@ -183,6 +201,26 @@ export async function updateTenant(id: string, data: TenantFormData) {
 
 export async function deleteTenant(id: string) {
   try {
+    const tenant = await prisma.tenant.findUnique({
+      where: { id },
+    })
+
+    if (!tenant?.subdomain.includes('test')) {
+      throw new Error('Can only delete test tenants')
+    }
+
+    // Delete all payments associated with the tenant first
+    await prisma.payment.deleteMany({
+      where: { tenantId: id },
+    })
+
+    // Delete the tenant's database
+    const result = await deleteTenantDatabase(tenant.subdomain)
+    if (!result.success) {
+      throw new Error('Failed to delete tenant database')
+    }
+
+    // Now we can safely delete the tenant
     await prisma.tenant.delete({
       where: { id },
     })

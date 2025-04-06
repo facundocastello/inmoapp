@@ -18,6 +18,7 @@ datasource db {
 model Tenant {
   id            String         @id @default(cuid())
   name          String
+  email         String?
   subdomain     String         @unique
   description   String?
   logo          String?
@@ -30,6 +31,15 @@ model Tenant {
   superAdmin    SuperAdmin?
   admins        Admin[]
   oneUseToken   String?
+
+  // Subscription fields
+  subscriptionType SubscriptionType @default(MANUAL)
+  nextPaymentAt    DateTime?
+  graceStartedAt   DateTime?
+  gracePeriodDays  Int              @default(15)
+  plan             Plan?            @relation(fields: [planId], references: [id])
+  planId           String?
+  payments         Payment[]
 }
 
 // Super Admin model for system-wide administration
@@ -144,4 +154,47 @@ model ThemeSettings {
   error700 String
   error800 String
   error900 String
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum PaymentMethod {
+  MANUAL
+  AUTOMATED
+}
+
+enum SubscriptionType {
+  MANUAL
+  AUTOMATED
+}
+
+model Payment {
+  id             String        @id @default(cuid())
+  amount         Float
+  status         PaymentStatus
+  paymentMethod  PaymentMethod
+  dueDate        DateTime
+  paidAt         DateTime?
+  proofOfPayment String? // URL to the uploaded proof of payment file
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  tenant         Tenant        @relation(fields: [tenantId], references: [id])
+  tenantId       String
+}
+
+model Plan {
+  id           String   @id @default(cuid())
+  name         String
+  description  String?
+  price        Float
+  billingCycle Int      @default(1) // Number of months between payments
+  features     Json? // Stores plan features as JSON
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  tenants      Tenant[]
 }

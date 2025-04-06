@@ -14,10 +14,12 @@ interface FileInputProps
   accept?: string
   multiple?: boolean
   defaultValue?: string | null
+  disabled?: boolean
 }
 
 export const FileInput = ({
   className,
+  disabled,
   name,
   label,
   error,
@@ -76,25 +78,30 @@ export const FileInput = ({
           styles.dropzone,
           isDragging && styles.dropzoneDragging,
           error && styles.dropzoneError,
+          disabled && styles.dropzoneDisabled,
           className,
         )}
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-        onDrop={handleDrop}
+        onDragOver={!disabled ? handleDragOver : undefined}
+        onDragLeave={!disabled ? handleDragLeave : undefined}
+        onDrop={!disabled ? handleDrop : undefined}
       >
         <input
           id={name}
           type="file"
           accept={accept}
           multiple={multiple}
-          className={styles.input}
+          className={cn(styles.input, disabled && styles.inputDisabled)}
           onChange={handleFileChange}
+          disabled={disabled}
           {...props}
         />
         {!value && (
           <div className={styles.placeholder}>
             <svg
-              className={styles.placeholderIcon}
+              className={cn(
+                styles.placeholderIcon,
+                disabled && styles.placeholderIconDisabled,
+              )}
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
@@ -107,8 +114,15 @@ export const FileInput = ({
                 d="M7 16a4 4 0 01-.88-7.903A5.44 5.44 0 0115.9 3H16a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
               />
             </svg>
-            <p className={styles.placeholderText}>
-              Drag and drop your file here, or click to select
+            <p
+              className={cn(
+                styles.placeholderText,
+                disabled && styles.placeholderTextDisabled,
+              )}
+            >
+              {disabled
+                ? 'File upload disabled'
+                : 'Drag and drop your file here, or click to select'}
             </p>
           </div>
         )}
@@ -127,28 +141,30 @@ export const FileInput = ({
                 className={styles.preview}
               />
             )}
-            <button
-              type="button"
-              className={styles.removeButton}
-              onClick={() => {
-                setValue(name, null, { shouldValidate: true })
-              }}
-            >
-              <svg
-                className={styles.removeIcon}
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
+            {!disabled && (
+              <button
+                type="button"
+                className={styles.removeButton}
+                onClick={() => {
+                  setValue(name, null, { shouldValidate: true })
+                }}
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
+                <svg
+                  className={styles.removeIcon}
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            )}
           </div>
         )}
       </div>
@@ -169,10 +185,15 @@ const styles = {
   `,
   dropzoneDragging: 'border-primary-500 bg-primary-50',
   dropzoneError: 'border-error-500',
+  dropzoneDisabled:
+    'border-neutral-300 bg-neutral-50 cursor-not-allowed hover:bg-neutral-50',
   input: 'absolute inset-0 w-full h-full opacity-0 cursor-pointer',
+  inputDisabled: 'cursor-not-allowed',
   placeholder: 'flex flex-col items-center justify-center space-y-2',
   placeholderIcon: 'w-10 h-12 text-primary-800',
+  placeholderIconDisabled: 'text-neutral-400',
   placeholderText: 'text-sm text-primary-800 text-center',
+  placeholderTextDisabled: 'text-neutral-400',
   previewContainer: 'relative w-full h-full',
   preview: 'w-full h-full object-contain rounded-lg',
   removeButton: `

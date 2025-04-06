@@ -1,5 +1,4 @@
 import { redirect } from 'next/navigation'
-import { signIn } from 'next-auth/react'
 
 import { LoginForm } from '@/components/auth/LoginForm'
 import { getIsAdmin } from '@/lib/auth'

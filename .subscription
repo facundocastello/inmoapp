@@ -1,0 +1,231 @@
+# Subscription Management System
+
+## Architecture
+
+### Directory Structure
+```
+src/
+├── app/
+│   ├── (super-admin)/
+│   │   └── super-admin/
+│   │       ├── plans/
+│   │       │   ├── page.tsx
+│   │       │   ├── new/
+│   │       │   │   └── page.tsx
+│   │       │   └── [id]/
+│   │       │       └── edit/
+│   │       │           └── page.tsx
+│   │       └── subscriptions/
+│   │           └── manual/
+│   │               └── page.tsx
+│   └── (tenant)/
+│       └── [tenant]/
+│           └── (tenant-admin)/
+│               └── admin/
+│                   └── billing/
+│                       └── page.tsx
+├── components/
+│   ├── payments/
+│   │   ├── ManualPaymentTable.tsx
+│   │   └── PaymentProofUpload.tsx
+│   ├── plans/
+│   │   ├── PlansTable.tsx
+│   │   └── PlanForm.tsx
+│   └── ui/
+│       ├── Button.tsx
+│       ├── forms/
+│       │   └── FileInput.tsx
+│       └── table/
+│           └── Table.tsx
+├── lib/
+│   ├── actions/
+│   │   ├── payments.ts
+│   │   ├── plans.ts
+│   │   └── tenant.ts
+│   ├── subscription/
+│   │   ├── grace-period.ts
+│   │   ├── plan-checker.ts
+│   │   ├── payment-processor.ts
+│   │   └── subscription-checker.ts
+│   └── email/
+│       └── send.ts
+```
+
+### Key Design Decisions
+1. **Route Groups**
+   - Using `(super-admin)` route group for admin features
+   - Using `(tenant)` route group for tenant-specific features
+   - Proper layout inheritance and protection
+
+2. **Component Organization**
+   - PascalCase for component files (e.g., `ManualPaymentTable.tsx`)
+   - Feature-based directory structure
+   - Reusable UI components in `components/ui`
+
+3. **Utility Organization**
+   - Subscription-related utilities in `lib/subscription`
+   - Server actions in `lib/actions`
+   - Email utilities in `lib/email`
+
+4. **Middleware Design**
+   - Lightweight tenant checks
+   - Subdomain and path-based routing
+   - Proper header handling with `x-forwarded-host`
+
+## Completed Features
+
+### Schema
+- ✅ Tenant model with subscription fields
+  - subscriptionType (MANUAL/AUTOMATED)
+  - nextPaymentAt
+  - graceStartedAt
+  - gracePeriodDays
+  - plan relation
+- ✅ Payment model
+  - amount
+  - status (PENDING/COMPLETED/FAILED/REFUNDED)
+  - paymentMethod (MANUAL/AUTOMATED)
+  - dueDate
+  - paidAt
+  - proofOfPayment (URL to uploaded file)
+- ✅ Plan model
+  - name
+  - description
+  - price
+  - billingCycle (1 for monthly, 12 for yearly)
+  - features (JSON)
+
+### Components
+- ✅ ManualPaymentTable
+  - Displays pending payments
+  - Shows tenant, plan, amount, and due date
+  - "Mark as Paid" button with loading state
+  - Uses UI Table component
+- ✅ PaymentProofUpload
+  - File upload component for payment proofs
+  - Supports images and PDFs
+  - Image optimization for uploaded images
+  - Proper error handling and loading states
+- ✅ Plans Management
+  - List all subscription plans
+  - Create/Edit/Delete plans
+  - Feature display
+  - Billing cycle display
+  - CRUD operations with proper validation
+- ✅ PlanForm
+  - Create and edit plans
+  - Feature configuration
+  - Price and billing cycle settings
+  - Form validation with Zod
+- ✅ TenantForm with Subscription
+  - Plan selection
+  - Payment method selection (Manual/Automated)
+  - Integration with tenant creation/update
+- ✅ PublicSignupForm with Subscription
+  - Plan selection during signup
+  - Payment method selection
+  - Integration with tenant creation
+- ✅ Billing Page
+  - Current plan details
+  - Payment history
+  - Grace period status
+  - Overdue payment warnings
+  - Payment due date display
+
+### Utilities
+- ✅ PlanChecker
+  - Feature usage validation
+  - User limit checks
+  - Storage limit checks
+  - Project limit checks
+  - Plan limits retrieval
+- ✅ SubscriptionChecker
+  - Daily payment processing
+  - Grace period management
+  - Automated payment simulation
+  - Email notifications
+- ✅ Grace Period Utility
+  - Grace period status calculation
+  - Grace period start validation
+  - Remaining days calculation
+- ✅ Email utility (placeholder)
+  - Email options interface
+  - Console logging for development
+
+### API
+- ✅ Cron job endpoint for subscription checks
+- ✅ Vercel Cron configuration
+- ✅ Server actions for payment processing
+- ✅ Server actions for plan management
+- ✅ Server actions for tenant management
+
+## Missing Features
+
+### Components
+- ❌ Payment form for manual payments
+- ❌ Payment method management
+- ❌ Plan comparison view
+- ❌ Usage tracking dashboard
+
+### Utilities
+- ❌ Actual email sending implementation
+- ❌ Payment gateway integration
+- ❌ Webhook handling for payment notifications
+- ❌ Automated payment retry mechanism
+- ❌ Payment receipt generation
+
+### API
+- ❌ Payment processing endpoints
+- ❌ Payment method management endpoints
+
+### Features
+- ❌ Multiple payment methods support
+- ❌ Subscription upgrade/downgrade
+- ❌ Prorated billing
+- ❌ Discount codes
+- ❌ Invoice generation
+- ❌ Payment failure recovery
+- ❌ Subscription analytics
+- ❌ Usage tracking and reporting
+
+## Learnings & Best Practices
+
+1. **File Organization**
+   - Use PascalCase for component files
+   - Keep utility functions in `lib` directory
+   - Group related features in route groups
+
+2. **Type Safety**
+   - Proper typing for Prisma models
+   - Consistent use of interfaces
+   - Type checking for billing cycles (1/12)
+   - Proper handling of nullable fields
+
+3. **Form Handling**
+   - Use Zod for form validation
+   - Proper type inference from schemas
+   - Consistent form structure
+   - Clear error messages
+
+4. **UI Components**
+   - Consistent button variants
+   - Reusable table components
+   - Proper loading states
+   - Clear form layouts
+   - Proper disabled states for form inputs
+
+5. **Error Handling**
+   - Graceful error handling in server actions
+   - Proper error messages for users
+   - Transaction support for critical operations
+   - Proper cleanup of related records
+
+## Next Steps
+1. Implement payment form for manual payments
+2. Integrate with a payment gateway
+3. Implement actual email sending
+4. Create plan comparison view
+5. Add usage tracking
+6. Implement subscription analytics
+7. Add payment method management
+8. Add subscription upgrade/downgrade functionality 

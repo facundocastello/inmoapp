@@ -1,6 +1,8 @@
 import { PublicSignupForm } from '@/components/tenant/PublicSignupForm'
+import { getPlans } from '@/lib/actions/plans'
 
-export default function SignupPage() {
+export default async function SignupPage() {
+  const plans = await getPlans()
   return (
     <div className="min-h-screen bg-primary-100 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md mx-auto">
@@ -13,7 +15,7 @@ export default function SignupPage() {
           </p>
         </div>
 
-        <PublicSignupForm />
+        <PublicSignupForm plans={plans} />
       </div>
     </div>
   )

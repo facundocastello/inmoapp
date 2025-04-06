@@ -9,6 +9,8 @@ const navigation = [
   { name: 'Dashboard', href: '/admin' },
   { name: 'Tenants', href: '/super-admin/tenants' },
   { name: 'Users', href: '/super-admin/users' },
+  { name: 'Plans', href: '/super-admin/plans' },
+  { name: 'Subscriptions', href: '/super-admin/subscriptions/manual' },
   { name: 'Settings', href: '/super-admin/settings' },
 ]
 

@@ -9,10 +9,9 @@ import { Button } from '@/components/ui/Button'
 import { Checkbox } from '@/components/ui/forms/Checkbox'
 import { FileInput } from '@/components/ui/forms/FileInput'
 import { Input } from '@/components/ui/forms/Input'
+import { Select } from '@/components/ui/forms/Select'
 import { Textarea } from '@/components/ui/forms/Textarea'
 import { createTenant, TenantTheme, updateTenant } from '@/lib/actions/tenant'
-
-import { Tenant } from '.prisma/shared'
 
 const tenantSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -27,6 +26,8 @@ const tenantSchema = z.object({
     .optional()
     .nullable(),
   isActive: z.boolean(),
+  planId: z.string().min(1, 'Plan is required'),
+  subscriptionType: z.enum(['MANUAL', 'AUTOMATED']),
 })
 
 export type TenantFormData = {
@@ -36,6 +37,8 @@ export type TenantFormData = {
   logo?: File | string | null | undefined
   isActive: boolean
   theme?: TenantTheme
+  planId: string
+  subscriptionType: 'MANUAL' | 'AUTOMATED'
   admin?: {
     name: string
     email: string
@@ -44,16 +47,29 @@ export type TenantFormData = {
 }
 
 interface TenantFormProps {
-  initialData?: Omit<
-    Tenant,
-    'createdAt' | 'updatedAt' | 'theme' | 'databaseName'
-  >
+  initialData?: {
+    id: string
+    name: string
+    subdomain: string
+    description: string | null
+    logo: string | null
+    isActive: boolean
+    planId: string | null
+    subscriptionType: 'MANUAL' | 'AUTOMATED'
+  }
   isLoading?: boolean
+  plans: Array<{
+    id: string
+    name: string
+    price: number
+    billingCycle: number
+  }>
 }
 
 export const TenantForm = ({
   initialData,
   isLoading = false,
+  plans,
 }: TenantFormProps) => {
   const methods = useForm<TenantFormData>({
     resolver: zodResolver(tenantSchema),
@@ -61,7 +77,9 @@ export const TenantForm = ({
       name: '',
       subdomain: '',
       isActive: true,
+      subscriptionType: 'MANUAL',
       ...initialData,
+      planId: initialData?.planId as string,
     },
   })
 
@@ -117,6 +135,31 @@ export const TenantForm = ({
             error={errors.logo?.message?.toString()}
             defaultValue={initialData?.logo}
           />
+        </div>
+
+        <div className={styles.grid}>
+          <div>
+            <Select
+              name="planId"
+              label="Plan"
+              options={plans.map((plan) => ({
+                value: plan.id,
+                label: `${plan.name} ($${plan.price}/${plan.billingCycle === 1 ? 'month' : 'year'})`,
+              }))}
+              error={errors.planId?.message?.toString()}
+            />
+          </div>
+          <div>
+            <Select
+              name="subscriptionType"
+              label="Payment Method"
+              options={[
+                { value: 'MANUAL', label: 'Manual Payment' },
+                { value: 'AUTOMATED', label: 'Automated Payment' },
+              ]}
+              error={errors.subscriptionType?.message?.toString()}
+            />
+          </div>
         </div>
 
         <div>

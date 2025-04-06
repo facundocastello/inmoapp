@@ -9,7 +9,7 @@ interface InputProps extends HTMLAttributes<HTMLInputElement> {
   className?: string
   name: string
   label: string
-  type?: 'text' | 'email' | 'password'
+  type?: 'text' | 'email' | 'password' | 'number'
   error?: string
   helperText?: string
 }
@@ -36,7 +36,9 @@ export const Input = ({
         id={name}
         type={type}
         className={cn(styles.input, error && styles.error, className)}
-        {...register(name)}
+        {...register(name, {
+          valueAsNumber: type === 'number',
+        })}
         {...props}
       />
       {error && <p className={styles.errorMessage}>{error}</p>}

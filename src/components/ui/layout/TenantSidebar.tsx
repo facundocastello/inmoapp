@@ -12,6 +12,7 @@ const navigation = [
   { name: 'Dashboard', href: '/admin', icon: 'LayoutDashboard' },
   { name: 'Users', href: '/admin/users', icon: 'Users' },
   { name: 'Content', href: '/admin/content', icon: 'FileText' },
+  { name: 'Billing', href: '/admin/billing', icon: 'CreditCard' },
   { name: 'Settings', href: '/admin/settings', icon: 'Settings' },
 ]
 
@@ -78,6 +79,7 @@ export const TenantSidebar = () => {
                 {item.icon === 'LayoutDashboard' && <Menu size={20} />}
                 {item.icon === 'Users' && <Menu size={20} />}
                 {item.icon === 'FileText' && <Menu size={20} />}
+                {item.icon === 'CreditCard' && <Menu size={20} />}
                 {item.icon === 'Settings' && <Menu size={20} />}
               </span>
               {!isCollapsed && <span>{item.name}</span>}

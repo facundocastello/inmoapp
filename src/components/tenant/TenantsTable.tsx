@@ -63,6 +63,11 @@ export const TenantsTable = ({ tenants }: TenantsTableProps) => {
                   <Button variant="outline" size="sm">
                     Delete
                   </Button>
+                  <Link
+                    href={`http://${tenant.subdomain}.localhost:3000/login`}
+                  >
+                    Visit
+                  </Link>
                 </form>
               </div>
             </TableCell>

@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation'
 
 import { TenantForm } from '@/components/tenant/TenantForm'
 import { PageContainer } from '@/components/ui/layout/PageContainer'
+import { getPlans } from '@/lib/actions/plans'
 import { getTenant } from '@/lib/actions/tenant'
 
 interface TenantPageProps {
@@ -10,6 +11,7 @@ interface TenantPageProps {
 
 export default async function TenantPage({ params }: TenantPageProps) {
   const tenant = await getTenant((await params).id)
+  const plans = await getPlans()
 
   if (!tenant) {
     notFound()
@@ -24,6 +26,7 @@ export default async function TenantPage({ params }: TenantPageProps) {
 
         <div className="rounded-lg border border-primary-200 p-6">
           <TenantForm
+            plans={plans}
             initialData={{
               id: tenant.id,
               name: tenant.name,
@@ -31,6 +34,8 @@ export default async function TenantPage({ params }: TenantPageProps) {
               description: tenant.description,
               logo: tenant.logo,
               isActive: tenant.isActive,
+              planId: tenant.planId,
+              subscriptionType: tenant.subscriptionType,
             }}
           />
         </div>
