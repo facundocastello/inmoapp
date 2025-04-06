@@ -17,7 +17,7 @@ export default function LandingPage() {
             Create your own tenant and get started with our powerful platform.
           </p>
           <div className={styles.actions}>
-            <Link href="/admin" className={styles.primaryLink}>
+            <Link href="/signup" className={styles.primaryLink}>
               Get Started
             </Link>
             <Link href="/admin" className={styles.secondaryLink}>

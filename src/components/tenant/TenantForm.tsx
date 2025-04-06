@@ -36,6 +36,11 @@ export type TenantFormData = {
   logo?: File | string | null | undefined
   isActive: boolean
   theme?: TenantTheme
+  admin?: {
+    name: string
+    email: string
+    password: string
+  }
 }
 
 interface TenantFormProps {

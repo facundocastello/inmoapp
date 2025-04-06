@@ -29,6 +29,7 @@ model Tenant {
   themeSettings ThemeSettings?
   superAdmin    SuperAdmin?
   admins        Admin[]
+  oneUseToken   String?
 }
 
 // Super Admin model for system-wide administration

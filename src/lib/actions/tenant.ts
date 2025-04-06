@@ -1,12 +1,15 @@
 'use server'
 
+import { hash } from 'bcryptjs'
+import { randomBytes } from 'crypto'
 import { revalidatePath } from 'next/cache'
 
 import { TenantFormData } from '@/components/tenant/TenantForm'
 import { getTenantId } from '@/lib/get-tenant'
-import { prisma } from '@/lib/prisma'
+import { getTenantPrismaClient, prisma } from '@/lib/prisma'
 import { darkColorsPreset } from '@/theme/colors'
 
+import { createTenantDatabase } from '../prisma/db'
 import { uploadFile } from './file'
 import { Tenant as PrismaTenant } from '.prisma/shared'
 
@@ -83,11 +86,21 @@ export async function getTenant(id: string) {
 
 export async function createTenant(data: TenantFormData) {
   try {
+    // Create the tenant's database and push schema
+    const dbResult = await createTenantDatabase(data.subdomain)
+    if (!dbResult.success) {
+      throw new Error('Failed to create tenant database')
+    }
+
     const parsedLogo =
       data.logo instanceof File
         ? await uploadFile(data.logo, { shouldOptimize: true })
         : data.logo
 
+    // Generate a one-time use token
+    const oneUseToken = randomBytes(32).toString('hex')
+
+    // Create tenant in shared database
     const tenant = await prisma.tenant.create({
       data: {
         name: data.name,
@@ -97,9 +110,25 @@ export async function createTenant(data: TenantFormData) {
         isActive: data.isActive,
         databaseName: data.subdomain,
         theme: data.theme || {},
+        oneUseToken, // Store the token
       },
       select: DEFAULT_SELECT,
     })
+
+    // If admin data is provided, create the admin user in the tenant's database
+    if (data.admin) {
+      const tenantPrisma = await getTenantPrismaClient(data.subdomain)
+      const hashedPassword = await hash(data.admin.password, 10)
+
+      await tenantPrisma.user.create({
+        data: {
+          name: data.admin.name,
+          email: data.admin.email,
+          password: hashedPassword,
+          role: 'ADMIN',
+        },
+      })
+    }
 
     revalidatePath('/super-admin/tenants')
     return {
@@ -107,6 +136,7 @@ export async function createTenant(data: TenantFormData) {
       data: {
         ...tenant,
         createdAt: tenant.createdAt.toISOString(),
+        oneUseToken, // Return the token
       },
     }
   } catch (error) {

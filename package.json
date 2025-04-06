@@ -21,6 +21,7 @@
     "db:setup": "yarn db:push && yarn db:push:tenant && yarn db:seed && yarn db:seed:tenant",
     "db:studio": "prisma studio & prisma studio --schema=./prisma/tenant-schema.prisma --port=5556",
     "prisma-initialize": "(yarn generate & yarn generate:tenant) && (yarn db:reset & yarn db:reset:tenant) && (yarn db:seed & yarn db:seed:tenant)",
+    "generate:push": "(yarn generate & yarn generate:tenant) && (yarn db:push & yarn db:push:tenant)",
     "type-check": "tsc --pretty --noEmit"
   },
   "dependencies": {

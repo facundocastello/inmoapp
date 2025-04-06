@@ -11,11 +11,13 @@ interface InputProps extends HTMLAttributes<HTMLInputElement> {
   label: string
   type?: 'text' | 'email' | 'password'
   error?: string
+  helperText?: string
 }
 
 export const Input = ({
   className,
   name,
+  helperText,
   label,
   type = 'text',
   error,
@@ -38,6 +40,7 @@ export const Input = ({
         {...props}
       />
       {error && <p className={styles.errorMessage}>{error}</p>}
+      {helperText && <p className={styles.helperText}>{helperText}</p>}
     </div>
   )
 }
@@ -53,4 +56,5 @@ const styles = {
   `,
   error: 'border-error-500 focus:border-error-500 focus:ring-error-500',
   errorMessage: 'text-sm text-error-500',
+  helperText: 'text-[11px] text-primary-700',
 }

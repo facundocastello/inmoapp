@@ -2,7 +2,7 @@
 
 import { redirect, useParams } from 'next/navigation'
 import { signIn } from 'next-auth/react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 
 import { Button } from '@/components/ui/Button'
@@ -14,7 +14,7 @@ type LoginFormValues = {
   password: string
 }
 
-export function LoginForm() {
+export function LoginForm({ oneUseToken }: { oneUseToken?: string }) {
   const { tenant } = useParams<{ tenant: string }>()
   const tenantId = tenant === 'login' ? null : tenant
   const [error, setError] = useState<string | null>(null)
@@ -24,6 +24,22 @@ export function LoginForm() {
       password: tenantId ? 'AdminSecure123!' : 'SuperSecure123!',
     },
   })
+
+  useEffect(() => {
+    if (oneUseToken) {
+      signIn('credentials', {
+        oneUseToken,
+        tenantSubdomain: tenantId,
+        redirect: false,
+      }).then((result) => {
+        if (result?.error) {
+          setError(result.error)
+          return
+        }
+        redirect('/admin')
+      })
+    }
+  }, [oneUseToken])
 
   const onSubmit = async (data: LoginFormValues) => {
     const result = await signIn('credentials', {

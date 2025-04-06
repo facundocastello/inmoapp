@@ -36,49 +36,22 @@ export const authOptions: NextAuthOptions = {
         email: { label: 'Email', type: 'email' },
         password: { label: 'Password', type: 'password' },
         tenantSubdomain: { label: 'Tenant Subdomain', type: 'text' },
+        oneUseToken: { label: 'One-Time Use Token', type: 'text' },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) return null
-        if (!credentials.tenantSubdomain) {
-          const user = await prisma.superAdmin.findUnique({
-            where: { email: credentials.email },
-          })
-          if (!user) throw new Error('User not found')
-          const isPasswordValid = await compare(
-            credentials.password,
-            user.password,
-          )
+        if (!credentials) throw new Error('No credentials provided')
 
-          if (!isPasswordValid) throw new Error('Invalid password')
+        try {
+          if (credentials.oneUseToken && credentials.tenantSubdomain)
+            return await authenticateWithOneTimeToken(credentials)
 
-          return {
-            id: user.id,
-            email: user.email,
-            name: user.name,
-            role: 'super-admin',
-            isTenantUser: false,
-          }
-        }
-        const prismaTenant = await prisma.tenant.findUnique({
-          where: { subdomain: credentials.tenantSubdomain },
-        })
-        if (!prismaTenant) throw new Error('Tenant not found')
-        const tenantPrisma = getTenantPrismaClient(prismaTenant.databaseName)
-        const tenantUser = await tenantPrisma.user.findUnique({
-          where: { email: credentials.email },
-        })
-        if (!tenantUser) throw new Error('User not found')
-        const isPasswordValid = await compare(
-          credentials.password,
-          tenantUser.password,
-        )
-        if (!isPasswordValid) throw new Error('Invalid password')
-        return {
-          id: tenantUser.id,
-          email: tenantUser.email,
-          name: tenantUser.name,
-          role: tenantUser.role,
-          isTenantUser: true,
+          if (!credentials.tenantSubdomain)
+            return await authenticateSuperAdmin(credentials)
+
+          return await authenticateTenantUser(credentials)
+        } catch (error) {
+          console.error('Authentication error:', error)
+          throw error
         }
       },
     }),
@@ -92,6 +65,10 @@ export const authOptions: NextAuthOptions = {
       return token
     },
   },
+  pages: {
+    signIn: '/login',
+    error: '/login',
+  },
   secret: process.env.NEXTAUTH_SECRET,
 }
 
@@ -100,3 +77,95 @@ const handler = NextAuth(authOptions)
 export { handler as GET, handler as POST }
 
 // export default NextAuth(authOptions)
+
+async function authenticateSuperAdmin({
+  email,
+  password,
+}: {
+  email: string
+  password: string
+}) {
+  const user = await prisma.superAdmin.findUnique({
+    where: { email },
+  })
+  if (!user) throw new Error('User not found')
+
+  const isPasswordValid = await compare(password, user.password)
+  if (!isPasswordValid) throw new Error('Invalid password')
+
+  return {
+    id: user.id,
+    email: user.email,
+    name: user.name,
+    role: 'super-admin' as const,
+    tenantId: user.tenantId,
+    isTenantUser: false,
+  }
+}
+
+async function authenticateTenantUser({
+  email,
+  password,
+  tenantSubdomain,
+}: {
+  email: string
+  password: string
+  tenantSubdomain: string
+}) {
+  const tenant = await prisma.tenant.findUnique({
+    where: { subdomain: tenantSubdomain },
+  })
+  if (!tenant) throw new Error('Tenant not found')
+
+  const tenantPrisma = getTenantPrismaClient(tenant.databaseName)
+  const user = await tenantPrisma.user.findUnique({
+    where: { email },
+  })
+  if (!user) throw new Error('User not found')
+
+  const isPasswordValid = await compare(password, user.password)
+  if (!isPasswordValid) throw new Error('Invalid password')
+
+  return {
+    id: user.id,
+    email: user.email,
+    name: user.name,
+    role: user.role,
+    tenantId: tenant.id,
+    isTenantUser: true,
+  }
+}
+
+async function authenticateWithOneTimeToken({
+  tenantSubdomain,
+  oneUseToken,
+}: {
+  tenantSubdomain: string
+  oneUseToken: string
+}) {
+  const tenant = await prisma.tenant.findUnique({
+    where: { subdomain: tenantSubdomain },
+  })
+  if (!tenant || tenant.oneUseToken !== oneUseToken) {
+    throw new Error('Invalid one-time use token')
+  }
+
+  const tenantPrisma = getTenantPrismaClient(tenant.databaseName)
+  const user = await tenantPrisma.user.findFirst()
+  if (!user) throw new Error('User not found')
+
+  // Invalidate the one-time token after use
+  await prisma.tenant.update({
+    where: { id: tenant.id },
+    data: { oneUseToken: null },
+  })
+
+  return {
+    id: user.id,
+    email: user.email,
+    name: user.name,
+    role: user.role,
+    tenantId: tenant.id,
+    isTenantUser: true,
+  }
+}

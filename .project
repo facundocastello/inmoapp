@@ -19,15 +19,15 @@ ITS SUPER IMPORTANT TO ALWAYS FOLLOW LINEMENTS ON .cursor-context. (inline style
 - Color system and theme implementation
 - Base UI components and layouts
 - Admin interfaces (Super Admin and Tenant Admin)
-- File Storage Upload
+- File Storage Upload & optimization & security
 
 ## In Progress
 
 ### Tenant Signup System
-- [ ] Public Signup Flow
-  - [ ] Signup form with validation
-  - [ ] Tenant database provisioning
-  - [ ] Initial setup configuration
+- [x] Public Signup Flow
+  - [x] Signup form with validation
+  - [x] Tenant database provisioning
+  - [x] Initial setup configuration
   - [ ] Welcome email and onboarding
 - [ ] Subscription Management
   - [ ] Subscription status tracking
@@ -38,14 +38,6 @@ ITS SUPER IMPORTANT TO ALWAYS FOLLOW LINEMENTS ON .cursor-context. (inline style
   - [ ] Payment gateway setup
   - [ ] Subscription plans
   - [ ] Billing management
-
-### File Storage Setup
-- [x] Digital Ocean Integration
-  - [x] Spaces configuration
-  - [x] File upload service
-  - [x] File retrieval service
-  - [ ] Image optimization pipeline
-  - [ ] Security and access control
 
 ## Upcoming Tasks
 

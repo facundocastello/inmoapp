@@ -47,15 +47,15 @@ export const TableCellImage = ({
   ...props
 }: TableCellImageProps) => {
   return (
-    fileKey && (
-      <td className={cn(styles.cell, className)} {...props}>
+    <td className={cn(styles.cell, className)} {...props}>
+      {fileKey && (
         <Image
           className="w-12 h-12 rounded-full"
           fileKey={fileKey}
           alt="Preview"
         />
-      </td>
-    )
+      )}
+    </td>
   )
 }
 interface TableHeaderCellProps extends HTMLAttributes<HTMLTableCellElement> {}
