@@ -31,7 +31,7 @@ export default function LandingPage() {
 }
 
 const styles = {
-  page: 'min-h-screen bg-background',
+  page: 'min-h-screen bg-primary-100',
   header: 'border-b',
   headerContainer: 'container mx-auto px-4 py-4',
   title: 'text-2xl font-bold',

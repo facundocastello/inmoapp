@@ -27,7 +27,9 @@ src/
 ├── components/
 │   ├── payments/
 │   │   ├── ManualPaymentTable.tsx
-│   │   └── PaymentProofUpload.tsx
+│   │   ├── PaymentTable.tsx
+│   │   ├── PaymentProofUpload.tsx
+│   │   └── MarkAsPaidButton.tsx
 │   ├── plans/
 │   │   ├── PlansTable.tsx
 │   │   └── PlanForm.tsx
@@ -41,12 +43,16 @@ src/
 │   ├── actions/
 │   │   ├── payments.ts
 │   │   ├── plans.ts
+│   │   ├── subscription.ts
 │   │   └── tenant.ts
 │   ├── subscription/
 │   │   ├── grace-period.ts
 │   │   ├── plan-checker.ts
 │   │   ├── payment-processor.ts
 │   │   └── subscription-checker.ts
+│   ├── utils/
+│   │   └── payments/
+│   │       └── mercadopago.ts
 │   └── email/
 │       └── send.ts
 ```
@@ -65,6 +71,7 @@ src/
 3. **Utility Organization**
    - Subscription-related utilities in `lib/subscription`
    - Server actions in `lib/actions`
+   - Payment gateway utilities in `lib/utils/payments`
    - Email utilities in `lib/email`
 
 4. **Middleware Design**
@@ -88,12 +95,21 @@ src/
   - dueDate
   - paidAt
   - proofOfPayment (URL to uploaded file)
+  - externalId (for automated payments)
 - ✅ Plan model
   - name
   - description
   - price
   - billingCycle (1 for monthly, 12 for yearly)
   - features (JSON)
+- ✅ Subscription model
+  - externalId (for automated payments)
+  - status (ACTIVE/PENDING/PAUSED/CANCELLED/EXPIRED)
+  - paymentMethod (MANUAL/AUTOMATED)
+  - nextPaymentAt
+  - graceStartedAt
+  - gracePeriodDays
+  - billingCycle
 
 ### Components
 - ✅ ManualPaymentTable
@@ -101,6 +117,10 @@ src/
   - Shows tenant, plan, amount, and due date
   - "Mark as Paid" button with loading state
   - Uses UI Table component
+- ✅ PaymentTable
+  - Displays all payments
+  - Shows payment status and details
+  - Supports both manual and automated payments
 - ✅ PaymentProofUpload
   - File upload component for payment proofs
   - Supports images and PDFs
@@ -131,6 +151,8 @@ src/
   - Grace period status
   - Overdue payment warnings
   - Payment due date display
+  - Automated payment integration
+  - Payment proof upload for manual payments
 
 ### Utilities
 - ✅ PlanChecker
@@ -148,6 +170,13 @@ src/
   - Grace period status calculation
   - Grace period start validation
   - Remaining days calculation
+- ✅ MercadoPago Integration
+  - Subscription creation
+  - Payment processing
+  - Webhook handling
+  - Status checking
+  - Price updates
+  - Subscription cancellation
 - ✅ Email utility (placeholder)
   - Email options interface
   - Console logging for development
@@ -158,24 +187,22 @@ src/
 - ✅ Server actions for payment processing
 - ✅ Server actions for plan management
 - ✅ Server actions for tenant management
+- ✅ MercadoPago webhook endpoint
+- ✅ Automated payment processing
+- ✅ Payment status updates
 
 ## Missing Features
 
 ### Components
-- ❌ Payment form for manual payments
 - ❌ Payment method management
 - ❌ Plan comparison view
 - ❌ Usage tracking dashboard
 
 ### Utilities
 - ❌ Actual email sending implementation
-- ❌ Payment gateway integration
-- ❌ Webhook handling for payment notifications
-- ❌ Automated payment retry mechanism
 - ❌ Payment receipt generation
 
 ### API
-- ❌ Payment processing endpoints
 - ❌ Payment method management endpoints
 
 ### Features
@@ -194,12 +221,14 @@ src/
    - Use PascalCase for component files
    - Keep utility functions in `lib` directory
    - Group related features in route groups
+   - Separate payment gateway logic into dedicated utils
 
 2. **Type Safety**
    - Proper typing for Prisma models
    - Consistent use of interfaces
    - Type checking for billing cycles (1/12)
    - Proper handling of nullable fields
+   - Strong typing for payment statuses and methods
 
 3. **Form Handling**
    - Use Zod for form validation
@@ -219,13 +248,21 @@ src/
    - Proper error messages for users
    - Transaction support for critical operations
    - Proper cleanup of related records
+   - Webhook error handling and retries
+
+6. **Payment Integration**
+   - Clear separation of payment gateway logic
+   - Proper webhook handling
+   - Status mapping between systems
+   - Secure payment processing
+   - Proper error handling for payment failures
 
 ## Next Steps
-1. Implement payment form for manual payments
-2. Integrate with a payment gateway
+1. Implement payment method management
+2. Add subscription upgrade/downgrade functionality
 3. Implement actual email sending
 4. Create plan comparison view
 5. Add usage tracking
 6. Implement subscription analytics
-7. Add payment method management
-8. Add subscription upgrade/downgrade functionality 
+7. Add payment receipt generation
+8. Add multiple payment methods support 

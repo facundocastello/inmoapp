@@ -11,7 +11,7 @@ export default async function NewTenantPage() {
           <h1 className="text-2xl font-semibold">Create Tenant</h1>
         </div>
 
-        <div className="rounded-lg border border-primary-200 bg-primary-900 p-6">
+        <div className="rounded-lg border border-primary-200 p-6">
           <TenantForm plans={plans} />
         </div>
       </div>

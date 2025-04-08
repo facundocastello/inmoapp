@@ -64,6 +64,7 @@ export const TenantsTable = ({ tenants }: TenantsTableProps) => {
                     Delete
                   </Button>
                   <Link
+                    className="text-primary-500 mx-4"
                     href={`http://${tenant.subdomain}.localhost:3000/login`}
                   >
                     Visit

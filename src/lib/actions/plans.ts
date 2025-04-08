@@ -8,7 +8,6 @@ export type PlanData = {
   name: string
   description?: string | null
   price: number
-  billingCycle: number
   features: Record<string, any>
 }
 

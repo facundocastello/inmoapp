@@ -41,7 +41,6 @@ export function PlansTable({ plans }: PlansTableProps) {
           <TableHeaderCell>Name</TableHeaderCell>
           <TableHeaderCell>Description</TableHeaderCell>
           <TableHeaderCell>Price</TableHeaderCell>
-          <TableHeaderCell>Billing Cycle</TableHeaderCell>
           <TableHeaderCell>Features</TableHeaderCell>
           <TableHeaderCell>Actions</TableHeaderCell>
         </TableRow>
@@ -52,9 +51,6 @@ export function PlansTable({ plans }: PlansTableProps) {
             <TableCell>{plan.name}</TableCell>
             <TableCell>{plan.description || '-'}</TableCell>
             <TableCell>${plan.price}</TableCell>
-            <TableCell>
-              {plan.billingCycle === 1 ? 'Monthly' : 'Yearly'}
-            </TableCell>
             <TableCell>
               <div className={styles.features}>
                 {Object.entries(plan.features as Record<string, any>).map(

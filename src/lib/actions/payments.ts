@@ -7,6 +7,7 @@ import { prisma } from '@/lib/prisma'
 
 import { getIsSuperAdmin } from '../auth'
 import { uploadFile } from './file'
+import { PaymentMethod, PaymentStatus } from '.prisma/shared'
 
 export async function markPaymentAsPaid(paymentId: string) {
   // check if user is super admin
@@ -19,9 +20,9 @@ export async function markPaymentAsPaid(paymentId: string) {
     const payment = await prisma.payment.findUnique({
       where: { id: paymentId },
       include: {
-        tenant: {
+        subscription: {
           include: {
-            plan: true,
+            tenant: true,
           },
         },
       },
@@ -35,13 +36,13 @@ export async function markPaymentAsPaid(paymentId: string) {
       throw new Error('Payment is not in pending status')
     }
 
-    if (!payment.tenant.plan) {
+    if (!payment.subscription) {
       throw new Error('Tenant has no plan assigned')
     }
 
     // Calculate next payment date based on plan's billing cycle
     const nextPaymentAt = new Date()
-    const billingCycle = payment.tenant.plan.billingCycle // 1 for monthly, 12 for yearly
+    const billingCycle = payment.subscription.billingCycle // 1 for monthly, 12 for yearly
 
     if (billingCycle === 1) {
       nextPaymentAt.setMonth(nextPaymentAt.getMonth() + 1)
@@ -58,8 +59,8 @@ export async function markPaymentAsPaid(paymentId: string) {
           paidAt: new Date(),
         },
       }),
-      prisma.tenant.update({
-        where: { id: payment.tenantId },
+      prisma.subscription.update({
+        where: { tenantId: payment.subscription?.tenantId },
         data: {
           nextPaymentAt,
           graceStartedAt: null, // Clear grace period if it exists
@@ -69,10 +70,10 @@ export async function markPaymentAsPaid(paymentId: string) {
 
     // Send confirmation email
     await sendEmail({
-      to: payment.tenant.email || '',
+      to: payment.subscription?.tenant.email || '',
       subject: 'Payment Confirmed',
       body: `
-        Dear ${payment.tenant.name},
+        Dear ${payment.subscription?.tenant.name},
 
         Your payment of $${payment.amount} has been confirmed.
         
@@ -121,5 +122,64 @@ export async function updatePaymentProof(
   } catch (error) {
     console.error('Error updating payment proof:', error)
     return { success: false, error: 'Failed to update payment proof' }
+  }
+}
+
+interface ProcessPaymentResult {
+  success: boolean
+  error?: string
+  initPoint?: string
+}
+
+export async function processPayment(
+  tenantId: string,
+  amount: number,
+  paymentMethod: PaymentMethod,
+): Promise<ProcessPaymentResult> {
+  try {
+    const subscription = await prisma.subscription.findUnique({
+      where: { tenantId },
+      include: {
+        plan: true,
+        tenant: true,
+      },
+    })
+    const tenant = subscription?.tenant
+    const plan = subscription?.plan
+    if (!tenant || !plan) {
+      return {
+        success: false,
+        error: 'Tenant or plan not found',
+      }
+    }
+
+    // If there's an existing subscription, check its status
+    if (subscription) {
+      if (subscription.status === 'ACTIVE') {
+        return {
+          success: false,
+          error: 'Tenant already has an active subscription',
+        }
+      }
+    }
+
+    // Create payment record
+    await prisma.payment.create({
+      data: {
+        amount,
+        status: PaymentStatus.PENDING,
+        paymentMethod,
+        dueDate: new Date(),
+        subscriptionId: subscription.id,
+      },
+    })
+
+    return { success: true }
+  } catch (error) {
+    console.error('Error processing payment:', error)
+    return {
+      success: false,
+      error: 'Failed to process payment',
+    }
   }
 }

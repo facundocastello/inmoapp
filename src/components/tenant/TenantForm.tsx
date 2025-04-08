@@ -11,7 +11,11 @@ import { FileInput } from '@/components/ui/forms/FileInput'
 import { Input } from '@/components/ui/forms/Input'
 import { Select } from '@/components/ui/forms/Select'
 import { Textarea } from '@/components/ui/forms/Textarea'
-import { createTenant, TenantTheme, updateTenant } from '@/lib/actions/tenant'
+import {
+  createTenant,
+  TenantFormData,
+  updateTenant,
+} from '@/lib/actions/tenant'
 
 const tenantSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -30,22 +34,6 @@ const tenantSchema = z.object({
   subscriptionType: z.enum(['MANUAL', 'AUTOMATED']),
 })
 
-export type TenantFormData = {
-  name: string
-  subdomain: string
-  description?: string | null
-  logo?: File | string | null | undefined
-  isActive: boolean
-  theme?: TenantTheme
-  planId: string
-  subscriptionType: 'MANUAL' | 'AUTOMATED'
-  admin?: {
-    name: string
-    email: string
-    password: string
-  }
-}
-
 interface TenantFormProps {
   initialData?: {
     id: string
@@ -62,7 +50,6 @@ interface TenantFormProps {
     id: string
     name: string
     price: number
-    billingCycle: number
   }>
 }
 
@@ -144,7 +131,7 @@ export const TenantForm = ({
               label="Plan"
               options={plans.map((plan) => ({
                 value: plan.id,
-                label: `${plan.name} ($${plan.price}/${plan.billingCycle === 1 ? 'month' : 'year'})`,
+                label: `${plan.name} ($${plan.price}/month)`,
               }))}
               error={errors.planId?.message?.toString()}
             />

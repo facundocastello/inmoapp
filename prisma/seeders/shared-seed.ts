@@ -47,21 +47,6 @@ async function main() {
         tenantId: tenant.id,
       },
     })
-
-    // Create a regular admin for the test tenant
-    const adminPassword = await hash('AdminSecure123!', 12)
-    await prisma.admin.upsert({
-      where: {
-        email: 'admin@test.example.com',
-      },
-      update: {},
-      create: {
-        email: 'admin@test.example.com',
-        password: adminPassword,
-        name: 'Test Admin',
-        tenantId: tenant.id,
-      },
-    })
   } catch (error) {
     console.error('Error seeding shared database:', error)
     throw error

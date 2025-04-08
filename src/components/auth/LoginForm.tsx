@@ -7,7 +7,8 @@ import { useForm } from 'react-hook-form'
 
 import { Button } from '@/components/ui/Button'
 import { Form } from '@/components/ui/form/Form'
-import { Input } from '@/components/ui/form/Input'
+import { Input } from '@/components/ui/forms/Input'
+import { Loader } from '@/components/ui/Loader'
 
 type LoginFormValues = {
   email: string
@@ -18,6 +19,7 @@ export function LoginForm({ oneUseToken }: { oneUseToken?: string }) {
   const { tenant } = useParams<{ tenant: string }>()
   const tenantId = tenant === 'login' ? null : tenant
   const [error, setError] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
   const form = useForm<LoginFormValues>({
     defaultValues: {
       email: tenantId ? 'test@test.com' : 'superadmin@example.com',
@@ -42,63 +44,61 @@ export function LoginForm({ oneUseToken }: { oneUseToken?: string }) {
   }, [oneUseToken])
 
   const onSubmit = async (data: LoginFormValues) => {
-    const result = await signIn('credentials', {
-      email: data.email,
-      password: data.password,
-      redirect: false,
-      tenantSubdomain: tenantId || '',
-    })
+    setIsLoading(true)
+    setError(null)
 
-    if (result?.error) {
-      setError(result.error)
-      return
+    try {
+      const result = await signIn('credentials', {
+        email: data.email,
+        password: data.password,
+        redirect: false,
+        tenantSubdomain: tenantId || '',
+      })
+
+      if (result?.error) {
+        setError(result.error)
+        return
+      }
+
+      // Redirect to admin dashboard on success
+      redirect(tenantId ? '/admin' : '/super-admin')
+    } finally {
+      setIsLoading(false)
     }
-
-    // Redirect to admin dashboard on success
-    redirect(tenantId ? '/admin' : '/super-admin')
   }
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className={styles.form}>
-        <div className={styles.formContainer}>
-          <h1 className={styles.title}>Welcome back</h1>
-          <p className={styles.subtitle}>Please sign in to your account</p>
+    <>
+      {isLoading && <Loader />}
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className={styles.form}>
+          <div className={styles.formContainer}>
+            <h1 className={styles.title}>Welcome back</h1>
+            <p className={styles.subtitle}>Please sign in to your account</p>
 
-          <div className={styles.inputGroup}>
-            <Input
-              type="email"
-              name="email"
-              placeholder="Email"
-              registerOptions={{
-                required: 'Email is required',
-                pattern: {
-                  value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                  message: 'Invalid email address',
-                },
-              }}
-            />
-            <Input
-              type="password"
-              name="password"
-              placeholder="Password"
-              registerOptions={{}}
-            />
+            <div className={styles.inputGroup}>
+              <Input type="email" name="email" label="Email" />
+              <Input type="password" name="password" label="Password" />
+            </div>
+
+            {error && <p className={styles.error}>{error}</p>}
+
+            <Button
+              type="submit"
+              className={styles.submitButton}
+              disabled={isLoading}
+            >
+              Sign in
+            </Button>
           </div>
-
-          {error && <p className={styles.error}>{error}</p>}
-
-          <Button type="submit" className={styles.submitButton}>
-            Sign in
-          </Button>
-        </div>
-      </form>
-    </Form>
+        </form>
+      </Form>
+    </>
   )
 }
 
 const styles = {
-  form: 'w-full min-h-screen flex items-center justify-center bg-gray-50',
+  form: 'w-full min-h-screen flex items-center justify-center',
   formContainer:
     'w-full max-w-md p-8 space-y-6 bg-primary-100 rounded-xl shadow-lg',
   title: 'text-2xl font-bold text-center text-primary-900',

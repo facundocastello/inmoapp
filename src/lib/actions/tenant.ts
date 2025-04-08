@@ -2,50 +2,52 @@
 
 import { hash } from 'bcryptjs'
 import { randomBytes } from 'crypto'
-import { revalidatePath } from 'next/cache'
+import { revalidatePath, unstable_cache } from 'next/cache'
+import { redirect } from 'next/navigation'
 
-import { TenantFormData } from '@/components/tenant/TenantForm'
 import { getTenantId } from '@/lib/get-tenant'
 import { getTenantPrismaClient, prisma } from '@/lib/prisma'
 import { darkColorsPreset } from '@/theme/colors'
 
 import { createTenantDatabase, deleteTenantDatabase } from '../prisma/db'
 import { uploadFile } from './file'
-import { Tenant as PrismaTenant } from '.prisma/shared'
+import {
+  PaymentMethod,
+  SubscriptionStatus,
+  Tenant as PrismaTenant,
+} from '.prisma/shared'
 
-export async function getCurrentTenant() {
-  // In a real application, you would get the tenant from the session or context
-  const tenantSubdomain = await getTenantId()
-  if (!tenantSubdomain) return null
-  const tenant = await prisma.tenant.findUnique({
-    where: {
-      subdomain: tenantSubdomain,
-    },
-    include: {
-      plan: true,
-    },
-  })
+export type TenantFormData = {
+  name: string
+  subdomain: string
+  description?: string | null
+  logo?: File | string | null | undefined
+  isActive: boolean
+  theme?: TenantTheme
+  planId: string
+  subscriptionType: 'MANUAL' | 'AUTOMATED'
+  admin?: {
+    name: string
+    email: string
+    password: string
+  }
+}
 
-  return tenant
+export async function getCurrentTenantOrRedirect() {
+  try {
+    const tenantSubdomain = await getTenantId()
+    if (!tenantSubdomain) return null
+    const tenant = await cachedGetTenant(tenantSubdomain)
+    return tenant
+  } catch (error) {
+    redirect(`${process.env.BASE_URL}`)
+  }
 }
 
 export async function getTenantColorSchema(): Promise<PrismaTenant['theme']> {
   const tenantId = await getTenantId()
   if (!tenantId) return darkColorsPreset
   return darkColorsPreset
-}
-
-const DEFAULT_SELECT = {
-  id: true,
-  name: true,
-  subdomain: true,
-  description: true,
-  logo: true,
-  isActive: true,
-  theme: true,
-  planId: true,
-  subscriptionType: true,
-  createdAt: true,
 }
 
 export async function getTenants({
@@ -62,7 +64,7 @@ export async function getTenants({
         skip,
         take: limit,
         orderBy: { createdAt: 'desc' },
-        select: { ...DEFAULT_SELECT, plan: true },
+        select: { ...DEFAULT_SELECT },
       }),
       prisma.tenant.count(),
     ])
@@ -129,6 +131,21 @@ export async function createTenant(data: TenantFormData) {
         databaseName: data.subdomain,
         theme: data.theme || {},
         oneUseToken, // Store the token
+        subscription: {
+          create: {
+            status: SubscriptionStatus.ACTIVE,
+            paymentMethod: PaymentMethod.MANUAL,
+            nextPaymentAt: new Date(),
+            billingCycle: 1,
+            gracePeriodDays: 15,
+            graceStartedAt: new Date(),
+            plan: {
+              connect: {
+                id: data.planId,
+              },
+            },
+          },
+        },
       },
       select: DEFAULT_SELECT,
     })
@@ -209,10 +226,23 @@ export async function deleteTenant(id: string) {
       throw new Error('Can only delete test tenants')
     }
 
-    // Delete all payments associated with the tenant first
-    await prisma.payment.deleteMany({
+    // Delete all related records in the shared database
+    const sub = await prisma.subscription.findUnique({
       where: { tenantId: id },
     })
+    await prisma.$transaction([
+      // Delete all payments associated with the tenant
+      prisma.payment.deleteMany({
+        where: { subscriptionId: sub?.id },
+      }),
+      prisma.subscription.deleteMany({
+        where: { tenantId: id },
+      }),
+      // Delete theme settings if exists
+      prisma.themeSettings.deleteMany({
+        where: { tenantId: id },
+      }),
+    ])
 
     // Delete the tenant's database
     const result = await deleteTenantDatabase(tenant.subdomain)
@@ -233,6 +263,29 @@ export async function deleteTenant(id: string) {
   }
 }
 
+const getTenantBySubdomain = async (subdomain: string) => {
+  const tenant = await prisma.tenant.findUnique({
+    where: { subdomain },
+  })
+  return tenant
+}
+
+const cachedGetTenant = (tenantId: string) =>
+  unstable_cache(getTenantBySubdomain, ['tenant', tenantId], {
+    tags: [`tenant-${tenantId}`],
+  })(tenantId)
+
 export type Tenants = Awaited<ReturnType<typeof getTenants>>
 export type Tenant = Awaited<ReturnType<typeof getTenant>>
 export type TenantTheme = Awaited<ReturnType<typeof getTenantColorSchema>>
+
+const DEFAULT_SELECT = {
+  id: true,
+  name: true,
+  subdomain: true,
+  description: true,
+  logo: true,
+  isActive: true,
+  theme: true,
+  createdAt: true,
+}

@@ -7,13 +7,32 @@ export async function middleware(request: NextRequest) {
   const host =
     request.headers.get('x-forwarded-host') || request.headers.get('host') || ''
 
+  if (host.includes('devtunnels.ms')) {
+    const response = NextResponse.next()
+    const tenantId = pathname.split('/')[1]
+    response.headers.set('x-tenant-id', tenantId)
+    return response
+  }
+
+  // Handle WebSocket upgrade requests
+  if (request.headers.get('upgrade') === 'websocket') {
+    const response = NextResponse.next()
+    response.headers.set('Access-Control-Allow-Origin', '*')
+    response.headers.set('Access-Control-Allow-Methods', 'GET,OPTIONS')
+    response.headers.set('Access-Control-Allow-Headers', '*')
+    return response
+  }
+
   // Skip middleware for static files and API routes
   if (
     pathname.startsWith('/_next') ||
     pathname.startsWith('/api') ||
-    pathname.startsWith('/static')
+    pathname.startsWith('/static') ||
+    pathname.includes('webpack-hmr')
   ) {
-    return NextResponse.next()
+    const response = NextResponse.next()
+    response.headers.set('Access-Control-Allow-Origin', '*')
+    return response
   }
 
   // Extract tenant identifier from subdomain or path

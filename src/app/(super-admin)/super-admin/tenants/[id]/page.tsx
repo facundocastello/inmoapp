@@ -3,14 +3,23 @@ import { notFound } from 'next/navigation'
 import { TenantForm } from '@/components/tenant/TenantForm'
 import { PageContainer } from '@/components/ui/layout/PageContainer'
 import { getPlans } from '@/lib/actions/plans'
-import { getTenant } from '@/lib/actions/tenant'
+import { prisma } from '@/lib/prisma'
 
 interface TenantPageProps {
   params: Promise<{ id: string }>
 }
 
 export default async function TenantPage({ params }: TenantPageProps) {
-  const tenant = await getTenant((await params).id)
+  const subscription = await prisma.subscription.findUnique({
+    where: {
+      tenantId: (await params).id,
+    },
+    include: {
+      plan: true,
+      tenant: true,
+    },
+  })
+  const tenant = subscription?.tenant
   const plans = await getPlans()
 
   if (!tenant) {
@@ -34,8 +43,8 @@ export default async function TenantPage({ params }: TenantPageProps) {
               description: tenant.description,
               logo: tenant.logo,
               isActive: tenant.isActive,
-              planId: tenant.planId,
-              subscriptionType: tenant.subscriptionType,
+              planId: subscription?.planId,
+              subscriptionType: subscription?.paymentMethod,
             }}
           />
         </div>

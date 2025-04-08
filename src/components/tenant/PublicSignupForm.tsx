@@ -40,7 +40,6 @@ interface PublicSignupFormProps {
     id: string
     name: string
     price: number
-    billingCycle: number
   }>
 }
 
@@ -130,7 +129,7 @@ export const PublicSignupForm = ({ plans }: PublicSignupFormProps) => {
             label="Plan"
             options={plans.map((plan) => ({
               value: plan.id,
-              label: `${plan.name} ($${plan.price}/${plan.billingCycle === 1 ? 'month' : 'year'})`,
+              label: `${plan.name} ($${plan.price}/month)`,
             }))}
             error={errors.planId?.message?.toString()}
           />
@@ -139,8 +138,8 @@ export const PublicSignupForm = ({ plans }: PublicSignupFormProps) => {
             name="subscriptionType"
             label="Payment Method"
             options={[
-              { value: 'MANUAL', label: 'Manual Payment' },
-              { value: 'AUTOMATED', label: 'Automated Payment' },
+              { value: 'MANUAL', label: 'Transferencia / Efectivo' },
+              { value: 'AUTOMATED', label: 'Mercado Pago' },
             ]}
             error={errors.subscriptionType?.message?.toString()}
           />

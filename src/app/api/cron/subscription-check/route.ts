@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 
-import { checkSubscriptions } from '@/lib/subscription/subscription-checker'
+import { checkSubscriptions } from '@/lib/utils/payments/subscription'
 
 // This endpoint will be called by Vercel Cron Jobs daily
 export async function GET() {

@@ -3,7 +3,7 @@
 import { hash } from 'bcryptjs'
 
 import { getTenantPrismaClient, prisma } from '@/lib/prisma'
-import { checkSubscriptions } from '@/lib/subscription/subscription-checker'
+import { checkSubscriptions } from '@/lib/utils/payments/subscription'
 
 import { createTenantDatabase } from '../prisma/db'
 
@@ -50,7 +50,6 @@ export async function createTestTenant(scenario: string) {
     throw new Error('Failed to create tenant database')
   }
 
-  // Create test tenant
   const tenant = await prisma.tenant.create({
     data: {
       name: `Test Tenant (${scenario})`,
@@ -58,11 +57,16 @@ export async function createTestTenant(scenario: string) {
       description: `Test tenant for ${scenario} scenario`,
       isActive: true,
       databaseName: subdomain,
-      planId: randomPlan.id,
       subscriptionType: 'MANUAL',
-      nextPaymentAt,
-      graceStartedAt,
-      gracePeriodDays: 15, // Default grace period
+      subscription: {
+        create: {
+          planId: randomPlan.id,
+          paymentMethod: 'MANUAL',
+          nextPaymentAt,
+          graceStartedAt,
+          gracePeriodDays: 15,
+        },
+      },
     },
   })
 

@@ -7,7 +7,6 @@ import * as z from 'zod'
 
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/forms/Input'
-import { Select } from '@/components/ui/forms/Select'
 import { Textarea } from '@/components/ui/forms/Textarea'
 import { createPlan, type PlanData, updatePlan } from '@/lib/actions/plans'
 
@@ -15,7 +14,6 @@ const planSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   description: z.string().optional().nullable(),
   price: z.number().min(0, 'Price must be greater than or equal to 0'),
-  billingCycle: z.number().min(1, 'Billing cycle must be at least 1'),
   features: z.object({
     maxUsers: z.number().min(1, 'Max users must be at least 1'),
     maxStorage: z.number().min(1, 'Max storage must be at least 1'),
@@ -33,7 +31,6 @@ interface PlanFormProps {
     name: string
     description: string | null
     price: number
-    billingCycle: number
     features: Record<string, any>
   }
   isLoading?: boolean
@@ -46,7 +43,6 @@ export const PlanForm = ({ initialData, isLoading = false }: PlanFormProps) => {
       name: initialData?.name || '',
       description: initialData?.description || '',
       price: initialData?.price || 0,
-      billingCycle: initialData?.billingCycle || 1,
       features: {
         maxUsers: initialData?.features.maxUsers || 1,
         maxStorage: initialData?.features.maxStorage || 100,
@@ -66,7 +62,6 @@ export const PlanForm = ({ initialData, isLoading = false }: PlanFormProps) => {
       name: data.name,
       description: data.description,
       price: data.price,
-      billingCycle: data.billingCycle,
       features: {
         maxUsers: data.features.maxUsers,
         maxStorage: data.features.maxStorage,
@@ -112,18 +107,6 @@ export const PlanForm = ({ initialData, isLoading = false }: PlanFormProps) => {
             label="Description"
             error={errors.description?.message?.toString()}
             rows={4}
-          />
-        </div>
-
-        <div>
-          <Select
-            name="billingCycle"
-            label="Billing Cycle"
-            options={[
-              { value: '1', label: 'Monthly' },
-              { value: '12', label: 'Yearly' },
-            ]}
-            error={errors.billingCycle?.message?.toString()}
           />
         </div>
 

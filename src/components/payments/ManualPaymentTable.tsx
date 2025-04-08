@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import { Button } from '@/components/ui/Button'
 import {
@@ -14,24 +14,17 @@ import {
 import { markPaymentAsPaid } from '@/lib/actions/payments'
 import { useToast } from '@/lib/hooks/useToast'
 
-interface Payment {
+import { Plan, Tenant } from '.prisma/shared'
+
+type Payment = {
   id: string
   amount: number
   status: string
   dueDate: Date
-  tenant: {
-    name: string
-    plan: {
-      name: string
-      id: string
-      description: string | null
-      createdAt: Date
-      updatedAt: Date
-      price: number
-      billingCycle: number
-      features: any
-    } | null
-  }
+  subscription: {
+    plan: Plan | null
+    tenant: Tenant | null
+  } | null
 }
 
 interface ManualPaymentTableProps {
@@ -78,8 +71,12 @@ export function ManualPaymentTable({ payments }: ManualPaymentTableProps) {
       <TableBody>
         {payments.map((payment) => (
           <TableRow key={payment.id}>
-            <TableCell>{payment.tenant.name}</TableCell>
-            <TableCell>{payment.tenant.plan?.name || 'No plan'}</TableCell>
+            <TableCell>
+              {payment.subscription?.tenant?.name || 'No tenant'}
+            </TableCell>
+            <TableCell>
+              {payment.subscription?.plan?.name || 'No plan'}
+            </TableCell>
             <TableCell>${payment.amount}</TableCell>
             <TableCell>
               {new Date(payment.dueDate).toLocaleDateString()}
