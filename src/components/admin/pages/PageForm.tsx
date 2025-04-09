@@ -26,7 +26,6 @@ export function PageForm({ users, id, initialData }: PageFormProps) {
   })
 
   const onSubmit = async (data: PageFormData) => {
-    console.log({ data })
     if (id) await updatePage(id, data)
     else await createPage(data)
   }

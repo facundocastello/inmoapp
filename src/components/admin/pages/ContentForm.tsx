@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/forms/Input'
 import { Textarea } from '@/components/ui/forms/Textarea'
 import { createContent, updateContent } from '@/lib/actions/tenant/content'
+import { updatePageContent } from '@/lib/actions/tenant/page'
 
 const contentSchema = z.object({
   contents: z.array(
@@ -19,7 +20,7 @@ const contentSchema = z.object({
   ),
 })
 
-type ContentFormData = z.infer<typeof contentSchema>
+export type ContentFormData = z.infer<typeof contentSchema>
 
 interface ContentFormProps {
   initialData?: {
@@ -47,15 +48,8 @@ export function ContentForm({ initialData, pageId }: ContentFormProps) {
   } = methods
 
   const onSubmit = async (data: ContentFormData) => {
-    data.contents.forEach((d) => {
-      d.id
-        ? updateContent(d.id, d)
-        : createContent({
-            ...d,
-            authorId: '1',
-            pageId,
-          })
-    })
+    const updatedPage = await updatePageContent(pageId, data)
+    methods.setValue('contents', updatedPage.content)
   }
 
   return (
@@ -82,7 +76,7 @@ export function ContentForm({ initialData, pageId }: ContentFormProps) {
             <Input
               name={`contents.${index}.id`}
               label="id"
-              className={styles.hidden}
+              // className={styles.hidden}
               error={errors.contents?.[index]?.id?.message}
             />
             <Input

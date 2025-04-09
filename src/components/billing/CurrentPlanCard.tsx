@@ -35,8 +35,6 @@ export default function CurrentPlanCard({
 
   const isManualPayment = subscription?.paymentMethod === 'MANUAL'
 
-  console.log('suscription', subscription)
-
   return (
     <Card className={styles.card}>
       <CardHeader>

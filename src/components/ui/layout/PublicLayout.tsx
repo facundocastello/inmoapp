@@ -8,18 +8,17 @@ interface Page {
   slug: string
 }
 
-export default async function TenantLayout({
+export default async function PublicLayout({
   children,
-  params,
+  tenant,
 }: {
   children: React.ReactNode
-  params: Promise<{ tenant: string }>
+  tenant: string
 }) {
-  const { tenant } = await params
   const featuredPages = await getFeaturedPages()
 
   return (
-    <div className={styles.container}>
+    <div id="public-layout" className={styles.container}>
       <nav className={styles.nav}>
         <div className={styles.navContainer}>
           <div className={styles.navContent}>
@@ -53,15 +52,15 @@ export default async function TenantLayout({
 }
 
 const styles = {
-  container: 'min-h-screen bg-primary-200',
-  nav: 'bg-primary-100 shadow-sm',
+  container: 'min-h-screen bg-secondary-200',
+  nav: 'bg-secondary-100 shadow-sm',
   navContainer: 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8',
   navContent: 'flex justify-between h-16',
   navContentLeft: 'flex-shrink-0 flex items-center',
   navContentRight: 'hidden sm:ml-6 sm:flex sm:space-x-8',
   navContentLeftItem: 'flex-shrink-0 flex items-center',
-  navContentLeftItemLink: 'text-xl font-bold',
+  navContentLeftItemLink: 'text-xl font-bold text-secondary-900',
   navContentRightItem:
-    'inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900 hover:text-gray-500',
+    'inline-flex items-center px-1 pt-1 text-sm font-medium text-secondary-900 hover:text-secondary-500',
   main: 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8',
 }

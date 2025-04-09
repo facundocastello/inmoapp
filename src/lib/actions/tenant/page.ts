@@ -1,8 +1,11 @@
 'use server'
 
-import { revalidatePath } from 'next/cache'
+import { revalidatePath, unstable_cache } from 'next/cache'
 
-import { getTenantClient } from '@/lib/get-tenant'
+import { ContentFormData } from '@/components/admin/pages/ContentForm'
+import { getTenantClient, getTenantId } from '@/lib/get-tenant'
+import { getTenantPrismaClient } from '@/lib/prisma'
+import { getTenantTag, revalidateTenantTag } from '@/lib/utils/cache'
 
 export async function createPage(data: PageFormData) {
   const tenantPrisma = await getTenantClient()
@@ -39,6 +42,43 @@ export async function updatePage(id: string, data: PageFormData) {
   })
   revalidatePath('/[tenant]')
   return page
+}
+
+export async function updatePageContent(id: string, data: ContentFormData) {
+  const tenantPrisma = await getTenantClient()
+  const page = await tenantPrisma.page.findUnique({
+    where: { id },
+    select: { authorId: true },
+  })
+  if (!page) throw new Error('Page not found')
+
+  const updateContent = data.contents.filter(({ id }) => id) as {
+    id: string
+    title: string
+    body: string
+  }[]
+  const createContent = data.contents.filter(({ id }) => !id) as {
+    title: string
+    body: string
+  }[]
+  const updatedPage = await tenantPrisma.page.update({
+    where: { id },
+    data: {
+      content: {
+        updateMany: updateContent.map((content) => ({
+          where: { id: content.id },
+          data: { title: content.title, body: content.body },
+        })),
+        create: createContent.map((content) => ({
+          ...content,
+          author: { connect: { id: page.authorId } },
+        })),
+      },
+    },
+    include: { content: true },
+  })
+  await revalidateTenantTag(`${updatedPage.slug}`)
+  return updatedPage
 }
 
 export async function deletePage(id: string) {
@@ -88,12 +128,20 @@ export async function getFeaturedPages() {
   })
 }
 
-export async function getPageBySlug(slug: string) {
-  const tenantPrisma = await getTenantClient()
+export async function getPageBySlug(slug: string, tenantId: string) {
+  const tenantPrisma = await getTenantPrismaClient(tenantId)
   return tenantPrisma.page.findUnique({
     where: { slug },
     include: { content: true },
   })
+}
+
+export const cachedGetPageBySlug = async (slug: string) => {
+  const tenantId = await getTenantId()
+  if (!tenantId) throw new Error('Tenant ID not found')
+  return unstable_cache(getPageBySlug, ['page', slug], {
+    tags: [await getTenantTag(slug)],
+  })(slug, tenantId)
 }
 
 export async function getHomepage() {

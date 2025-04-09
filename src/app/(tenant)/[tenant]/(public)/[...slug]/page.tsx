@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation'
 
-import { getPageBySlug } from '@/lib/actions/tenant/page'
+import { cachedGetPageBySlug } from '@/lib/actions/tenant/page'
 
 export default async function Page({
   params,
@@ -8,12 +8,10 @@ export default async function Page({
   params: Promise<{ slug: string[] }>
 }) {
   const slug = (await params).slug
-  const page = await getPageBySlug(`/${slug.join('/')}`)
-  console.log({ here: page })
+  const page = await cachedGetPageBySlug(`/${slug.join('/')}`)
 
-  if (!page) {
-    notFound()
-  }
+  if (!page) notFound()
+
   return (
     <div className={styles.container}>
       <h1 className={styles.title}>{page.title}</h1>
@@ -28,7 +26,7 @@ export default async function Page({
 }
 
 const styles = {
-  container: 'container mx-auto px-4 py-8 bg-primary-100',
+  container: 'container mx-auto px-4 py-8 bg-secondary-100',
   title: 'text-4xl font-bold mb-6',
   content: 'prose max-w-none',
 }

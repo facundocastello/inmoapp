@@ -49,3 +49,7 @@ body {
     animation: skeleton-shine 2s ease-in-out infinite;
   }
 }
+
+#public-layout {
+  color: var(--color-secondary-900);
+}
