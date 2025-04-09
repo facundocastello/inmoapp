@@ -22,7 +22,7 @@ async function main() {
   const adminPassword = await hash('AdminSecure123!', 12)
 
   const prismaClient = getTenantPrismaClient(defaultDb)
-  const admin = await prismaClient.user.upsert({
+  await prismaClient.user.upsert({
     where: {
       email: 'admin@tenant.example.com',
     },
@@ -50,40 +50,58 @@ async function main() {
     },
   })
 
-  // Create some sample content
-  await prismaClient.content.upsert({
+  await prismaClient.page.upsert({
     where: {
-      title: 'Welcome to Your New Site',
+      title: 'About Us',
     },
     update: {},
     create: {
-      title: 'Welcome to Your New Site',
-      body: `
-        <h1>Welcome to Your New Site</h1>
-        <p>This is a sample content page to help you get started.</p>
-        <p>You can edit this content or create new pages using the admin panel.</p>
-      `,
-      authorId: admin.id,
+      title: 'About Us',
+      slug: 'about-us',
+      isActive: true,
+      isFeatured: false,
+      isHome: false,
+      authorId: editor.id,
+      content: {
+        create: {
+          title: 'About Us',
+          body: `
+            <h1>About Us</h1>
+            <p>This is a sample about page.</p>
+            <p>Customize this content to tell your story.</p>
+          `,
+          authorId: editor.id,
+        },
+      },
     },
   })
 
-  await prismaClient.content.upsert({
+  await prismaClient.page.upsert({
     where: {
-      title: 'About Us',
+      title: 'Contact Us',
     },
     update: {},
     create: {
-      title: 'About Us',
-      body: `
-        <h1>About Us</h1>
-        <p>This is a sample about page.</p>
-        <p>Customize this content to tell your story.</p>
-      `,
+      title: 'Contact Us',
+      slug: 'contact-us',
+      isActive: true,
+      isFeatured: false,
+      isHome: false,
       authorId: editor.id,
+      content: {
+        create: {
+          title: 'About Us',
+          body: `
+            <h1>About Us</h1>
+            <p>This is a sample about page.</p>
+            <p>Customize this content to tell your story.</p>
+          `,
+          authorId: editor.id,
+        },
+      },
     },
   })
 }
-
 main()
   .catch((e) => {
     console.error('Error seeding tenant template database:', e)

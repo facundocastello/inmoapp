@@ -75,7 +75,6 @@ export default function CurrentPlanCard({
                 <CheckSubscription subscription={subscription} />
               )
             )}
-            <CheckSubscription subscription={subscription} />
 
             {isPaymentOverdue && !isInGracePeriod && (
               <div className={cn(styles.alert, styles.error)}>

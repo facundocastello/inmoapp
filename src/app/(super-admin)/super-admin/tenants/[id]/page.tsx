@@ -28,12 +28,12 @@ export default async function TenantPage({ params }: TenantPageProps) {
 
   return (
     <PageContainer>
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-semibold">Edit Tenant</h1>
+      <div className={styles.container}>
+        <div className={styles.header}>
+          <h1 className={styles.title}>Edit Tenant</h1>
         </div>
 
-        <div className="rounded-lg border border-primary-200 p-6">
+        <div className={styles.formContainer}>
           <TenantForm
             plans={plans}
             initialData={{
@@ -51,4 +51,11 @@ export default async function TenantPage({ params }: TenantPageProps) {
       </div>
     </PageContainer>
   )
+}
+
+const styles = {
+  container: 'space-y-6',
+  header: 'flex items-center justify-between',
+  title: 'text-2xl font-semibold',
+  formContainer: 'rounded-lg border border-primary-200 p-6',
 }

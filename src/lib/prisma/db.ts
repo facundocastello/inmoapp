@@ -1,4 +1,4 @@
-export async function createTenantDatabase(subdomain: string) {
+export async function pushTenantDatabase(subdomain: string) {
   try {
     const { exec } = await import('child_process')
     const { promisify } = await import('util')
@@ -8,7 +8,7 @@ export async function createTenantDatabase(subdomain: string) {
     console.log(`Using schema: ./prisma/tenant-schema.prisma`)
 
     await execAsync(
-      `TENANT_DATABASE_URL="${process.env.TENANT_DATABASE_URL?.replace('test', subdomain)}" prisma db push --schema=./prisma/tenant-schema.prisma`,
+      `TENANT_DATABASE_URL="${process.env.TENANT_DATABASE_URL?.replace('test', subdomain)}" prisma db push --accept-data-loss --schema=./prisma/tenant-schema.prisma`,
     )
 
     console.log(`Successfully created database for tenant: ${subdomain}`)

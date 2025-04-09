@@ -47,13 +47,13 @@ export default async function BillingPage({
           <CardHeader>
             <CardTitle>Payment History</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="space-y-4">
-              <h3 className="text-sm font-medium">Upload Payment Proof</h3>
-              <div className="space-y-4">
+          <CardContent className={styles.cardContent}>
+            <div className={styles.paymentSection}>
+              <h3 className={styles.uploadTitle}>Upload Payment Proof</h3>
+              <div className={styles.paymentList}>
                 {subscription?.payments.map((payment) => (
-                  <div key={payment.id} className="space-y-2">
-                    <p className="text-sm text-neutral-600">
+                  <div key={payment.id} className={styles.paymentItem}>
+                    <p className={styles.paymentDue}>
                       Payment due on{' '}
                       {new Date(payment.dueDate).toLocaleDateString()}
                     </p>
@@ -68,4 +68,13 @@ export default async function BillingPage({
       <PaymentTable payments={subscription?.payments || []} />
     </>
   )
+}
+
+const styles = {
+  cardContent: 'space-y-6',
+  paymentSection: 'space-y-4',
+  uploadTitle: 'text-sm font-medium',
+  paymentList: 'space-y-4',
+  paymentItem: 'space-y-2',
+  paymentDue: 'text-sm text-neutral-600',
 }

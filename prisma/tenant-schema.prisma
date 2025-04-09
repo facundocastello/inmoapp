@@ -13,26 +13,44 @@ datasource db {
 
 // User model for tenant-specific users
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
+  id        String    @id @default(cuid())
+  email     String    @unique
   password  String
   name      String
   role      UserRole
   avatar    String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   content   Content[]
+  pages     Page[]
 }
 
 // Content model for tenant-specific content
 model Content {
   id        String   @id @default(cuid())
-  title     String   @unique
+  title     String
   body      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  page      Page     @relation(fields: [pageId], references: [id])
+  pageId    String
   author    User     @relation(fields: [authorId], references: [id])
   authorId  String
+}
+
+// Page model for tenant-specific pages
+model Page {
+  id         String    @id @default(cuid())
+  title      String    @unique
+  slug       String    @unique
+  isActive   Boolean   @default(true)
+  isFeatured Boolean   @default(false)
+  isHome     Boolean   @default(false)
+  content    Content[]
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  author     User      @relation(fields: [authorId], references: [id])
+  authorId   String
 }
 
 // Enum for user roles
@@ -40,4 +58,4 @@ enum UserRole {
   ADMIN
   EDITOR
   VIEWER
-} 
+}

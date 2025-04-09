@@ -1,6 +1,15 @@
 'use client'
 
-import { LogOut, Menu, X } from 'lucide-react'
+import {
+  CreditCard,
+  FileText,
+  LayoutDashboard,
+  LogOut,
+  Menu,
+  Settings,
+  Users,
+  X,
+} from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { signOut } from 'next-auth/react'
@@ -11,7 +20,7 @@ import { cn } from '@/lib/utils'
 const navigation = [
   { name: 'Dashboard', href: '/admin', icon: 'LayoutDashboard' },
   { name: 'Users', href: '/admin/users', icon: 'Users' },
-  { name: 'Content', href: '/admin/content', icon: 'FileText' },
+  { name: 'Pages', href: '/admin/pages', icon: 'FileText' },
   { name: 'Billing', href: '/admin/billing', icon: 'CreditCard' },
   { name: 'Settings', href: '/admin/settings', icon: 'Settings' },
 ]
@@ -32,7 +41,7 @@ export const TenantSidebar = () => {
 
       {isMobileMenuOpen && (
         <div
-          className="fixed inset-0 z-30 bg-black/50 md:hidden"
+          className={styles.mobileOverlay}
           onClick={() => setIsMobileMenuOpen(false)}
         />
       )}
@@ -76,11 +85,13 @@ export const TenantSidebar = () => {
               onClick={() => setIsMobileMenuOpen(false)}
             >
               <span className={styles.icon}>
-                {item.icon === 'LayoutDashboard' && <Menu size={20} />}
-                {item.icon === 'Users' && <Menu size={20} />}
-                {item.icon === 'FileText' && <Menu size={20} />}
-                {item.icon === 'CreditCard' && <Menu size={20} />}
-                {item.icon === 'Settings' && <Menu size={20} />}
+                {item.icon === 'LayoutDashboard' && (
+                  <LayoutDashboard size={20} />
+                )}
+                {item.icon === 'Users' && <Users size={20} />}
+                {item.icon === 'FileText' && <FileText size={20} />}
+                {item.icon === 'CreditCard' && <CreditCard size={20} />}
+                {item.icon === 'Settings' && <Settings size={20} />}
               </span>
               {!isCollapsed && <span>{item.name}</span>}
             </Link>
@@ -110,6 +121,7 @@ const styles = {
     transition-colors duration-200
     md:hidden
   `,
+  mobileOverlay: 'fixed inset-0 z-30 bg-black/50 md:hidden',
   sidebar: `
     h-screen min-w-48
     bg-primary-200 border-r border-primary-300

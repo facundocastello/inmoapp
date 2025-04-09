@@ -28,9 +28,9 @@ export default async function TenantsPage({ searchParams }: TenantsPageProps) {
 
   return (
     <PageContainer>
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-semibold">Tenants</h1>
+      <div className={styles.container}>
+        <div className={styles.header}>
+          <h1 className={styles.title}>Tenants</h1>
           <Link href="/super-admin/tenants/new">
             <Button>Create Tenant</Button>
           </Link>
@@ -38,12 +38,12 @@ export default async function TenantsPage({ searchParams }: TenantsPageProps) {
 
         <TenantsTable tenants={tenants} />
 
-        <div className="flex items-center justify-between">
-          <div className="text-sm text-primary-800">
+        <div className={styles.footer}>
+          <div className={styles.paginationInfo}>
             Showing {(page - 1) * limit + 1} to {Math.min(page * limit, total)}{' '}
             of {total} tenants
           </div>
-          <div className="flex space-x-2">
+          <div className={styles.paginationButtons}>
             {page > 1 && (
               <Link
                 href={`/super-admin/tenants?page=${page - 1}&limit=${limit}`}
@@ -67,4 +67,13 @@ export default async function TenantsPage({ searchParams }: TenantsPageProps) {
       </div>
     </PageContainer>
   )
+}
+
+const styles = {
+  container: 'space-y-6',
+  header: 'flex items-center justify-between',
+  title: 'text-2xl font-semibold',
+  footer: 'flex items-center justify-between',
+  paginationInfo: 'text-sm text-primary-800',
+  paginationButtons: 'flex space-x-2',
 }

@@ -50,7 +50,7 @@ export default async function ManualPaymentsPage() {
   const { pendingPayments, gracePeriodsubscriptions } = await getData()
 
   return (
-    <div className="grid gap-6">
+    <div className={styles.container}>
       <Card>
         <CardHeader>
           <CardTitle>Pending Manual Payments</CardTitle>
@@ -65,15 +65,12 @@ export default async function ManualPaymentsPage() {
           <CardTitle>Tenants in Grace Period</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
+          <div className={styles.gracePeriodContainer}>
             {gracePeriodsubscriptions.map((sub) => (
-              <div
-                key={sub.id}
-                className="flex items-center justify-between p-4 border rounded-lg"
-              >
+              <div key={sub.id} className={styles.gracePeriodItem}>
                 <div>
-                  <h3 className="font-medium">{sub.tenant.name}</h3>
-                  <p className="text-sm text-gray-500">
+                  <h3 className={styles.tenantName}>{sub.tenant.name}</h3>
+                  <p className={styles.gracePeriodEnd}>
                     Grace period ends:{' '}
                     {new Date(
                       new Date(sub.graceStartedAt!).getTime() +
@@ -89,4 +86,12 @@ export default async function ManualPaymentsPage() {
       </Card>
     </div>
   )
+}
+
+const styles = {
+  container: 'grid gap-6',
+  gracePeriodContainer: 'space-y-4',
+  gracePeriodItem: 'flex items-center justify-between p-4 border rounded-lg',
+  tenantName: 'font-medium',
+  gracePeriodEnd: 'text-sm text-gray-500',
 }

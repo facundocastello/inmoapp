@@ -5,15 +5,15 @@ import { PageContainer } from '@/components/ui/layout/PageContainer'
 import { prisma } from '@/lib/prisma'
 
 interface EditPlanPageProps {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 export default async function EditPlanPage({ params }: EditPlanPageProps) {
   const plan = await prisma.plan.findUnique({
     where: {
-      id: params.id,
+      id: (await params).id,
     },
   })
 
@@ -29,10 +29,15 @@ export default async function EditPlanPage({ params }: EditPlanPageProps) {
 
   return (
     <PageContainer>
-      <div className="space-y-6">
-        <h1 className="text-2xl font-semibold">Edit Plan</h1>
+      <div className={styles.container}>
+        <h1 className={styles.title}>Edit Plan</h1>
         <PlanForm initialData={initialData} />
       </div>
     </PageContainer>
   )
+}
+
+const styles = {
+  container: 'space-y-6',
+  title: 'text-2xl font-semibold',
 }

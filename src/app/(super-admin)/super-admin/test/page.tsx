@@ -38,13 +38,13 @@ export default function TestPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className={styles.container}>
       <Card>
         <CardHeader>
           <CardTitle>Test Tenants</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <CardContent className={styles.cardContent}>
+          <div className={styles.buttonGrid}>
             <Button
               onClick={() => handleCreateTestTenant('expires-in-10-days')}
               isLoading={isLoading['expires-in-10-days']}
@@ -88,4 +88,10 @@ export default function TestPage() {
       </Card>
     </div>
   )
+}
+
+const styles = {
+  container: 'space-y-6',
+  cardContent: 'space-y-4',
+  buttonGrid: 'grid grid-cols-1 gap-4 sm:grid-cols-2',
 }

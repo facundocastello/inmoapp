@@ -5,9 +5,9 @@ ITS SUPER IMPORTANT TO ALWAYS FOLLOW LINEMENTS ON .cursor-context. (inline style
 ## Project Status
 
 - Current Phase: Foundation
-- Last Updated: April 5, 2024
-- Next Milestone: Tenant Signup System
-- Current Focus: Tenant Onboarding and Subscription Management
+- Last Updated: April 8, 2024
+- Next Milestone: Tenant Management Enhancements
+- Current Focus: Tenant Management and Analytics
 
 ## Completed Features
 
@@ -21,23 +21,46 @@ ITS SUPER IMPORTANT TO ALWAYS FOLLOW LINEMENTS ON .cursor-context. (inline style
 - Admin interfaces (Super Admin and Tenant Admin)
 - File Storage Upload & optimization & security
 
+### Tenant Signup System
+- Public Signup Flow: Complete signup process with plan selection and payment method integration
+- Tenant Database Provisioning: Automated database creation and configuration
+- Initial Setup Configuration: Tenant-specific settings and environment setup
+- Plan Selection: Integration of plan selection during signup process
+- Payment Method Selection: Support for both manual and automated payment methods
+
+### Subscription Management
+- Status Tracking: Real-time subscription status monitoring and updates
+- Cron Job System: Automated daily subscription checks and processing
+- Tenant Deactivation: Automated process for inactive subscriptions
+- Grace Period: Flexible grace period handling with configurable days
+- Plan Management: Complete CRUD operations for subscription plans
+- Billing Interface: User-friendly billing management dashboard
+- Payment History: Comprehensive payment tracking and history
+- Automated Payments: Integration with MercadoPago for recurring payments
+- Manual Payments: Support for manual payment processing and tracking
+- Proof Upload: Secure file upload system for payment verification
+
+### Payment Integration
+- MercadoPago Integration: Complete payment gateway integration
+- Subscription Creation: Automated subscription setup and management
+- Payment Processing: Secure payment processing and validation
+- Webhook System: Real-time payment status updates via webhooks
+- Status Updates: Automated payment status synchronization
+- Price Management: Dynamic subscription price updates
+- Cancellation Process: Streamlined subscription cancellation
+- Payment Methods: Support for both manual and automated payment options
+
 ## In Progress
 
-### Tenant Signup System
-- [x] Public Signup Flow
-  - [x] Signup form with validation
-  - [x] Tenant database provisioning
-  - [x] Initial setup configuration
-  - [ ] Welcome email and onboarding
-- [ ] Subscription Management
-  - [ ] Subscription status tracking
-  - [ ] Cron job for subscription checks
-  - [ ] Tenant deactivation process
-  - [ ] Grace period handling
-- [ ] Payment Integration (Future)
-  - [ ] Payment gateway setup
-  - [ ] Subscription plans
-  - [ ] Billing management
+### Tenant Management
+- [ ] Usage tracking dashboard
+- [ ] Subscription analytics
+- [ ] Multiple payment methods support
+- [ ] Subscription upgrade/downgrade
+- [ ] Prorated billing
+- [ ] Discount codes
+- [ ] Invoice generation
+- [ ] Payment receipt generation
 
 ## Upcoming Tasks
 
@@ -55,12 +78,18 @@ ITS SUPER IMPORTANT TO ALWAYS FOLLOW LINEMENTS ON .cursor-context. (inline style
 - [ ] Backup and recovery systems
 
 ## Technical Debt
-- None yet
+- Email sending implementation needs to be completed
+- Payment receipt generation needs to be implemented
+- Multiple payment methods support needs to be added
 
 ## Recent Decisions
 - Subdomain-based routing for tenant isolation
 - Component-based architecture with clear separation
 - TypeScript strict mode and modern tooling
-- Flexible tenant signup system with future payment integration
+- Flexible tenant signup system with payment integration
 - Cron-based subscription management for tenant activation/deactivation
 - Digital Ocean Spaces for file storage
+- MercadoPago integration for automated payments
+- Hybrid payment system (Manual/Automated)
+- Grace period implementation for payment delays
+- Webhook-based payment status updates

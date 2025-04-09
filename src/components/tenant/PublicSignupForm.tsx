@@ -80,10 +80,10 @@ export const PublicSignupForm = ({ plans }: PublicSignupFormProps) => {
 
       if (result.success && result.data?.oneUseToken) {
         // Redirect to the tenant's admin dashboard with the one-time use token
-        const baseUrl = window.location.origin
         const scheme = window.location.protocol
+        const host = window.location.host
         router.push(
-          `${scheme}://${data.subdomain}.${baseUrl.replace('https://', '')}/login?oneUseToken=${result.data.oneUseToken}`,
+          `${scheme}//${data.subdomain}.${host}/login?oneUseToken=${result.data.oneUseToken}`,
         )
       } else {
         // Handle error

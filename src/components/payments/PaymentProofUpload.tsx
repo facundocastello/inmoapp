@@ -65,9 +65,9 @@ export function PaymentProofUpload({
 
   return (
     <FormProvider {...form}>
-      <div className="flex flex-col items-center gap-4">
+      <div className={styles.container}>
         <FileInput
-          className="w-64"
+          className={styles.fileInput}
           name="proofOfPayment"
           accept="image/jpeg,image/png,application/pdf"
           disabled={isUploading}
@@ -78,11 +78,17 @@ export function PaymentProofUpload({
           type="submit"
           onClick={form.handleSubmit(handleSubmit)}
           disabled={isUploading}
-          className="w-full"
+          className={styles.button}
         >
           Upload
         </Button>
       </div>
     </FormProvider>
   )
+}
+
+const styles = {
+  container: 'flex flex-col items-center gap-4',
+  fileInput: 'w-64',
+  button: 'w-full',
 }

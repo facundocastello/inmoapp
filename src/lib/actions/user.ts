@@ -13,6 +13,11 @@ export type UserFormData = {
   avatar?: File | string | null
 }
 
+export const getUsers = async () => {
+  const prisma = await getTenantClient()
+  return prisma.user.findMany()
+}
+
 export const getUser = async (id: string) => {
   const prisma = await getTenantClient()
   return prisma.user.findUnique({

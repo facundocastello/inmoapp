@@ -49,11 +49,7 @@ export const TableCellImage = ({
   return (
     <td className={cn(styles.cell, className)} {...props}>
       {fileKey && (
-        <Image
-          className="w-12 h-12 rounded-full"
-          fileKey={fileKey}
-          alt="Preview"
-        />
+        <Image className={styles.image} fileKey={fileKey} alt="Preview" />
       )}
     </td>
   )
@@ -77,4 +73,5 @@ const styles = {
   cell: 'whitespace-nowrap px-6 py-4 text-primary-900',
   headerCell:
     'px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-primary-800 bg-primary-100/50',
+  image: 'w-12 h-12 rounded-full',
 }

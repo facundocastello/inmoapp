@@ -29,17 +29,20 @@ export function LoginForm({ oneUseToken }: { oneUseToken?: string }) {
 
   useEffect(() => {
     if (oneUseToken) {
+      setIsLoading(true)
       signIn('credentials', {
         oneUseToken,
         tenantSubdomain: tenantId,
         redirect: false,
-      }).then((result) => {
-        if (result?.error) {
-          setError(result.error)
-          return
-        }
-        redirect('/admin')
       })
+        .then((result) => {
+          if (result?.error) {
+            setError(result.error)
+            return
+          }
+          redirect('/admin')
+        })
+        .finally(() => setIsLoading(false))
     }
   }, [oneUseToken])
 

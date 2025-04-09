@@ -10,7 +10,11 @@ import {
   TableHeaderCell,
   TableRow,
 } from '@/components/ui/table/Table'
-import { deleteTenant, Tenants } from '@/lib/actions/tenant'
+import {
+  deleteTenant,
+  Tenants,
+  updateTenantDatabase,
+} from '@/lib/actions/tenant'
 
 interface TenantsTableProps {
   tenants: Tenants['data']
@@ -54,6 +58,16 @@ export const TenantsTable = ({ tenants }: TenantsTableProps) => {
                     Edit
                   </Button>
                 </Link>
+                <Button
+                  onClick={async () => {
+                    'use server'
+                    await updateTenantDatabase(tenant.subdomain)
+                  }}
+                  variant="outline"
+                  size="sm"
+                >
+                  Update Database
+                </Button>
                 <form
                   action={async () => {
                     'use server'
@@ -64,7 +78,7 @@ export const TenantsTable = ({ tenants }: TenantsTableProps) => {
                     Delete
                   </Button>
                   <Link
-                    className="text-primary-500 mx-4"
+                    className={styles.visitLink}
                     href={`http://${tenant.subdomain}.localhost:3000/login`}
                   >
                     Visit
@@ -84,4 +98,5 @@ const styles = {
   active: 'bg-success-100 text-success-800',
   inactive: 'bg-error-100 text-error-800',
   actions: 'flex space-x-2',
+  visitLink: 'text-primary-500 mx-4',
 }

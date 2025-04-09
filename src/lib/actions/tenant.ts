@@ -9,7 +9,7 @@ import { getTenantId } from '@/lib/get-tenant'
 import { getTenantPrismaClient, prisma } from '@/lib/prisma'
 import { darkColorsPreset } from '@/theme/colors'
 
-import { createTenantDatabase, deleteTenantDatabase } from '../prisma/db'
+import { deleteTenantDatabase, pushTenantDatabase } from '../prisma/db'
 import { uploadFile } from './file'
 import {
   PaymentMethod,
@@ -104,10 +104,17 @@ export async function getTenant(id: string) {
   }
 }
 
+export async function updateTenantDatabase(subdomain: string) {
+  const dbResult = await pushTenantDatabase(subdomain)
+  if (!dbResult.success) {
+    throw new Error('Failed to create tenant database')
+  }
+}
+
 export async function createTenant(data: TenantFormData) {
   try {
     // Create the tenant's database and push schema
-    const dbResult = await createTenantDatabase(data.subdomain)
+    const dbResult = await pushTenantDatabase(data.subdomain)
     if (!dbResult.success) {
       throw new Error('Failed to create tenant database')
     }
