@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils'
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'default' | 'outline' | 'ghost'
+  variant?: 'default' | 'outline' | 'ghost' | 'text'
   size?: 'default' | 'sm' | 'lg'
   isLoading?: boolean
 }
@@ -52,6 +52,7 @@ const styles = {
       'border border-primary-200 bg-primary-600 hover:bg-primary-600/90 hover:text-primary-900',
     ghost:
       'text-primary-900 bg-primary-200 hover:bg-primary-500 hover:text-primary-800',
+    text: 'text-primary-900 hover:text-primary-800',
   },
   sizes: {
     default: 'h-10 px-4 py-2',

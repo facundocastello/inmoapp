@@ -3,10 +3,9 @@
 import { redirect, useParams } from 'next/navigation'
 import { signIn } from 'next-auth/react'
 import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { FormProvider, useForm } from 'react-hook-form'
 
 import { Button } from '@/components/ui/Button'
-import { Form } from '@/components/ui/form/Form'
 import { Input } from '@/components/ui/forms/Input'
 import { Loader } from '@/components/ui/Loader'
 
@@ -73,7 +72,7 @@ export function LoginForm({ oneUseToken }: { oneUseToken?: string }) {
   return (
     <>
       {isLoading && <Loader />}
-      <Form {...form}>
+      <FormProvider {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className={styles.form}>
           <div className={styles.formContainer}>
             <h1 className={styles.title}>Welcome back</h1>
@@ -95,7 +94,7 @@ export function LoginForm({ oneUseToken }: { oneUseToken?: string }) {
             </Button>
           </div>
         </form>
-      </Form>
+      </FormProvider>
     </>
   )
 }

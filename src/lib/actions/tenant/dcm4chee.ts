@@ -4,7 +4,7 @@ import { revalidateTag } from 'next/cache'
 
 import { getTenantId } from '@/lib/get-tenant'
 import { prisma } from '@/lib/prisma'
-import { Dcm4cheeService } from '@/lib/utils/dcm4chee/service'
+import { Dcm4cheeService, DicomFilter } from '@/lib/utils/dcm4chee/service'
 
 import { cachedGetCurrentDroplet } from '../droplet'
 
@@ -16,12 +16,14 @@ export async function getDcm4cheeDeviceInfo() {
 export async function getDcm4cheeStudies({
   limit = 10,
   offset = 0,
+  filters = {},
 }: {
   limit?: number
   offset?: number
+  filters?: DicomFilter
 } = {}) {
   const service = await getDcm4cheeService()
-  return service.getStudies({ limit, offset })
+  return service.getStudies({ limit, offset, filters })
 }
 
 export async function createDcm4cheeAETitle({
@@ -35,26 +37,46 @@ export async function createDcm4cheeAETitle({
   return service.createAETitle(aetitle, description)
 }
 
-export async function uploadDicomFile({
-  file,
-}: {
-  file: File
-  aetitle: string
-  baseUrl?: string
-}) {
+export async function uploadDicomFile({ file }: { file: File }) {
   const service = await getDcm4cheeService()
   await service.uploadDicom(file)
 }
 
+export async function uploadPdfToStudy({
+  pdfFile,
+  studyInstanceUID,
+}: {
+  pdfFile: File
+  studyInstanceUID: string
+}) {
+  try {
+    const service = await getDcm4cheeService()
+
+    // Call the service method with improved error handling
+    const result = await service.uploadPdfToDicom(pdfFile, studyInstanceUID)
+
+    // Log success and return result
+    if (result.error) {
+      throw new Error(result.error)
+    }
+    console.log('PDF successfully uploaded to study', studyInstanceUID)
+    return result
+  } catch (error) {
+    console.error('Error in uploadPdfToStudy:', error)
+    // Rethrow for component-level error handling
+    throw error
+  }
+}
+
 export async function getDcm4cheeStudyByUID(studyUID: string) {
-  const dcm4cheeService = new Dcm4cheeService()
+  const dcm4cheeService = await getDcm4cheeService()
   return dcm4cheeService.getStudyByUIDWithSeriesAndInstances(studyUID)
 }
 
 const getDcm4cheeService = async () => {
   const tenant = await prisma.tenant.findUnique({
     where: {
-      id: (await getTenantId())!,
+      subdomain: (await getTenantId())!,
     },
     include: {
       droplet: true,
@@ -67,7 +89,6 @@ const getDcm4cheeService = async () => {
       throw new Error(droplet ? 'Droplet not found' : 'Droplet ip not found')
     ipAddress = droplet.ipAddress
   }
-
   const dcm4cheeService = new Dcm4cheeService({
     aet: tenant?.aetitle || undefined,
     host: ipAddress,

@@ -3,19 +3,25 @@ import React, { useState } from 'react'
 
 import { getDcm4cheeStudyByUID } from '@/lib/actions/tenant/dcm4chee'
 
+import { Button } from '../ui/Button'
+
 const ViewerPage = ({
   studyUID,
   study,
+  aetitle,
+  ipAddress,
 }: {
   studyUID: string
   study: Awaited<ReturnType<typeof getDcm4cheeStudyByUID>>
+  aetitle: string
+  ipAddress: string
 }) => {
   const [currentSeriesIndex, setCurrentSeriesIndex] = useState(0)
   const [currentInstanceIndex, setCurrentInstanceIndex] = useState(0)
   const [currentFrame, setCurrentFrame] = useState(1)
 
   const currentSeries = study.series[currentSeriesIndex]
-  const currentInstance = study.instances[currentInstanceIndex]
+  const currentInstance = currentSeries.instances[currentInstanceIndex]
   const numberOfFrames = currentInstance?.numberOfFrames || 1
 
   const handleSeriesChange = (direction: 'next' | 'prev') => {
@@ -31,7 +37,7 @@ const ViewerPage = ({
   const handleInstanceChange = (direction: 'next' | 'prev') => {
     if (
       direction === 'next' &&
-      currentInstanceIndex < study.instances.length - 1
+      currentInstanceIndex < currentSeries.instances.length - 1
     ) {
       setCurrentInstanceIndex(currentInstanceIndex + 1)
     } else if (direction === 'prev' && currentInstanceIndex > 0) {
@@ -46,8 +52,10 @@ const ViewerPage = ({
       setCurrentFrame(currentFrame - 1)
     }
   }
-
-  const imageUrl = `http://137.184.181.70:8080/dcm4chee-arc/aets/AS_RECEIVED/wado?requestType=WADO&studyUID=${studyUID}&seriesUID=${currentSeries.seriesInstanceUID}&objectUID=${currentInstance.sopInstanceUid}&contentType=image/jpeg&frameNumber=${currentFrame}`
+  const isPdf = currentInstance.sopClassUid === '1.2.840.10008.5.1.4.1.1.104.1'
+  const resourceUrl = isPdf
+    ? `http://${ipAddress}:8080/dcm4chee-arc/aets/${aetitle}/wado?requestType=WADO&studyUID=${studyUID}&seriesUID=${currentSeries.seriesInstanceUID}&objectUID=${currentInstance.sopInstanceUid}&contentType=application/pdf&frameNumber=${currentFrame}`
+    : `http://${ipAddress}:8080/dcm4chee-arc/aets/${aetitle}/wado?requestType=WADO&studyUID=${studyUID}&seriesUID=${currentSeries.seriesInstanceUID}&objectUID=${currentInstance.sopInstanceUid}&contentType=image/jpeg&frameNumber=${currentFrame}`
 
   return (
     <div className="flex flex-col items-center gap-4">
@@ -57,85 +65,83 @@ const ViewerPage = ({
         <div className="flex flex-col items-center gap-2">
           <span className="text-sm font-semibold">Series</span>
           <div className="flex gap-2">
-            <button
+            <Button
               onClick={() => handleSeriesChange('prev')}
               disabled={currentSeriesIndex === 0}
-              className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
             >
               Prev
-            </button>
+            </Button>
             <span className="px-3 py-1">
               {currentSeriesIndex + 1} / {study.series.length}
             </span>
-            <button
+            <Button
               onClick={() => handleSeriesChange('next')}
               disabled={currentSeriesIndex === study.series.length - 1}
-              className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
             >
               Next
-            </button>
+            </Button>
           </div>
         </div>
 
         <div className="flex flex-col items-center gap-2">
           <span className="text-sm font-semibold">Instance</span>
           <div className="flex gap-2">
-            <button
+            <Button
               onClick={() => handleInstanceChange('prev')}
               disabled={currentInstanceIndex === 0}
-              className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
             >
               Prev
-            </button>
+            </Button>
             <span className="px-3 py-1">
-              {currentInstanceIndex + 1} / {study.instances.length}
+              {currentInstanceIndex + 1} / {currentSeries.instances.length}
             </span>
-            <button
+            <Button
               onClick={() => handleInstanceChange('next')}
-              disabled={currentInstanceIndex === study.instances.length - 1}
-              className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
+              disabled={
+                currentInstanceIndex === currentSeries.instances.length - 1
+              }
             >
               Next
-            </button>
+            </Button>
           </div>
         </div>
 
-        {numberOfFrames > 1 && (
-          <div className="flex flex-col items-center gap-2">
-            <span className="text-sm font-semibold">Frame</span>
-            <div className="flex gap-2">
-              <button
-                onClick={() => handleFrameChange('prev')}
-                disabled={currentFrame === 1}
-                className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
-              >
-                Prev
-              </button>
-              <span className="px-3 py-1">
-                {currentFrame} / {numberOfFrames}
-              </span>
-              <button
-                onClick={() => handleFrameChange('next')}
-                disabled={currentFrame === numberOfFrames}
-                className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
-              >
-                Next
-              </button>
-            </div>
+        <div className="flex flex-col items-center gap-2">
+          <span className="text-sm font-semibold">Frame</span>
+          <div className="flex gap-2">
+            <Button
+              onClick={() => handleFrameChange('prev')}
+              disabled={currentFrame === 1}
+            >
+              Prev
+            </Button>
+            <span className="px-3 py-1">
+              {currentFrame} / {numberOfFrames}
+            </span>
+            <Button
+              onClick={() => handleFrameChange('next')}
+              disabled={currentFrame === numberOfFrames}
+            >
+              Next
+            </Button>
           </div>
-        )}
+        </div>
       </div>
 
       <div className="mt-4">
-        <img
-          style={{
-            width: currentInstance?.columns,
-            height: currentInstance?.rows,
-          }}
-          src={imageUrl}
-          alt="DICOM Image"
-          className="max-w-full"
-        />
+        {isPdf ? (
+          <iframe src={resourceUrl} width="100%" height="1000px" />
+        ) : (
+          <img
+            style={{
+              width: currentInstance?.columns,
+              height: currentInstance?.rows,
+            }}
+            src={resourceUrl}
+            alt="DICOM Image"
+            className="max-w-full"
+          />
+        )}
       </div>
     </div>
   )

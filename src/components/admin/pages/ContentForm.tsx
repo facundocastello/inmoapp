@@ -7,7 +7,6 @@ import * as z from 'zod'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/forms/Input'
 import { Textarea } from '@/components/ui/forms/Textarea'
-import { createContent, updateContent } from '@/lib/actions/tenant/content'
 import { updatePageContent } from '@/lib/actions/tenant/page'
 
 const contentSchema = z.object({

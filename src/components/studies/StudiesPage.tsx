@@ -43,7 +43,7 @@ export default function StudiesPage() {
     <div className={styles.container}>
       <h1 className={styles.title}>DICOM Studies</h1>
       <div className={styles.uploader}>
-        <DicomUploader aetitle="test" onUploadComplete={handleUploadComplete} />
+        <DicomUploader onUploadComplete={handleUploadComplete} />
       </div>
 
       {isLoading ? (

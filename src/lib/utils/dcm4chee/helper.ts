@@ -30,6 +30,7 @@ export interface MappedStudy {
   retrieveAETitle?: string
   url?: string
   specificCharacterSet?: string
+  series: MappedSeries[]
 }
 
 export function mapDicomStudy(study: DicomStudy): MappedStudy {
@@ -66,6 +67,7 @@ export function mapDicomStudy(study: DicomStudy): MappedStudy {
     url: study['00081190']?.Value?.[0],
 
     specificCharacterSet: study['00080005']?.Value?.[0],
+    series: [],
   }
 }
 
@@ -97,6 +99,7 @@ export interface MappedSeries {
   retrieveAETitle: string
   retrieveURL: string
   instanceAvailability: string
+  instances: MappedInstance[]
 }
 
 export function mapDicomSeries(series: DicomSeries): MappedSeries {
@@ -134,6 +137,7 @@ export function mapDicomSeries(series: DicomSeries): MappedSeries {
     retrieveAETitle: series['00080054']?.Value?.[0] || '',
     retrieveURL: series['7777106A']?.Value?.[0] || '',
     instanceAvailability: series['00080056']?.Value?.[0] || '',
+    instances: [],
   }
 }
 

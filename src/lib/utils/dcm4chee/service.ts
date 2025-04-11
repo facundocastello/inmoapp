@@ -1,4 +1,5 @@
 import dcmWebAppJson from './dcmWebApp.json'
+import dcmWebAppWadoJson from './dcmWebAppWado.json'
 import dicomNetworkAEJson from './dicomNetworkAE.json'
 import {
   mapDicomInstance,
@@ -18,6 +19,18 @@ import {
 
 const DEFAULT_HOST = '137.184.181.70'
 const DEFAULT_AET = 'DCM4CHEE'
+
+export interface DicomFilter {
+  PatientName?: string
+  PatientID?: string
+  AccessionNumber?: string
+  StudyDate?: string
+  Modality?: string
+  fuzzymatching?: boolean
+  orderby?: string
+  orderdir?: 'asc' | 'desc'
+  includefield?: string
+}
 
 export class Dcm4cheeService {
   private baseUrl: string
@@ -39,8 +52,38 @@ export class Dcm4cheeService {
     this.aet = aet
   }
 
-  private getStudiesEndpoint(limit: number = 21, offset: number = 0): string {
-    return `${this.baseUrl}/aets/${this.aet}/rs/studies?limit=${limit}&includefield=all&offset=${offset}`
+  private getStudiesEndpoint(
+    limit: number = 21,
+    offset: number = 0,
+    filters: DicomFilter = {},
+  ): string {
+    const params = new URLSearchParams()
+
+    // Add pagination
+    params.set('limit', limit.toString())
+    params.set('offset', offset.toString())
+
+    // Add includefield
+    params.set('includefield', filters.includefield || 'all')
+
+    // Add filters
+    if (filters.PatientName) params.set('PatientName', filters.PatientName)
+    if (filters.PatientID) params.set('PatientID', filters.PatientID)
+    if (filters.AccessionNumber)
+      params.set('AccessionNumber', filters.AccessionNumber)
+    if (filters.StudyDate) params.set('StudyDate', filters.StudyDate)
+    if (filters.Modality) params.set('Modality', filters.Modality)
+
+    // Add fuzzy matching if specified
+    if (filters.fuzzymatching) params.set('fuzzymatching', 'true')
+
+    // Add sorting if specified
+    if (filters.orderby)
+      params.set(
+        'orderby',
+        (filters.orderdir || 'asc') === 'asc' ? '' : '-' + filters.orderby,
+      )
+    return `${this.baseUrl}/aets/${this.aet}/rs/studies?${params.toString()}`
   }
 
   private getDeviceEndpoint(deviceName: string = 'dcm4chee-arc'): string {
@@ -60,16 +103,21 @@ export class Dcm4cheeService {
     {
       limit = 10,
       offset = 0,
+      filters = {},
     }: {
-      limit: number
-      offset: number
+      limit?: number
+      offset?: number
+      filters?: DicomFilter
     } = {
       limit: 10,
       offset: 0,
+      filters: {},
     },
   ): Promise<StudyResponse> {
     try {
-      const response = await fetch(this.getStudiesEndpoint(limit, offset))
+      const response = await fetch(
+        this.getStudiesEndpoint(limit, offset, filters),
+      )
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
@@ -140,9 +188,16 @@ export class Dcm4cheeService {
       newWebApp.dcmWebServicePath = `/dcm4chee-arc/aets/${aetitle}/rs`
       newWebApp.dicomAETitle = aetitle
 
+      const newWebAppWado = dcmWebAppWadoJson
+      newWebAppWado.dcmWebAppName = aetitle + '-wado'
+      newWebAppWado.dicomDescription = description
+      newWebAppWado.dcmWebServicePath = `/dcm4chee-arc/aets/${aetitle}/wado`
+      newWebAppWado.dicomAETitle = aetitle
+
       // Update device info with new AE and web app
       deviceInfo.dicomNetworkAE.push(newNetworkAE as DicomNetworkAE)
       deviceInfo.dcmDevice.dcmWebApp.push(newWebApp as DcmWebApp)
+      deviceInfo.dcmDevice.dcmWebApp.push(newWebAppWado as DcmWebApp)
 
       // Send PUT request to update device
       const response = await fetch(this.getDeviceEndpoint(), {
@@ -190,21 +245,21 @@ export class Dcm4cheeService {
   async getStudyByUIDWithSeriesAndInstances(studyUID: string) {
     try {
       // First, get the study details
-      // const studyResponse = await fetch(
-      //   `${this.baseUrl}/aets/${this.aet}/rs/studies`,
-      //   {
-      //     headers: {
-      //       Accept: 'application/json',
-      //     },
-      //   },
-      // )
+      const studyResponse = await fetch(
+        `${this.baseUrl}/aets/${this.aet}/rs/studies?StudyInstanceUID=${studyUID}&includefield=all`,
+        {
+          headers: {
+            Accept: 'application/json',
+          },
+        },
+      )
 
-      // if (!studyResponse.ok) {
-      //   throw new Error(`Failed to fetch study: ${studyResponse.statusText}`)
-      // }
+      if (!studyResponse.ok) {
+        throw new Error(`Failed to fetch study: ${studyResponse.statusText}`)
+      }
 
-      // const studyData: DicomStudy = await studyResponse.json()
-      // const mappedStudy = mapDicomStudy(studyData)
+      const studyData: DicomStudy = await studyResponse.json()
+      const mappedStudy = mapDicomStudy(studyData)
 
       // Then, get all series for this study
       const seriesResponse = await fetch(
@@ -219,7 +274,6 @@ export class Dcm4cheeService {
       if (!seriesResponse.ok) {
         throw new Error(`Failed to fetch series: ${seriesResponse.statusText}`)
       }
-
       const seriesData: DicomSeries[] = await seriesResponse.json()
       const mappedSeries = seriesData.map(mapDicomSeries)
 
@@ -239,19 +293,16 @@ export class Dcm4cheeService {
             `Failed to fetch instances: ${instancesResponse.statusText}`,
           )
         }
-
         const instancesData: DicomInstance[] = await instancesResponse.json()
         return instancesData.map(mapDicomInstance)
       })
 
       const instancesResults = await Promise.all(instancesPromises)
-      const allInstances = instancesResults.flat()
-
-      return {
-        // study: mappedStudy,
-        series: mappedSeries,
-        instances: allInstances,
-      }
+      mappedSeries.forEach((series, index) => {
+        series.instances = instancesResults[index]
+      })
+      mappedStudy.series = mappedSeries
+      return mappedStudy
     } catch (error) {
       console.error('Error fetching study with series and instances:', error)
       throw error
@@ -369,9 +420,8 @@ export class Dcm4cheeService {
 
       if (!res.ok) {
         const errorText = await res.text()
-        throw new Error(
-          `Failed to upload: ${res.status} ${res.statusText} - ${errorText}`,
-        )
+        console.error(`Failed to upload: `, res)
+        return { error: errorText }
       }
 
       const result = await res.json()
@@ -381,9 +431,380 @@ export class Dcm4cheeService {
       throw err
     }
   }
+
+  // Add getter methods for baseUrl and aet
+  getBaseUrl(): string {
+    return this.baseUrl
+  }
+
+  getAET(): string {
+    return this.aet
+  }
+
+  async uploadPdfToDicom(
+    pdfFile: File,
+    studyInstanceUID: string,
+  ): Promise<any> {
+    try {
+      // Query the study using the studies endpoint with a filter instead of direct access
+      const studyResponse = await fetch(
+        `${this.baseUrl}/aets/${this.aet}/rs/studies?StudyInstanceUID=${studyInstanceUID}&includefield=all`,
+        {
+          headers: {
+            Accept: 'application/json',
+          },
+        },
+      )
+
+      if (!studyResponse.ok) {
+        throw new Error(`Failed to fetch study: ${studyResponse.statusText}`)
+      }
+
+      const studyData: DicomStudy[] = await studyResponse.json()
+
+      if (!studyData || studyData.length === 0) {
+        throw new Error(`Study with UID ${studyInstanceUID} not found`)
+      }
+
+      const study = studyData[0]
+
+      // Create a deterministic series UID for PDF documents in this study
+
+      // Create a deterministic series UID for PDF documents in this study
+      // By using a hash of the study UID with a fixed suffix, we ensure all PDFs
+      // for the same study share the same series
+      const pdfSeriesHash = await hashString(
+        studyInstanceUID + '-pdf-documents',
+      )
+      const pdfSeriesInstanceUID = `${studyInstanceUID}.${pdfSeriesHash}`
+
+      // Create a unique SOP Instance UID for this specific PDF
+      const sopInstanceUID = generateDicomUID()
+
+      // Create a DICOM file from the PDF that's associated with the given study
+      const dicomBlob = await convertPdfToDicomBlob(
+        await pdfFile.arrayBuffer(),
+        {
+          studyInstanceUID,
+          seriesInstanceUID: pdfSeriesInstanceUID,
+          sopInstanceUID,
+          filename: pdfFile.name,
+          patientName: study['00100010']?.Value?.[0]?.Alphabetic,
+          issuerOfPatientID: study['00100021']?.Value?.[0],
+          patientID: study['00100020']?.Value?.[0],
+          studyDate: study['00080020']?.Value?.[0],
+          studyTime: study['00080030']?.Value?.[0],
+          accessionNumber: study['00080050']?.Value?.[0],
+          studyDescription: study['00081030']?.Value?.[0],
+        },
+      )
+
+      // Upload the converted DICOM file
+      const result = await this.uploadDicom(
+        new File([dicomBlob], `${pdfFile.name}.dcm`, {
+          type: 'application/dicom',
+        }),
+      )
+
+      if (result && typeof result === 'object' && 'error' in result) {
+        console.error('Upload error:', result.error)
+        return result
+      }
+
+      return result
+    } catch (error) {
+      console.error('Error converting PDF to DICOM:', error)
+      throw error
+    }
+  }
+}
+
+// Types for DICOM conversion
+interface DicomConversionOptions {
+  studyInstanceUID?: string
+  seriesInstanceUID?: string
+  sopInstanceUID?: string
+  filename?: string
+  patientName?: string
+  patientID?: string
+  issuerOfPatientID?: string
+  studyDate?: string
+  studyTime?: string
+  accessionNumber?: string
+  studyDescription?: string
+}
+
+interface DicomTag {
+  tag: [number, number]
+  vr: string
+  value: Uint8Array
+}
+
+/**
+ * Converts a PDF buffer to a DICOM format blob
+ */
+async function convertPdfToDicomBlob(
+  pdfArrayBuffer: ArrayBuffer,
+  options: DicomConversionOptions = {},
+): Promise<Blob> {
+  const pdfBytes = new Uint8Array(pdfArrayBuffer)
+  const filename = options.filename || 'document.pdf'
+
+  // Use the provided study UID (required) and generate new UIDs for series and SOP instance
+  if (!options.studyInstanceUID) {
+    throw new Error('Study Instance UID is required for PDF conversion')
+  }
+
+  // Use the provided UIDs or generate new ones
+  const sopInstanceUID = options.sopInstanceUID || generateDicomUID() // Always fresh
+  const seriesInstanceUID = options.seriesInstanceUID || generateDicomUID()
+  const studyInstanceUID = options.studyInstanceUID // Must use existing study UID
+
+  // Helper to write a DICOM tag
+  const writeTag = (group: number, element: number): number[] => [
+    group & 0xff,
+    (group >> 8) & 0xff,
+    element & 0xff,
+    (element >> 8) & 0xff,
+  ]
+
+  // Helper to write a VR (Value Representation) + length
+  const writeVR = (vr: string, length: number): Uint8Array => {
+    // DICOM has different encoding rules for different VR types
+    if (['OB', 'OW', 'SQ', 'UN', 'UT'].includes(vr)) {
+      // These VRs have a 2-byte VR, followed by 2 reserved bytes, followed by a 4-byte length
+      const view = new Uint8Array(8)
+      // Write VR
+      view[0] = vr.charCodeAt(0)
+      view[1] = vr.charCodeAt(1)
+      // 2 reserved bytes (0)
+      view[2] = 0
+      view[3] = 0
+      // 4-byte length (little endian)
+      view[4] = length & 0xff
+      view[5] = (length >> 8) & 0xff
+      view[6] = (length >> 16) & 0xff
+      view[7] = (length >> 24) & 0xff
+      return view
+    } else {
+      // Standard VRs have a 2-byte VR followed by a 2-byte length
+      const view = new Uint8Array(4)
+      // Write VR
+      view[0] = vr.charCodeAt(0)
+      view[1] = vr.charCodeAt(1)
+      // 2-byte length (little endian)
+      view[2] = length & 0xff
+      view[3] = (length >> 8) & 0xff
+      return view
+    }
+  }
+
+  // Define all the DICOM tags needed for an Encapsulated PDF
+  const fields: DicomTag[] = [
+    { tag: [0x0002, 0x0000], vr: 'UL', value: new Uint8Array([72, 0, 0, 0]) }, // File Meta Info Group Length
+    { tag: [0x0002, 0x0001], vr: 'OB', value: new Uint8Array([0x00, 0x01]) }, // File Meta Info Version
+    {
+      tag: [0x0002, 0x0002],
+      vr: 'UI',
+      value: stringToBytes('1.2.840.10008.5.1.4.1.1.104.1'),
+    }, // SOP Class UID (Encapsulated PDF)
+    { tag: [0x0002, 0x0003], vr: 'UI', value: stringToBytes(sopInstanceUID) }, // Media Storage SOP Instance UID
+
+    {
+      tag: [0x0002, 0x0010],
+      vr: 'UI',
+      value: stringToBytes('1.2.840.10008.1.2.1'),
+    }, // Transfer Syntax UID (Explicit VR Little Endian)
+
+    // Required character set for international text
+    { tag: [0x0008, 0x0005], vr: 'CS', value: stringToBytes('ISO_IR 192') }, // Specific Character Set (UTF-8)
+
+    // Instance Creation information
+    { tag: [0x0008, 0x0012], vr: 'DA', value: stringToBytes(getCurrentDate()) }, // Instance Creation Date
+    { tag: [0x0008, 0x0013], vr: 'TM', value: stringToBytes(getCurrentTime()) }, // Instance Creation Time
+    {
+      tag: [0x0008, 0x0014],
+      vr: 'UI',
+      value: stringToBytes('2.25.22494752317116273610107671966225830014'),
+    }, // Instance Creator UID (fixed for this application)
+
+    // Content identification
+    { tag: [0x0020, 0x0013], vr: 'IS', value: stringToBytes('1') }, // Instance Number
+    { tag: [0x0008, 0x0023], vr: 'DA', value: stringToBytes(getCurrentDate()) }, // Content Date
+    { tag: [0x0008, 0x0033], vr: 'TM', value: stringToBytes(getCurrentTime()) }, // Content Time
+
+    // Study, Series, and Instance identification
+    { tag: [0x0020, 0x000d], vr: 'UI', value: stringToBytes(studyInstanceUID) }, // Study Instance UID
+    {
+      tag: [0x0020, 0x000e],
+      vr: 'UI',
+      value: stringToBytes(seriesInstanceUID),
+    }, // Series Instance UID
+    {
+      tag: [0x0008, 0x0016],
+      vr: 'UI',
+      value: stringToBytes('1.2.840.10008.5.1.4.1.1.104.1'),
+    }, // SOP Class UID
+    { tag: [0x0008, 0x0018], vr: 'UI', value: stringToBytes(sopInstanceUID) }, // SOP Instance UID
+
+    // Basic metadata
+    { tag: [0x0008, 0x0060], vr: 'CS', value: stringToBytes('DOC') }, // Modality
+    {
+      tag: [0x0008, 0x103e],
+      vr: 'LO',
+      value: stringToBytes('PDF Documents'),
+    }, // Series Description
+    { tag: [0x0020, 0x0011], vr: 'IS', value: stringToBytes('1') }, // Series Number
+    { tag: [0x0020, 0x0013], vr: 'IS', value: stringToBytes('1') }, // Instance Number
+
+    // Patient and study information
+    ...(options.patientName
+      ? [
+          {
+            tag: [0x0010, 0x0010] as [number, number],
+            vr: 'PN',
+            value: stringToBytes(options.patientName),
+          },
+        ]
+      : []), // Patient Name
+    ...(options.issuerOfPatientID
+      ? [
+          {
+            tag: [0x0010, 0x0021] as [number, number],
+            vr: 'LO',
+            value: stringToBytes(options.issuerOfPatientID),
+          },
+        ]
+      : []), // Patient ID
+    ...(options.patientID
+      ? [
+          {
+            tag: [0x0010, 0x0020] as [number, number],
+            vr: 'LO',
+            value: stringToBytes(options.patientID),
+          },
+        ]
+      : []), // Patient ID
+    ...(options.studyDate
+      ? [
+          {
+            tag: [0x0008, 0x0020] as [number, number],
+            vr: 'DA',
+            value: stringToBytes(options.studyDate),
+          },
+        ]
+      : []), // Study Date
+    ...(options.studyTime
+      ? [
+          {
+            tag: [0x0008, 0x0030] as [number, number],
+            vr: 'TM',
+            value: stringToBytes(options.studyTime),
+          },
+        ]
+      : []), // Study Time
+    ...(options.accessionNumber
+      ? [
+          {
+            tag: [0x0008, 0x0050] as [number, number],
+            vr: 'SH',
+            value: stringToBytes(options.accessionNumber),
+          },
+        ]
+      : []), // Accession Number
+    ...(options.studyDescription
+      ? [
+          {
+            tag: [0x0008, 0x1030] as [number, number],
+            vr: 'LO',
+            value: stringToBytes(options.studyDescription),
+          },
+        ]
+      : []), // Study Description
+
+    // PDF specific attributes
+    { tag: [0x0008, 0x0070], vr: 'LO', value: stringToBytes('Clinic App') }, // Manufacturer
+    {
+      tag: [0x0042, 0x0010],
+      vr: 'ST',
+      value: stringToBytes('application/pdf'),
+    }, // MIME Type
+    { tag: [0x0042, 0x0011], vr: 'OB', value: pdfBytes }, // Encapsulated Document (the PDF)
+    { tag: [0x0042, 0x0012], vr: 'LO', value: stringToBytes(filename) }, // Document Title
+  ]
+
+  const dicomParts: (Uint8Array | Blob)[] = []
+
+  // DICOM 128-byte preamble + 'DICM'
+  dicomParts.push(new Uint8Array(128).fill(0))
+  dicomParts.push(new TextEncoder().encode('DICM'))
+
+  // Add all fields to the DICOM
+  for (const field of fields) {
+    dicomParts.push(new Uint8Array(writeTag(...field.tag)))
+    dicomParts.push(writeVR(field.vr, field.value.length))
+    dicomParts.push(field.value)
+  }
+
+  return new Blob(dicomParts, { type: 'application/dicom' })
+}
+
+/**
+ * Convert a string to bytes for DICOM format (null-terminated)
+ */
+function stringToBytes(str: string): Uint8Array {
+  const enc = new TextEncoder()
+  return enc.encode(str)
+}
+
+/**
+ * Generate a unique DICOM UID using UUID
+ */
+function generateDicomUID(): string {
+  const uuid = crypto.randomUUID().replace(/-/g, '')
+  const uid = '2.25.' + BigInt('0x' + uuid).toString()
+  return uid.slice(0, 64) // max UID length is 64 characters
+}
+
+/**
+ * Generate a simple hash string from input
+ */
+async function hashString(text: string): Promise<string> {
+  const encoder = new TextEncoder()
+  const data = encoder.encode(text)
+  const hashBuffer = await crypto.subtle.digest('SHA-1', data)
+  const hashArray = Array.from(new Uint8Array(hashBuffer))
+  // Convert to hex and take first 10 characters
+  return hashArray
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('')
+    .slice(0, 10)
 }
 
 interface PaginationOptions {
   limit?: number
   offset?: number
+}
+
+/**
+ * Get current date in DICOM format (YYYYMMDD)
+ */
+function getCurrentDate(): string {
+  const date = new Date()
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}${month}${day}`
+}
+
+/**
+ * Get current time in DICOM format (HHMMSS.mmm)
+ */
+function getCurrentTime(): string {
+  const date = new Date()
+  const hours = String(date.getHours()).padStart(2, '0')
+  const minutes = String(date.getMinutes()).padStart(2, '0')
+  const seconds = String(date.getSeconds()).padStart(2, '0')
+  const milliseconds = String(date.getMilliseconds()).padStart(3, '0')
+  return `${hours}${minutes}${seconds}.${milliseconds}`
 }
