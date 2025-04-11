@@ -10,6 +10,8 @@ import { Input } from '@/components/ui/forms/Input'
 import { Textarea } from '@/components/ui/forms/Textarea'
 import { createPlan, type PlanData, updatePlan } from '@/lib/actions/plans'
 
+import { Checkbox } from '../ui/forms/Checkbox'
+
 const planSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   description: z.string().optional().nullable(),
@@ -20,6 +22,7 @@ const planSchema = z.object({
     maxProjects: z.number().min(1, 'Max projects must be at least 1'),
     customDomain: z.boolean(),
     apiAccess: z.boolean(),
+    hasDedicatedDroplet: z.boolean(),
   }),
 })
 
@@ -49,6 +52,7 @@ export const PlanForm = ({ initialData, isLoading = false }: PlanFormProps) => {
         maxProjects: initialData?.features.maxProjects || 1,
         customDomain: initialData?.features.customDomain || false,
         apiAccess: initialData?.features.apiAccess || false,
+        hasDedicatedDroplet: initialData?.features.hasDedicatedDroplet || false,
       },
     },
   })
@@ -68,6 +72,7 @@ export const PlanForm = ({ initialData, isLoading = false }: PlanFormProps) => {
         maxProjects: data.features.maxProjects,
         customDomain: data.features.customDomain,
         apiAccess: data.features.apiAccess,
+        hasDedicatedDroplet: data.features.hasDedicatedDroplet,
       },
     }
 
@@ -113,30 +118,28 @@ export const PlanForm = ({ initialData, isLoading = false }: PlanFormProps) => {
         <div className={styles.features}>
           <h3 className={styles.featuresTitle}>Features</h3>
           <div className={styles.grid}>
-            <div>
-              <Input
-                name="features.maxUsers"
-                label="Max Users"
-                type="number"
-                error={errors.features?.maxUsers?.message?.toString()}
-              />
-            </div>
-            <div>
-              <Input
-                name="features.maxStorage"
-                label="Max Storage (MB)"
-                type="number"
-                error={errors.features?.maxStorage?.message?.toString()}
-              />
-            </div>
-            <div>
-              <Input
-                name="features.maxProjects"
-                label="Max Projects"
-                type="number"
-                error={errors.features?.maxProjects?.message?.toString()}
-              />
-            </div>
+            <Input
+              name="features.maxUsers"
+              label="Max Users"
+              type="number"
+              error={errors.features?.maxUsers?.message?.toString()}
+            />
+            <Input
+              name="features.maxStorage"
+              label="Max Storage (MB)"
+              type="number"
+              error={errors.features?.maxStorage?.message?.toString()}
+            />
+            <Input
+              name="features.maxProjects"
+              label="Max Projects"
+              type="number"
+              error={errors.features?.maxProjects?.message?.toString()}
+            />
+            <Checkbox
+              name="features.hasDedicatedDroplet"
+              label="Has Dedicated Droplet"
+            />
           </div>
         </div>
 

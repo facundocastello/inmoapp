@@ -10,6 +10,7 @@ import { getTenantPrismaClient, prisma } from '@/lib/prisma'
 import { darkColorsPreset } from '@/theme/colors'
 
 import { deleteTenantDatabase, pushTenantDatabase } from '../prisma/db'
+import { initializeDroplet } from './droplet'
 import { uploadFile } from './file'
 import {
   PaymentMethod,
@@ -156,6 +157,7 @@ export async function createTenant(data: TenantFormData) {
       },
       select: DEFAULT_SELECT,
     })
+    await initializeDroplet(tenant.id)
 
     // If admin data is provided, create the admin user in the tenant's database
     if (data.admin) {

@@ -20,6 +20,8 @@ model Tenant {
   name         String
   email        String?
   subdomain    String   @unique
+  aetitle      String?  @unique
+  dropletId    String?
   description  String?
   logo         String?
   createdAt    DateTime @default(now())
@@ -33,6 +35,17 @@ model Tenant {
   superAdmin       SuperAdmin?
   subscriptionType SubscriptionType @default(MANUAL)
   subscription     Subscription?
+  droplet          Droplet?
+}
+
+model Droplet {
+  id        String  @id @default(cuid())
+  dropletId String
+  name      String
+  ipAddress String?
+  tenantId  String  @unique
+  isPool    Boolean @default(false)
+  tenant    Tenant  @relation(fields: [tenantId], references: [id])
 }
 
 // Super Admin model for system-wide administration
@@ -69,7 +82,7 @@ model Plan {
   name          String
   description   String?
   price         Float
-  features      Json? // Stores plan features as JSON
+  features      Json? // Stores plan features as PlanFeatures type
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   subscriptions Subscription[]

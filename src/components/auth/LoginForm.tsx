@@ -42,7 +42,7 @@ export function LoginForm({ oneUseToken }: { oneUseToken?: string }) {
           }
           redirect('/admin')
         })
-        .finally(() => setIsLoading(false))
+        .catch(() => setIsLoading(false))
     }
   }, [oneUseToken])
 

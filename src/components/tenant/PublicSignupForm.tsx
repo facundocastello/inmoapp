@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/forms/Input'
 import { Select } from '@/components/ui/forms/Select'
 import { Textarea } from '@/components/ui/forms/Textarea'
+import { LoadingMessage } from '@/components/ui/LoadingMessage'
 import { createTenant } from '@/lib/actions/tenant'
 
 const signupSchema = z.object({
@@ -97,6 +98,19 @@ export const PublicSignupForm = ({ plans }: PublicSignupFormProps) => {
   return (
     <FormProvider {...methods}>
       <form onSubmit={methods.handleSubmit(onSubmit)} className={styles.form}>
+        {isSubmitting && (
+          <LoadingMessage
+            messages={[
+              'Creating tenant',
+              'Initializing database',
+              'Creating server',
+              'Creating user',
+              'Adding your custom domain',
+              'Setting your landing page',
+              'Setting your admin panel',
+            ]}
+          />
+        )}
         <div className={styles.container}>
           <h2 className={styles.title}>Company Information</h2>
 

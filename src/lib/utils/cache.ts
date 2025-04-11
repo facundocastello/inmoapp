@@ -9,6 +9,5 @@ export async function revalidateTenantTag(tag: string) {
 export async function getTenantTag(tag: string) {
   const tenantId = await getTenantId()
   if (!tenantId) return tag
-  console.log(`${tenantId}-${tag}`)
   return `${tenantId}-${tag}`
 }
