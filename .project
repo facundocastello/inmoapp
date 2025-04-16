@@ -1,6 +1,6 @@
 ITS SUPER IMPORTANT TO ALWAYS FOLLOW LINEMENTS ON .cursor-context. (inline style, use always ts, etc... READ IT)
 
-# Multi-Tenant Project Progress
+# InmoApp Project Progress
 
 ## Project Status
 
@@ -13,7 +13,7 @@ ITS SUPER IMPORTANT TO ALWAYS FOLLOW LINEMENTS ON .cursor-context. (inline style
 
 ### Core Infrastructure
 - Project initialization and structure
-- Database architecture with multi-tenant approach
+- Database architecture with InmoApp approach
 - Authentication system (Super-admin, Tenant admin, Public)
 - Development environment setup (Next.js, TypeScript, ESLint, Prettier)
 - Color system and theme implementation

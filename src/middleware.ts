@@ -9,8 +9,8 @@ export async function middleware(request: NextRequest) {
 
   if (host.includes('devtunnels.ms') || host.includes('vercel.app')) {
     const response = NextResponse.next()
-    const tenantId = pathname.split('/')[1]
-    response.headers.set('x-tenant-id', tenantId)
+    const tenantSubdomain = pathname.split('/')[1]
+    response.headers.set('x-tenant-id', tenantSubdomain)
     return response
   }
 
@@ -36,14 +36,14 @@ export async function middleware(request: NextRequest) {
   }
 
   // Extract tenant identifier from subdomain or path
-  let tenantId: string | null = null
+  let tenantSubdomain: string | null = null
 
   // Check for subdomain in development (localhost)
   const localhostMatch = host.match(/^([^.]+)\.localhost/)
   if (localhostMatch) {
     const subdomain = localhostMatch[1]
     if (subdomain !== 'www') {
-      tenantId = subdomain
+      tenantSubdomain = subdomain
     }
   }
   // Check for subdomain in production
@@ -56,39 +56,39 @@ export async function middleware(request: NextRequest) {
     if (hostParts.length >= 3) {
       const subdomain = hostParts[0]
       if (subdomain !== 'www') {
-        tenantId = subdomain
+        tenantSubdomain = subdomain
       }
     }
   }
 
   // If no subdomain, check for tenant in path
-  if (!tenantId) {
+  if (!tenantSubdomain) {
     const firstPathSegment = pathname.split('/')[1]
     if (firstPathSegment && firstPathSegment !== 'admin') {
-      tenantId = firstPathSegment
+      tenantSubdomain = firstPathSegment
     }
   }
 
   // If no tenant found, continue to landing page
-  if (!tenantId) {
+  if (!tenantSubdomain) {
     return NextResponse.next()
   }
 
   // Rewrite the URL to use the tenant's route group
   const newUrl = new URL(request.url)
 
-  if (tenantId) {
+  if (tenantSubdomain) {
     // Remove tenant from path if it was in the path
-    if (pathname.startsWith(`/${tenantId}`)) {
-      newUrl.pathname = pathname.replace(`/${tenantId}`, '')
+    if (pathname.startsWith(`/${tenantSubdomain}`)) {
+      newUrl.pathname = pathname.replace(`/${tenantSubdomain}`, '')
     }
     // Add tenant to the URL for routing
-    newUrl.pathname = `/${tenantId}${newUrl.pathname}`
+    newUrl.pathname = `/${tenantSubdomain}${newUrl.pathname}`
   }
 
   // Create response with tenant information
   const response = NextResponse.rewrite(newUrl)
-  response.headers.set('x-tenant-id', tenantId)
+  response.headers.set('x-tenant-id', tenantSubdomain)
 
   return response
 }

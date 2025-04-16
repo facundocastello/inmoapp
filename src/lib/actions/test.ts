@@ -2,10 +2,8 @@
 
 import { hash } from 'bcryptjs'
 
-import { getTenantPrismaClient, prisma } from '@/lib/prisma'
+import { prisma } from '@/lib/prisma'
 import { checkSubscriptions } from '@/lib/utils/payments/subscription'
-
-import { pushTenantDatabase } from '../prisma/db'
 
 const ONE_DAY = 24 * 60 * 60 * 1000
 
@@ -44,12 +42,6 @@ export async function createTestTenant(scenario: string) {
   const subdomain = `test-${scenario}-${Date.now()}`
   console.log(`Creating tenant with subdomain: ${subdomain}`)
 
-  // Create tenant database
-  const dbResult = await pushTenantDatabase(subdomain)
-  if (!dbResult.success) {
-    throw new Error('Failed to create tenant database')
-  }
-
   const tenant = await prisma.tenant.create({
     data: {
       name: `Test Tenant (${scenario})`,
@@ -70,13 +62,13 @@ export async function createTestTenant(scenario: string) {
     },
   })
 
-  const tenantPrisma = getTenantPrismaClient(subdomain)
-  await tenantPrisma.user.create({
+  await prisma.user.create({
     data: {
       email: 'test@test.com',
       password: await hash('test', 12),
       name: 'Test User',
       role: 'ADMIN',
+      tenantSubdomain: subdomain,
     },
   })
 

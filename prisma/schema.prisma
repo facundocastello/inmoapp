@@ -11,7 +11,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("SHARED_DATABASE_URL")
+  url      = env("DATABASE_URL")
 }
 
 // Tenant model to store information about each tenant
@@ -20,8 +20,6 @@ model Tenant {
   name         String
   email        String?
   subdomain    String   @unique
-  aetitle      String?  @unique
-  dropletId    String?
   description  String?
   logo         String?
   createdAt    DateTime @default(now())
@@ -33,31 +31,84 @@ model Tenant {
 
   themeSettings    ThemeSettings?
   superAdmin       SuperAdmin?
+  users            User[]
+  contents         Content[]
+  pages            Page[]
   subscriptionType SubscriptionType @default(MANUAL)
   subscription     Subscription?
-  droplet          Droplet?
 }
 
-model Droplet {
-  id        String  @id @default(cuid())
-  dropletId String
-  name      String
-  ipAddress String?
-  tenantId  String  @unique
-  isPool    Boolean @default(false)
-  tenant    Tenant  @relation(fields: [tenantId], references: [id])
+// User model for tenant-specific users
+model User {
+  id              String   @id @default(cuid())
+  email           String
+  password        String
+  name            String
+  avatar          String?
+  tenantSubdomain String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([email, tenantSubdomain])
+  tenant  Tenant    @relation(fields: [tenantSubdomain], references: [subdomain])
+  role    UserRole
+  content Content[]
+  pages   Page[]
+}
+
+// Content model for tenant-specific content
+model Content {
+  id              String   @id @default(cuid())
+  title           String
+  body            String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  pageId          String
+  authorId        String
+  tenantSubdomain String
+
+  @@unique([title, tenantSubdomain, pageId])
+  page   Page   @relation(fields: [pageId], references: [id])
+  author User   @relation(fields: [authorId], references: [id])
+  tenant Tenant @relation(fields: [tenantSubdomain], references: [subdomain])
+}
+
+// Page model for tenant-specific pages
+model Page {
+  id              String  @id @default(cuid())
+  title           String
+  slug            String
+  isActive        Boolean @default(true)
+  isFeatured      Boolean @default(false)
+  isHome          Boolean @default(false)
+  authorId        String
+  tenantSubdomain String
+
+  @@unique([slug, tenantSubdomain])
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  content   Content[]
+  author    User      @relation(fields: [authorId], references: [id])
+  tenant    Tenant    @relation(fields: [tenantSubdomain], references: [subdomain])
+}
+
+// Enum for user roles
+enum UserRole {
+  ADMIN
+  EDITOR
+  VIEWER
 }
 
 // Super Admin model for system-wide administration
 model SuperAdmin {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  password  String
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  tenant    Tenant   @relation(fields: [tenantId], references: [id])
-  tenantId  String   @unique
+  id              String   @id @default(cuid())
+  email           String   @unique
+  password        String
+  name            String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  tenant          Tenant   @relation(fields: [tenantSubdomain], references: [subdomain])
+  tenantSubdomain String   @unique
 }
 
 model Payment {
@@ -108,7 +159,7 @@ enum SubscriptionType {
 model Subscription {
   id              String    @id @default(cuid())
   externalId      String?   @unique
-  tenantId        String    @unique
+  tenantSubdomain String    @unique
   planId          String
   nextPaymentAt   DateTime?
   graceStartedAt  DateTime?
@@ -119,7 +170,7 @@ model Subscription {
 
   status        SubscriptionStatus @default(ACTIVE)
   paymentMethod PaymentMethod
-  tenant        Tenant             @relation(fields: [tenantId], references: [id])
+  tenant        Tenant             @relation(fields: [tenantSubdomain], references: [subdomain])
   plan          Plan               @relation(fields: [planId], references: [id])
   payments      Payment[]
 }
@@ -134,11 +185,11 @@ enum SubscriptionStatus {
 
 // Theme settings for tenant-specific color schemes
 model ThemeSettings {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  tenant    Tenant   @relation(fields: [tenantId], references: [id])
-  tenantId  String   @unique
+  id              String   @id @default(cuid())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  tenant          Tenant   @relation(fields: [tenantSubdomain], references: [subdomain])
+  tenantSubdomain String   @unique
 
   // Primary colors
   primary100 String

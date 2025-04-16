@@ -1,6 +1,7 @@
 'use server'
 
-import { getTenantClient } from '@/lib/get-tenant'
+import { requireTenantSubdomain } from '@/lib/get-tenant'
+import { prisma } from '@/lib/prisma'
 import { revalidateTenantTag } from '@/lib/utils/cache'
 
 import { getCurrentUser } from '../auth'
@@ -13,16 +14,17 @@ export async function createContent({
   body: string
   pageId: string
 }) {
-  const tenantPrisma = await getTenantClient()
+  const { tenantSubdomain } = await requireTenantSubdomain()
   const user = await getCurrentUser()
 
   if (!user) throw new Error('User not authenticated')
 
-  const content = await tenantPrisma.content.create({
+  const content = await prisma.content.create({
     data: {
       ...data,
       authorId: user.id,
       pageId,
+      tenantSubdomain,
     },
     include: { page: { select: { slug: true } } },
   })
@@ -37,9 +39,9 @@ export async function updateContent(
     body?: string
   },
 ) {
-  const tenantPrisma = await getTenantClient()
-  const content = await tenantPrisma.content.update({
-    where: { id },
+  const { tenantSubdomain } = await requireTenantSubdomain()
+  const content = await prisma.content.update({
+    where: { id, tenantSubdomain },
     data,
     include: { page: { select: { slug: true } } },
   })
@@ -48,26 +50,26 @@ export async function updateContent(
 }
 
 export async function deleteContent(id: string) {
-  const tenantPrisma = await getTenantClient()
-  const content = await tenantPrisma.content.delete({
-    where: { id },
+  const { tenantSubdomain } = await requireTenantSubdomain()
+  const content = await prisma.content.delete({
+    where: { id, tenantSubdomain },
     include: { page: { select: { slug: true } } },
   })
   await revalidateTenantTag(`${content.page.slug}`)
 }
 
 export async function getContent(id: string) {
-  const tenantPrisma = await getTenantClient()
-  return tenantPrisma.content.findUnique({
-    where: { id },
+  const { tenantSubdomain } = await requireTenantSubdomain()
+  return prisma.content.findUnique({
+    where: { id, tenantSubdomain },
     include: { page: true },
   })
 }
 
 export async function getContentByPage(pageId: string) {
-  const tenantPrisma = await getTenantClient()
-  return tenantPrisma.content.findMany({
-    where: { pageId },
+  const { tenantSubdomain } = await requireTenantSubdomain()
+  return prisma.content.findMany({
+    where: { pageId, tenantSubdomain },
     include: { page: true },
   })
 }

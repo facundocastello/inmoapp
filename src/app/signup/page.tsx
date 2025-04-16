@@ -10,7 +10,7 @@ export default async function SignupPage() {
         <div className={styles.header}>
           <h1 className={styles.title}>Create Your Tenant</h1>
           <p className={styles.subtitle}>
-            Get started with your own multi-tenant platform instance
+            Get started with your own InmoApp platform instance
           </p>
         </div>
 

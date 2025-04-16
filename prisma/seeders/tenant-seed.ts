@@ -1,58 +1,68 @@
 import { hash } from 'bcryptjs'
 
-import { PrismaClient as TenantPrismaClient } from '../../.prisma/tenant-client/index.js'
+import { PrismaClient } from '../../.prisma/shared/index.js'
 
-let tenantPrismaClient: TenantPrismaClient
+let prismaClient: PrismaClient
 
-const getTenantPrismaClient = (tenantSubdomain: string) => {
-  if (!tenantPrismaClient) {
-    tenantPrismaClient = new TenantPrismaClient({
-      datasources: {
-        db: { url: process.env.DATABASE_URL_PREFIX + tenantSubdomain },
-      },
-    })
+const getPrismaClient = () => {
+  if (!prismaClient) {
+    prismaClient = new PrismaClient()
   }
-  return tenantPrismaClient
+  return prismaClient
 }
-
-const defaultDb = 'test'
+const tenantSubdomain = 'test'
 
 async function main() {
   // Create an admin user
-  const adminPassword = await hash('AdminSecure123!', 12)
+  const adminPassword = await hash('Test1234', 12)
 
-  const prismaClient = getTenantPrismaClient(defaultDb)
+  const prismaClient = getPrismaClient()
   await prismaClient.user.upsert({
     where: {
-      email: 'admin@tenant.example.com',
+      email_tenantSubdomain: {
+        email: 'test@test.com',
+        tenantSubdomain,
+      },
     },
-    update: {},
+    update: {
+      password: adminPassword,
+    },
     create: {
-      email: 'admin@tenant.example.com',
+      email: 'test@test.com',
       password: adminPassword,
       name: 'Tenant Admin',
       role: 'ADMIN',
+      tenantSubdomain,
     },
   })
 
   // Create an editor user
-  const editorPassword = await hash('EditorSecure123!', 12)
+  const editorPassword = await hash('Test1234', 12)
   const editor = await prismaClient.user.upsert({
     where: {
-      email: 'editor@tenant.example.com',
+      email_tenantSubdomain: {
+        email: 'edit@test.com',
+        tenantSubdomain,
+      },
     },
-    update: {},
+    update: {
+      password: editorPassword,
+    },
     create: {
-      email: 'editor@tenant.example.com',
+      email: 'edit@test.com',
       password: editorPassword,
       name: 'Content Editor',
       role: 'EDITOR',
+      tenantSubdomain,
     },
   })
 
   await prismaClient.page.upsert({
     where: {
-      title: 'About Us',
+      slug_tenantSubdomain: {
+        slug: 'about-us',
+        tenantSubdomain,
+      },
     },
     update: {},
     create: {
@@ -62,6 +72,7 @@ async function main() {
       isFeatured: false,
       isHome: false,
       authorId: editor.id,
+      tenantSubdomain,
       content: {
         create: {
           title: 'About Us',
@@ -71,6 +82,7 @@ async function main() {
             <p>Customize this content to tell your story.</p>
           `,
           authorId: editor.id,
+          tenantSubdomain,
         },
       },
     },
@@ -78,7 +90,10 @@ async function main() {
 
   await prismaClient.page.upsert({
     where: {
-      title: 'Contact Us',
+      slug_tenantSubdomain: {
+        slug: 'contact-us',
+        tenantSubdomain,
+      },
     },
     update: {},
     create: {
@@ -88,6 +103,7 @@ async function main() {
       isFeatured: false,
       isHome: false,
       authorId: editor.id,
+      tenantSubdomain,
       content: {
         create: {
           title: 'About Us',
@@ -97,6 +113,7 @@ async function main() {
             <p>Customize this content to tell your story.</p>
           `,
           authorId: editor.id,
+          tenantSubdomain,
         },
       },
     },
@@ -108,6 +125,6 @@ main()
     process.exit(1)
   })
   .finally(async () => {
-    const prismaClient = getTenantPrismaClient(defaultDb)
+    const prismaClient = getPrismaClient()
     await prismaClient.$disconnect()
   })

@@ -1,16 +1,25 @@
 import { headers } from 'next/headers'
 
-import { getTenantPrismaClient } from './prisma'
+import { prisma } from './prisma'
 
-export async function getTenantId(): Promise<string | null> {
+export async function getTenantSubdomain(): Promise<string | null> {
   const headersList = await headers()
-  const tenantId = headersList.get('x-tenant-id')
+  const tenantSubdomain = headersList.get('x-tenant-id')
 
-  return tenantId || null
+  return tenantSubdomain || null
 }
 
 export async function getTenantClient() {
-  const tenantId = await getTenantId()
-  if (!tenantId) throw new Error('Tenant ID not found')
-  return getTenantPrismaClient(tenantId)
+  const tenantSubdomain = await getTenantSubdomain()
+  if (!tenantSubdomain) throw new Error('Tenant ID not found')
+  return {
+    prisma,
+    tenantSubdomain,
+  }
+}
+
+export async function requireTenantSubdomain() {
+  const tenantSubdomain = await getTenantSubdomain()
+  if (!tenantSubdomain) throw new Error('Tenant ID not found')
+  return { tenantSubdomain }
 }

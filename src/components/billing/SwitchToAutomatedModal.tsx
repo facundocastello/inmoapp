@@ -45,7 +45,7 @@ export function SwitchToAutomatedModal({
     try {
       setIsLoading(true)
       const response = await switchToAutomatedPayment(
-        subscription.tenantId,
+        subscription.tenantSubdomain,
         data.email,
       )
       if (!response || response.success) {

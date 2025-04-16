@@ -18,9 +18,8 @@ export default function PrivacyPolicyPage() {
             <p className={styles.paragraph}>
               En esta Política de Privacidad explicamos cómo recopilamos,
               utilizamos, procesamos y protegemos su información personal cuando
-              utiliza nuestra plataforma multi-tenant. Nos comprometemos a
-              proteger su privacidad y a manejar sus datos personales con
-              transparencia.
+              utiliza nuestra plataforma InmoApp. Nos comprometemos a proteger
+              su privacidad y a manejar sus datos personales con transparencia.
             </p>
           </section>
 

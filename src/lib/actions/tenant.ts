@@ -5,12 +5,10 @@ import { randomBytes } from 'crypto'
 import { revalidatePath, unstable_cache } from 'next/cache'
 import { redirect } from 'next/navigation'
 
-import { getTenantId } from '@/lib/get-tenant'
-import { getTenantPrismaClient, prisma } from '@/lib/prisma'
+import { prisma } from '@/lib/prisma'
 import { darkColorsPreset } from '@/theme/colors'
 
-import { deleteTenantDatabase, pushTenantDatabase } from '../prisma/db'
-import { initializeDroplet } from './droplet'
+import { getTenantSubdomain } from '../get-tenant'
 import { uploadFile } from './file'
 import {
   PaymentMethod,
@@ -36,7 +34,7 @@ export type TenantFormData = {
 
 export async function getCurrentTenantOrRedirect() {
   try {
-    const tenantSubdomain = await getTenantId()
+    const tenantSubdomain = await getTenantSubdomain()
     if (!tenantSubdomain) return null
     const tenant = await cachedGetTenant(tenantSubdomain)
     return tenant
@@ -46,8 +44,8 @@ export async function getCurrentTenantOrRedirect() {
 }
 
 export async function getTenantColorSchema(): Promise<PrismaTenant['theme']> {
-  const tenantId = await getTenantId()
-  if (!tenantId) return darkColorsPreset
+  const tenantSubdomain = await getTenantSubdomain()
+  if (!tenantSubdomain) return darkColorsPreset
   return darkColorsPreset
 }
 
@@ -105,21 +103,8 @@ export async function getTenant(id: string) {
   }
 }
 
-export async function updateTenantDatabase(subdomain: string) {
-  const dbResult = await pushTenantDatabase(subdomain)
-  if (!dbResult.success) {
-    throw new Error('Failed to create tenant database')
-  }
-}
-
 export async function createTenant(data: TenantFormData) {
   try {
-    // Create the tenant's database and push schema
-    const dbResult = await pushTenantDatabase(data.subdomain)
-    if (!dbResult.success) {
-      throw new Error('Failed to create tenant database')
-    }
-
     const parsedLogo =
       data.logo instanceof File
         ? await uploadFile(data.logo, { shouldOptimize: true })
@@ -157,19 +142,17 @@ export async function createTenant(data: TenantFormData) {
       },
       select: DEFAULT_SELECT,
     })
-    await initializeDroplet(tenant.id)
 
     // If admin data is provided, create the admin user in the tenant's database
     if (data.admin) {
-      const tenantPrisma = await getTenantPrismaClient(data.subdomain)
       const hashedPassword = await hash(data.admin.password, 10)
-
-      await tenantPrisma.user.create({
+      await prisma.user.create({
         data: {
           name: data.admin.name,
           email: data.admin.email,
           password: hashedPassword,
           role: 'ADMIN',
+          tenantSubdomain: data.subdomain,
         },
       })
     }
@@ -237,7 +220,7 @@ export async function deleteTenant(id: string) {
 
     // Delete all related records in the shared database
     const sub = await prisma.subscription.findUnique({
-      where: { tenantId: id },
+      where: { tenantSubdomain: id },
     })
     await prisma.$transaction([
       // Delete all payments associated with the tenant
@@ -245,19 +228,13 @@ export async function deleteTenant(id: string) {
         where: { subscriptionId: sub?.id },
       }),
       prisma.subscription.deleteMany({
-        where: { tenantId: id },
+        where: { tenantSubdomain: id },
       }),
       // Delete theme settings if exists
       prisma.themeSettings.deleteMany({
-        where: { tenantId: id },
+        where: { tenantSubdomain: id },
       }),
     ])
-
-    // Delete the tenant's database
-    const result = await deleteTenantDatabase(tenant.subdomain)
-    if (!result.success) {
-      throw new Error('Failed to delete tenant database')
-    }
 
     // Now we can safely delete the tenant
     await prisma.tenant.delete({
@@ -279,10 +256,10 @@ const getTenantBySubdomain = async (subdomain: string) => {
   return tenant
 }
 
-const cachedGetTenant = (tenantId: string) =>
-  unstable_cache(getTenantBySubdomain, ['tenant', tenantId], {
-    tags: [`tenant-${tenantId}`],
-  })(tenantId)
+const cachedGetTenant = (tenantSubdomain: string) =>
+  unstable_cache(getTenantBySubdomain, ['tenant', tenantSubdomain], {
+    tags: [`tenant-${tenantSubdomain}`],
+  })(tenantSubdomain)
 
 export type Tenants = Awaited<ReturnType<typeof getTenants>>
 export type Tenant = Awaited<ReturnType<typeof getTenant>>

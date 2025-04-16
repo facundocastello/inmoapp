@@ -16,13 +16,13 @@ type LoginFormValues = {
 
 export function LoginForm({ oneUseToken }: { oneUseToken?: string }) {
   const { tenant } = useParams<{ tenant: string }>()
-  const tenantId = tenant === 'login' ? null : tenant
+  const tenantSubdomain = tenant === 'login' ? null : tenant
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const form = useForm<LoginFormValues>({
     defaultValues: {
-      email: tenantId ? 'test@test.com' : 'superadmin@example.com',
-      password: tenantId ? 'test' : 'SuperSecure123!',
+      email: tenantSubdomain ? 'test@test.com' : 'superadmin@example.com',
+      password: tenantSubdomain ? 'Test1234' : 'SuperSecure123!',
     },
   })
 
@@ -31,7 +31,7 @@ export function LoginForm({ oneUseToken }: { oneUseToken?: string }) {
       setIsLoading(true)
       signIn('credentials', {
         oneUseToken,
-        tenantSubdomain: tenantId,
+        tenantSubdomain: tenantSubdomain,
         redirect: false,
       })
         .then((result) => {
@@ -54,7 +54,7 @@ export function LoginForm({ oneUseToken }: { oneUseToken?: string }) {
         email: data.email,
         password: data.password,
         redirect: false,
-        tenantSubdomain: tenantId || '',
+        tenantSubdomain: tenantSubdomain || '',
       })
 
       if (result?.error) {
@@ -63,7 +63,7 @@ export function LoginForm({ oneUseToken }: { oneUseToken?: string }) {
       }
 
       // Redirect to admin dashboard on success
-      redirect(tenantId ? '/admin' : '/super-admin')
+      redirect(tenantSubdomain ? '/admin' : '/super-admin')
     } finally {
       setIsLoading(false)
     }

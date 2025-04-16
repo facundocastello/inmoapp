@@ -14,7 +14,7 @@ Project Context:
 - Use react-hook-form for form handling
 - Use next-auth for authentication
 - Use Tailwind CSS for styling
-- Multi-tenant architecture:
+- InmoApp architecture:
   - Two Prisma schemas: tenant and shared
   - Each schema has its own types in .prisma directory
   - Import shared types: import { Type } from '.prisma/shared'

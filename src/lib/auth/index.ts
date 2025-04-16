@@ -8,9 +8,9 @@ import type { NextAuthOptions } from 'next-auth'
 import { getServerSession } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 
-import { getTenantPrismaClient, prisma } from '@/lib/prisma'
+import { prisma } from '@/lib/prisma'
 
-import { UserRole } from '.prisma/tenant-client'
+import { UserRole } from '.prisma/shared'
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -103,7 +103,7 @@ async function authenticateSuperAdmin({
     email: user.email,
     name: user.name,
     role: 'super-admin' as const,
-    tenantId: user.tenantId,
+    tenantSubdomain: user.tenantSubdomain,
     isTenantUser: false,
   }
 }
@@ -122,9 +122,8 @@ async function authenticateTenantUser({
   })
   if (!tenant) throw new Error('Tenant not found')
 
-  const tenantPrisma = getTenantPrismaClient(tenant.databaseName)
-  const user = await tenantPrisma.user.findUnique({
-    where: { email },
+  const user = await prisma.user.findUnique({
+    where: { email_tenantSubdomain: { email, tenantSubdomain } },
   })
   if (!user) throw new Error('User not found')
 
@@ -136,7 +135,7 @@ async function authenticateTenantUser({
     email: user.email,
     name: user.name,
     role: user.role,
-    tenantId: tenant.id,
+    tenantSubdomain: tenant.subdomain,
     isTenantUser: true,
   }
 }
@@ -155,8 +154,9 @@ async function authenticateWithOneTimeToken({
     throw new Error('Invalid one-time use token')
   }
 
-  const tenantPrisma = getTenantPrismaClient(tenant.databaseName)
-  const user = await tenantPrisma.user.findFirst()
+  const user = await prisma.user.findFirst({
+    where: { tenantSubdomain },
+  })
   if (!user) throw new Error('User not found')
 
   // Invalidate the one-time token after use
@@ -170,7 +170,7 @@ async function authenticateWithOneTimeToken({
     email: user.email,
     name: user.name,
     role: user.role,
-    tenantId: tenant.id,
+    tenantSubdomain: tenant.subdomain,
     isTenantUser: true,
   }
 }
@@ -179,7 +179,7 @@ interface User {
   id: string
   email: string
   name: string
-  tenantId: string
+  tenantSubdomain: string
   role: UserRole | 'super-admin'
   isTenantUser: boolean
 }

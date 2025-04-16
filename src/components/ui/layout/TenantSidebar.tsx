@@ -22,7 +22,6 @@ const navigation = [
   { name: 'Users', href: '/admin/users', icon: 'Users' },
   { name: 'Pages', href: '/admin/pages', icon: 'FileText' },
   { name: 'Billing', href: '/admin/billing', icon: 'CreditCard' },
-  { name: 'Studies', href: '/admin/studies', icon: 'FileText' },
   { name: 'Settings', href: '/admin/settings', icon: 'Settings' },
 ]
 

@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/forms/Input'
 import { Select } from '@/components/ui/forms/Select'
 import { createUser, updateUser, type UserFormData } from '@/lib/actions/user'
 
-import { User } from '.prisma/tenant-client'
+import { User } from '.prisma/shared'
 
 const userSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -29,7 +29,10 @@ const userSchema = z.object({
 })
 
 interface UserFormProps {
-  initialData?: Omit<User, 'password' | 'createdAt' | 'updatedAt'>
+  initialData?: Omit<
+    User,
+    'password' | 'createdAt' | 'updatedAt' | 'tenantSubdomain'
+  >
   isLoading?: boolean
 }
 

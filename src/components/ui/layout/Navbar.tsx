@@ -11,7 +11,6 @@ const navigation = [
   { name: 'Users', href: '/super-admin/users' },
   { name: 'Plans', href: '/super-admin/plans' },
   { name: 'Subscriptions', href: '/super-admin/subscriptions/manual' },
-  { name: 'Droplets', href: '/super-admin/droplets' },
   { name: 'Settings', href: '/super-admin/settings' },
 ]
 
@@ -23,7 +22,7 @@ export const Navbar = () => {
       <div className={styles.container}>
         <div className={styles.logo}>
           <Link href="/admin" className={styles.logoLink}>
-            Multi-Tenant Platform
+            InmoApp Platform
           </Link>
         </div>
         <div className={styles.navigation}>

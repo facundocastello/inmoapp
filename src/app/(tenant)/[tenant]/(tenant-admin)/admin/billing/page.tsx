@@ -24,7 +24,7 @@ export default async function BillingPage({
 
   const subscription = await prisma.subscription.findUnique({
     where: {
-      tenantId: tenant.id,
+      tenantSubdomain: tenant.subdomain,
     },
     include: {
       plan: true,

@@ -44,7 +44,7 @@ async function main() {
         email: 'superadmin@example.com',
         password: hashedPassword,
         name: 'Super Admin',
-        tenantId: tenant.id,
+        tenantSubdomain: tenant.subdomain,
       },
     })
   } catch (error) {

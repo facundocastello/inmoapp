@@ -1,10 +1,10 @@
-# Multi-Tenant Next.js Application
+# InmoApp Next.js Application
 
-A modern multi-tenant application built with Next.js, implementing tenant isolation and management features.
+A modern InmoApp application built with Next.js, implementing tenant isolation and management features.
 
 ## Features
 
-- Multi-tenant architecture with tenant isolation
+- InmoApp architecture with tenant isolation
 - Next.js 14 with App Router
 - TypeScript support
 - Modern UI with Tailwind CSS

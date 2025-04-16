@@ -2,7 +2,9 @@
 
 import { hash } from 'bcryptjs'
 
-import { getTenantClient } from '../get-tenant'
+import { prisma } from '@/lib/prisma'
+
+import { requireTenantSubdomain } from '../get-tenant'
 import { uploadFile } from './file'
 
 export type UserFormData = {
@@ -14,14 +16,18 @@ export type UserFormData = {
 }
 
 export const getUsers = async () => {
-  const prisma = await getTenantClient()
-  return prisma.user.findMany()
+  const { tenantSubdomain } = await requireTenantSubdomain()
+  return prisma.user.findMany({
+    where: {
+      tenantSubdomain,
+    },
+  })
 }
 
 export const getUser = async (id: string) => {
-  const prisma = await getTenantClient()
+  const { tenantSubdomain } = await requireTenantSubdomain()
   return prisma.user.findUnique({
-    where: { id },
+    where: { id, tenantSubdomain },
     select: {
       id: true,
       name: true,
@@ -33,7 +39,7 @@ export const getUser = async (id: string) => {
 }
 
 export const createUser = async (data: UserFormData) => {
-  const prisma = await getTenantClient()
+  const { tenantSubdomain } = await requireTenantSubdomain()
 
   const parsedAvatar =
     data.avatar instanceof File ? await uploadFile(data.avatar) : data.avatar
@@ -44,6 +50,7 @@ export const createUser = async (data: UserFormData) => {
       password: data.password || '', // In a real app, you'd hash this
       role: data.role,
       avatar: parsedAvatar,
+      tenantSubdomain,
     },
   })
 
@@ -51,7 +58,7 @@ export const createUser = async (data: UserFormData) => {
 }
 
 export const updateUser = async (id: string, data: UserFormData) => {
-  const prisma = await getTenantClient()
+  const { tenantSubdomain } = await requireTenantSubdomain()
   const parsedAvatar =
     data.avatar instanceof File ? await uploadFile(data.avatar) : data.avatar
   const user = await prisma.user.update({
@@ -62,14 +69,15 @@ export const updateUser = async (id: string, data: UserFormData) => {
       ...(data.password && { password: await hash(data.password, 12) }), // Only update password if provided, also hash this
       role: data.role,
       avatar: parsedAvatar,
+      tenantSubdomain,
     },
   })
   return { data: user }
 }
 
 export const deleteUser = async (id: string) => {
-  const prisma = await getTenantClient()
+  const { tenantSubdomain } = await requireTenantSubdomain()
   await prisma.user.delete({
-    where: { id },
+    where: { id, tenantSubdomain },
   })
 }

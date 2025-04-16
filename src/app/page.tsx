@@ -7,14 +7,12 @@ export default async function LandingPage() {
     <div className={styles.page}>
       <header className={styles.header}>
         <div className={styles.headerContainer}>
-          <h1 className={styles.title}>Multi-Tenant Platform</h1>
+          <h1 className={styles.title}>InmoApp Platform</h1>
         </div>
       </header>
       <main className={styles.main}>
         <div className={styles.content}>
-          <h2 className={styles.heading}>
-            Welcome to Our Multi-Tenant Platform
-          </h2>
+          <h2 className={styles.heading}>Welcome to Our InmoApp Platform</h2>
           <p className={styles.description}>
             Create your own tenant and get started with our powerful platform.
           </p>

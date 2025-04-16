@@ -18,19 +18,19 @@ interface ProcessPaymentResult {
 }
 
 export async function createSubscription({
-  tenantId,
+  tenantSubdomain,
   planId,
   externalId,
   paymentMethod,
 }: {
-  tenantId: string
+  tenantSubdomain: string
   planId: string
   externalId: string
   paymentMethod: PaymentMethod
 }): Promise<ProcessPaymentResult> {
   try {
     const subscription = await prisma.subscription.findUnique({
-      where: { tenantId },
+      where: { tenantSubdomain },
     })
 
     // Check if tenant already has a subscription
@@ -42,7 +42,7 @@ export async function createSubscription({
     }
 
     const tenant = await prisma.tenant.findUnique({
-      where: { id: tenantId },
+      where: { id: tenantSubdomain },
     })
     const plan = await prisma.plan.findUnique({
       where: { id: planId },
@@ -57,7 +57,7 @@ export async function createSubscription({
     // Create subscription
     const newSubscription = await prisma.subscription.create({
       data: {
-        tenantId,
+        tenantSubdomain,
         planId,
         externalId,
         paymentMethod,
@@ -67,7 +67,7 @@ export async function createSubscription({
 
     // Update tenant's subscription type
     await prisma.tenant.update({
-      where: { id: tenantId },
+      where: { id: tenantSubdomain },
       data: {
         subscriptionType: paymentMethod,
         subscription: { connect: { id: newSubscription.id } },
@@ -85,11 +85,11 @@ export async function createSubscription({
 }
 
 export async function switchToAutomatedPayment(
-  tenantId: string,
+  tenantSubdomain: string,
   email?: string,
 ) {
   const subscription = await prisma.subscription.findUnique({
-    where: { tenantId },
+    where: { tenantSubdomain },
     include: {
       plan: true,
       tenant: true,
@@ -119,7 +119,7 @@ export async function switchToAutomatedPayment(
   const result = subscription.externalId
     ? await getMercadoPagoSubscription(subscription.externalId)
     : await createMercadoPagoSubscription({
-        tenantId,
+        tenantSubdomain,
         planId: subscription?.planId,
         email: email as string,
         amount: subscription?.plan?.price,
@@ -131,7 +131,7 @@ export async function switchToAutomatedPayment(
   }
 
   await prisma.subscription.update({
-    where: { tenantId },
+    where: { tenantSubdomain },
     data: {
       paymentMethod: PaymentMethod.AUTOMATED,
       externalId: result.subscription.id,

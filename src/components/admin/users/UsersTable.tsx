@@ -11,9 +11,10 @@ import {
 } from '@/components/ui/table/Table'
 import { TableCellImage } from '@/components/ui/table/Table'
 import { deleteUser } from '@/lib/actions/user'
-import { TenantPrisma } from '@/lib/prisma/types/tenant'
 
-type Users = TenantPrisma.UserGetPayload<{
+import { Prisma } from '.prisma/shared'
+
+type Users = Prisma.UserGetPayload<{
   include: {
     content: true
   }

@@ -16,8 +16,8 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'Multi-tenant App',
-  description: 'Multi-tenant application with theme support',
+  title: 'InmoApp App',
+  description: 'InmoApp application with theme support',
 }
 
 export default async function RootLayout({

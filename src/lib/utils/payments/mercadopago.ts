@@ -17,7 +17,7 @@ const preapproval = new PreApproval(client)
 const payment = new Payment(client)
 
 interface CreateSubscriptionParams {
-  tenantId: string
+  tenantSubdomain: string
   planId: string
   email: string
   amount: number
@@ -26,7 +26,7 @@ interface CreateSubscriptionParams {
 }
 
 export async function createMercadoPagoSubscription({
-  tenantId,
+  tenantSubdomain,
   planId,
   email,
   amount,
@@ -34,7 +34,7 @@ export async function createMercadoPagoSubscription({
   currency,
 }: CreateSubscriptionParams) {
   console.log('Creating Mercado Pago subscription:', {
-    tenantId,
+    tenantSubdomain,
     planId,
     email,
     amount,
@@ -51,7 +51,7 @@ export async function createMercadoPagoSubscription({
     const subscription = await preapproval.create({
       body: {
         reason: `Subscription for plan ${plan.name}`,
-        external_reference: tenantId,
+        external_reference: tenantSubdomain,
         payer_email: email,
         auto_recurring: {
           frequency,
@@ -71,7 +71,7 @@ export async function createMercadoPagoSubscription({
   } catch (error) {
     console.error('Error creating subscription:', {
       error,
-      tenantId,
+      tenantSubdomain,
       planId,
       amount,
     })
