@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
+    "prebuild": "yarn generate && yarn generate:tenant",
     "start": "next start",
     "lint": "next lint",
     "studio": "prisma studio",

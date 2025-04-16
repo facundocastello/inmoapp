@@ -7,7 +7,7 @@ export async function middleware(request: NextRequest) {
   const host =
     request.headers.get('x-forwarded-host') || request.headers.get('host') || ''
 
-  if (host.includes('devtunnels.ms')) {
+  if (host.includes('devtunnels.ms') || host.includes('vercel.app')) {
     const response = NextResponse.next()
     const tenantId = pathname.split('/')[1]
     response.headers.set('x-tenant-id', tenantId)
@@ -48,9 +48,16 @@ export async function middleware(request: NextRequest) {
   }
   // Check for subdomain in production
   else if (host.includes('.') && !host.startsWith('localhost')) {
-    const subdomain = host.split('.')[0]
-    if (subdomain !== 'www') {
-      tenantId = subdomain
+    // Parse the hostname properly to identify subdomains
+    const hostParts = host.split('.')
+
+    // Only consider it a subdomain if we have at least 3 parts (subdomain.domain.tld)
+    // or if the first part is 'www' in a two-part domain (www.domain.tld)
+    if (hostParts.length >= 3) {
+      const subdomain = hostParts[0]
+      if (subdomain !== 'www') {
+        tenantId = subdomain
+      }
     }
   }
 

@@ -25,8 +25,7 @@ const StudyPage = async ({
       <ViewerPage
         studyUID={studyUID}
         study={study}
-        aetitle={tenant.aetitle}
-        ipAddress={droplet.ipAddress}
+        tenantSubdomain={tenant.subdomain}
       />
     </div>
   )
