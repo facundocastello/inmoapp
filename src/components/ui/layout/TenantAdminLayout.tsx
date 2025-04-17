@@ -1,5 +1,3 @@
-'use client'
-
 import { Breadcrumb } from './Breadcrumb'
 import { PageContainer } from './PageContainer'
 import { TenantSidebar } from './TenantSidebar'

@@ -1,13 +1,16 @@
 import { revalidateTag } from 'next/cache'
 
-import { getTenantSubdomain } from '../get-tenant'
+import { getTenantId } from '../get-tenant'
 
-export async function revalidateTenantTag(tag: string) {
-  return revalidateTag(await getTenantTag(tag))
+export async function revalidateTenantRelationTag(
+  tag: string,
+  tenantId?: string,
+) {
+  return revalidateTag(await getTenantRelationTag(tag, tenantId))
 }
 
-export async function getTenantTag(tag: string) {
-  const tenantSubdomain = await getTenantSubdomain()
-  if (!tenantSubdomain) return tag
-  return `${tenantSubdomain}-${tag}`
+export async function getTenantRelationTag(tag: string, id?: string) {
+  const tenantId = id || (await getTenantId())
+  if (!tenantId) return tag
+  return `${tenantId}-${tag}`
 }

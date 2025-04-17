@@ -68,7 +68,7 @@ export async function createTestTenant(scenario: string) {
       password: await hash('test', 12),
       name: 'Test User',
       role: 'ADMIN',
-      tenantSubdomain: subdomain,
+      tenantId: tenant.id,
     },
   })
 

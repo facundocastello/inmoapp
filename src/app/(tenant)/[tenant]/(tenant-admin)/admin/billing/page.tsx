@@ -24,7 +24,7 @@ export default async function BillingPage({
 
   const subscription = await prisma.subscription.findUnique({
     where: {
-      tenantSubdomain: tenant.subdomain,
+      tenantId: tenant.id,
     },
     include: {
       plan: true,
@@ -41,7 +41,6 @@ export default async function BillingPage({
     <>
       <CurrentPlanCard plan={plan} subscription={subscription} />
       {plan && <PlansTable plans={[plan]} />}
-
       {hasPendingPayments && (
         <Card>
           <CardHeader>

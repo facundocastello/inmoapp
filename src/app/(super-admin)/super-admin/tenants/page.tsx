@@ -9,6 +9,7 @@ interface TenantsPageProps {
   searchParams: Promise<{
     page?: string
     limit?: string
+    forceDelete?: string
   }>
 }
 
@@ -16,6 +17,7 @@ export default async function TenantsPage({ searchParams }: TenantsPageProps) {
   const awaitedParams = await searchParams
   const page = Number(awaitedParams.page || 1)
   const limit = Number(awaitedParams.limit || 10)
+  const forceDelete = awaitedParams.forceDelete
 
   const {
     data: tenants,
@@ -36,7 +38,7 @@ export default async function TenantsPage({ searchParams }: TenantsPageProps) {
           </Link>
         </div>
 
-        <TenantsTable tenants={tenants} />
+        <TenantsTable tenants={tenants} forceDelete={forceDelete} />
 
         <div className={styles.footer}>
           <div className={styles.paginationInfo}>

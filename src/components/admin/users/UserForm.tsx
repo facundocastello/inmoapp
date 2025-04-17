@@ -29,10 +29,7 @@ const userSchema = z.object({
 })
 
 interface UserFormProps {
-  initialData?: Omit<
-    User,
-    'password' | 'createdAt' | 'updatedAt' | 'tenantSubdomain'
-  >
+  initialData?: Omit<User, 'password' | 'createdAt' | 'updatedAt' | 'tenantId'>
   isLoading?: boolean
 }
 

@@ -32,7 +32,7 @@ export async function PlansSection({
               <p className={styles.planDescription}>{plan.description}</p>
             )}
             <ul className={styles.planFeatures}>
-              {Object.entries(plan.features as PlanFeature).map(
+              {Object.entries((plan.features || {}) as PlanFeature).map(
                 ([key, value]) => (
                   <li key={key} className={styles.planFeature}>
                     {typeof value === 'boolean' ? (

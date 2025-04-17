@@ -10,18 +10,45 @@ const getPrismaClient = () => {
   }
   return prismaClient
 }
-const tenantSubdomain = 'test'
-
 async function main() {
   // Create an admin user
   const adminPassword = await hash('Test1234', 12)
 
   const prismaClient = getPrismaClient()
+
+  const tenant = await prismaClient.tenant.upsert({
+    where: {
+      subdomain: 'test',
+    },
+    update: {},
+    create: {
+      name: 'Test Tenant',
+      subdomain: 'test',
+      isActive: true,
+      theme: {
+        primary: '#2186EB',
+        secondary: '#47A3F3',
+        accent: '#7CC4FA',
+      },
+      databaseName: 'test',
+      subscription: {
+        create: {
+          planId: '1',
+          paymentMethod: 'MANUAL',
+          status: 'ACTIVE',
+          gracePeriodDays: 15,
+          nextPaymentAt: new Date(),
+        },
+      },
+    },
+  })
+  const tenantId = tenant.id
+
   await prismaClient.user.upsert({
     where: {
-      email_tenantSubdomain: {
+      email_tenantId: {
         email: 'test@test.com',
-        tenantSubdomain,
+        tenantId,
       },
     },
     update: {
@@ -32,7 +59,7 @@ async function main() {
       password: adminPassword,
       name: 'Tenant Admin',
       role: 'ADMIN',
-      tenantSubdomain,
+      tenantId,
     },
   })
 
@@ -40,9 +67,9 @@ async function main() {
   const editorPassword = await hash('Test1234', 12)
   const editor = await prismaClient.user.upsert({
     where: {
-      email_tenantSubdomain: {
+      email_tenantId: {
         email: 'edit@test.com',
-        tenantSubdomain,
+        tenantId,
       },
     },
     update: {
@@ -53,15 +80,15 @@ async function main() {
       password: editorPassword,
       name: 'Content Editor',
       role: 'EDITOR',
-      tenantSubdomain,
+      tenantId,
     },
   })
 
   await prismaClient.page.upsert({
     where: {
-      slug_tenantSubdomain: {
+      slug_tenantId: {
         slug: 'about-us',
-        tenantSubdomain,
+        tenantId,
       },
     },
     update: {},
@@ -72,7 +99,7 @@ async function main() {
       isFeatured: false,
       isHome: false,
       authorId: editor.id,
-      tenantSubdomain,
+      tenantId,
       content: {
         create: {
           title: 'About Us',
@@ -82,7 +109,7 @@ async function main() {
             <p>Customize this content to tell your story.</p>
           `,
           authorId: editor.id,
-          tenantSubdomain,
+          tenantId,
         },
       },
     },
@@ -90,9 +117,9 @@ async function main() {
 
   await prismaClient.page.upsert({
     where: {
-      slug_tenantSubdomain: {
+      slug_tenantId: {
         slug: 'contact-us',
-        tenantSubdomain,
+        tenantId,
       },
     },
     update: {},
@@ -103,7 +130,7 @@ async function main() {
       isFeatured: false,
       isHome: false,
       authorId: editor.id,
-      tenantSubdomain,
+      tenantId,
       content: {
         create: {
           title: 'About Us',
@@ -113,7 +140,7 @@ async function main() {
             <p>Customize this content to tell your story.</p>
           `,
           authorId: editor.id,
-          tenantSubdomain,
+          tenantId,
         },
       },
     },

@@ -53,14 +53,14 @@ export function PlansTable({ plans }: PlansTableProps) {
             <TableCell>${plan.price}</TableCell>
             <TableCell>
               <div className={styles.features}>
-                {Object.entries(plan.features as Record<string, any>).map(
-                  ([key, value]) => (
-                    <div key={key} className={styles.feature}>
-                      {key}:{' '}
-                      {typeof value === 'number' ? value : value ? 'Yes' : 'No'}
-                    </div>
-                  ),
-                )}
+                {Object.entries(
+                  (plan.features || {}) as Record<string, any>,
+                ).map(([key, value]) => (
+                  <div key={key} className={styles.feature}>
+                    {key}:{' '}
+                    {typeof value === 'number' ? value : value ? 'Yes' : 'No'}
+                  </div>
+                ))}
               </div>
             </TableCell>
             <TableCell>

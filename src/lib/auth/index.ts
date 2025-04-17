@@ -103,7 +103,6 @@ async function authenticateSuperAdmin({
     email: user.email,
     name: user.name,
     role: 'super-admin' as const,
-    tenantSubdomain: user.tenantSubdomain,
     isTenantUser: false,
   }
 }
@@ -123,7 +122,7 @@ async function authenticateTenantUser({
   if (!tenant) throw new Error('Tenant not found')
 
   const user = await prisma.user.findUnique({
-    where: { email_tenantSubdomain: { email, tenantSubdomain } },
+    where: { email_tenantId: { email, tenantId: tenant.id } },
   })
   if (!user) throw new Error('User not found')
 
@@ -137,6 +136,7 @@ async function authenticateTenantUser({
     role: user.role,
     tenantSubdomain: tenant.subdomain,
     isTenantUser: true,
+    tenantId: tenant.id,
   }
 }
 
@@ -155,7 +155,7 @@ async function authenticateWithOneTimeToken({
   }
 
   const user = await prisma.user.findFirst({
-    where: { tenantSubdomain },
+    where: { tenantId: tenant.id },
   })
   if (!user) throw new Error('User not found')
 
@@ -172,6 +172,7 @@ async function authenticateWithOneTimeToken({
     role: user.role,
     tenantSubdomain: tenant.subdomain,
     isTenantUser: true,
+    tenantId: tenant.id,
   }
 }
 

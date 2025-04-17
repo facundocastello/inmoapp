@@ -19,7 +19,7 @@ export function SwitchToAutomatedButton({
 
   const handleButtonClick = () => {
     if (subscription.externalId) {
-      switchToAutomatedPayment(subscription.tenantSubdomain).then((result) => {
+      switchToAutomatedPayment(subscription.tenantId).then((result) => {
         setIsOpen(!result.success)
       })
     } else {

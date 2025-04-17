@@ -60,7 +60,7 @@ export async function markPaymentAsPaid(paymentId: string) {
         },
       }),
       prisma.subscription.update({
-        where: { tenantSubdomain: payment.subscription?.tenantSubdomain },
+        where: { tenantId: payment.subscription?.tenantId },
         data: {
           nextPaymentAt,
           graceStartedAt: null, // Clear grace period if it exists
@@ -132,13 +132,13 @@ interface ProcessPaymentResult {
 }
 
 export async function processPayment(
-  tenantSubdomain: string,
+  tenantId: string,
   amount: number,
   paymentMethod: PaymentMethod,
 ): Promise<ProcessPaymentResult> {
   try {
     const subscription = await prisma.subscription.findUnique({
-      where: { tenantSubdomain },
+      where: { tenantId },
       include: {
         plan: true,
         tenant: true,

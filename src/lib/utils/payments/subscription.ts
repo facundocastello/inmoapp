@@ -63,7 +63,6 @@ const checkSubscription = async (subscription: Subscription) => {
     subscription.gracePeriodDays,
   )
   const shouldStartGracePeriod = !graceStatus.isActive && !graceStatus.isExpired
-
   if (tenant.subscriptionType === SubscriptionType.MANUAL) {
     if (shouldStartGracePeriod) {
       await startGracePeriodForManualPayment(subscription)

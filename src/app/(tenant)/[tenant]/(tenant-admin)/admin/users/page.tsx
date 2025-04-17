@@ -2,14 +2,14 @@ import Link from 'next/link'
 
 import { UsersTable } from '@/components/admin/users/UsersTable'
 import { Button } from '@/components/ui/Button'
-import { requireTenantSubdomain } from '@/lib/get-tenant'
+import { requireTenantId } from '@/lib/get-tenant'
 import { prisma } from '@/lib/prisma'
 
 export default async function UsersPage() {
-  const { tenantSubdomain } = await requireTenantSubdomain()
+  const { tenantId } = await requireTenantId()
   const users = await prisma.user.findMany({
     where: {
-      tenantSubdomain,
+      tenantId,
     },
     include: {
       content: true,

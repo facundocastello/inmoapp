@@ -12,7 +12,7 @@ interface TenantPageProps {
 export default async function TenantPage({ params }: TenantPageProps) {
   const subscription = await prisma.subscription.findUnique({
     where: {
-      tenantSubdomain: (await params).id,
+      tenantId: (await params).id,
     },
     include: {
       plan: true,

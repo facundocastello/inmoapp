@@ -24,7 +24,7 @@ export default async function EditPlanPage({ params }: EditPlanPageProps) {
   // Convert features from JsonValue to Record<string, any>
   const initialData = {
     ...plan,
-    features: (plan.features as Record<string, any>) || {},
+    features: ((plan.features || {}) as Record<string, any>) || {},
   }
 
   return (

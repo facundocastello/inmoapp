@@ -1,8 +1,8 @@
 'use server'
 
-import { requireTenantSubdomain } from '@/lib/get-tenant'
+import { requireTenantId } from '@/lib/get-tenant'
 import { prisma } from '@/lib/prisma'
-import { revalidateTenantTag } from '@/lib/utils/cache'
+import { revalidateTenantRelationTag } from '@/lib/utils/cache'
 
 import { getCurrentUser } from '../auth'
 
@@ -14,7 +14,7 @@ export async function createContent({
   body: string
   pageId: string
 }) {
-  const { tenantSubdomain } = await requireTenantSubdomain()
+  const { tenantId } = await requireTenantId()
   const user = await getCurrentUser()
 
   if (!user) throw new Error('User not authenticated')
@@ -24,11 +24,12 @@ export async function createContent({
       ...data,
       authorId: user.id,
       pageId,
-      tenantSubdomain,
+      tenantId,
     },
     include: { page: { select: { slug: true } } },
   })
-  await revalidateTenantTag(`${content.page.slug}`)
+  const slug = content.page.slug
+  await revalidateTenantRelationTag(`${slug}-page`, tenantId)
   return content
 }
 
@@ -39,37 +40,39 @@ export async function updateContent(
     body?: string
   },
 ) {
-  const { tenantSubdomain } = await requireTenantSubdomain()
+  const { tenantId } = await requireTenantId()
   const content = await prisma.content.update({
-    where: { id, tenantSubdomain },
+    where: { id, tenantId },
     data,
     include: { page: { select: { slug: true } } },
   })
-  await revalidateTenantTag(`${content.page.slug}`)
+  const slug = content.page.slug
+  await revalidateTenantRelationTag(`${slug}-page`, tenantId)
   return content
 }
 
 export async function deleteContent(id: string) {
-  const { tenantSubdomain } = await requireTenantSubdomain()
+  const { tenantId } = await requireTenantId()
   const content = await prisma.content.delete({
-    where: { id, tenantSubdomain },
+    where: { id, tenantId },
     include: { page: { select: { slug: true } } },
   })
-  await revalidateTenantTag(`${content.page.slug}`)
+  const slug = content.page.slug
+  await revalidateTenantRelationTag(`${slug}-page`, tenantId)
 }
 
 export async function getContent(id: string) {
-  const { tenantSubdomain } = await requireTenantSubdomain()
+  const { tenantId } = await requireTenantId()
   return prisma.content.findUnique({
-    where: { id, tenantSubdomain },
+    where: { id, tenantId },
     include: { page: true },
   })
 }
 
 export async function getContentByPage(pageId: string) {
-  const { tenantSubdomain } = await requireTenantSubdomain()
+  const { tenantId } = await requireTenantId()
   return prisma.content.findMany({
-    where: { pageId, tenantSubdomain },
+    where: { pageId, tenantId },
     include: { page: true },
   })
 }

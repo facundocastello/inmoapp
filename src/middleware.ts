@@ -6,11 +6,11 @@ export async function middleware(request: NextRequest) {
   // Use x-forwarded-host instead of nextUrl.host
   const host =
     request.headers.get('x-forwarded-host') || request.headers.get('host') || ''
-
   if (host.includes('devtunnels.ms') || host.includes('vercel.app')) {
     const response = NextResponse.next()
     const tenantSubdomain = pathname.split('/')[1]
-    response.headers.set('x-tenant-id', tenantSubdomain)
+    if (tenantSubdomain)
+      response.headers.set('x-tenant-subdomain', tenantSubdomain)
     return response
   }
 
@@ -88,7 +88,8 @@ export async function middleware(request: NextRequest) {
 
   // Create response with tenant information
   const response = NextResponse.rewrite(newUrl)
-  response.headers.set('x-tenant-id', tenantSubdomain)
+  if (tenantSubdomain)
+    response.headers.set('x-tenant-subdomain', tenantSubdomain)
 
   return response
 }

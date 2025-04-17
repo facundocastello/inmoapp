@@ -30,7 +30,6 @@ model Tenant {
   oneUseToken  String?
 
   themeSettings    ThemeSettings?
-  superAdmin       SuperAdmin?
   users            User[]
   contents         Content[]
   pages            Page[]
@@ -45,12 +44,12 @@ model User {
   password        String
   name            String
   avatar          String?
-  tenantSubdomain String
+  tenantId String
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
-  @@unique([email, tenantSubdomain])
-  tenant  Tenant    @relation(fields: [tenantSubdomain], references: [subdomain])
+  @@unique([email, tenantId])
+  tenant  Tenant    @relation(fields: [tenantId], references: [id])
   role    UserRole
   content Content[]
   pages   Page[]
@@ -65,12 +64,12 @@ model Content {
   updatedAt       DateTime @updatedAt
   pageId          String
   authorId        String
-  tenantSubdomain String
+  tenantId String
 
-  @@unique([title, tenantSubdomain, pageId])
+  @@unique([title, tenantId, pageId])
   page   Page   @relation(fields: [pageId], references: [id])
   author User   @relation(fields: [authorId], references: [id])
-  tenant Tenant @relation(fields: [tenantSubdomain], references: [subdomain])
+  tenant Tenant @relation(fields: [tenantId], references: [id])
 }
 
 // Page model for tenant-specific pages
@@ -82,14 +81,14 @@ model Page {
   isFeatured      Boolean @default(false)
   isHome          Boolean @default(false)
   authorId        String
-  tenantSubdomain String
+  tenantId String
 
-  @@unique([slug, tenantSubdomain])
+  @@unique([slug, tenantId])
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   content   Content[]
   author    User      @relation(fields: [authorId], references: [id])
-  tenant    Tenant    @relation(fields: [tenantSubdomain], references: [subdomain])
+  tenant    Tenant    @relation(fields: [tenantId], references: [id])
 }
 
 // Enum for user roles
@@ -107,8 +106,6 @@ model SuperAdmin {
   name            String
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
-  tenant          Tenant   @relation(fields: [tenantSubdomain], references: [subdomain])
-  tenantSubdomain String   @unique
 }
 
 model Payment {
@@ -159,7 +156,7 @@ enum SubscriptionType {
 model Subscription {
   id              String    @id @default(cuid())
   externalId      String?   @unique
-  tenantSubdomain String    @unique
+  tenantId String    @unique
   planId          String
   nextPaymentAt   DateTime?
   graceStartedAt  DateTime?
@@ -170,7 +167,7 @@ model Subscription {
 
   status        SubscriptionStatus @default(ACTIVE)
   paymentMethod PaymentMethod
-  tenant        Tenant             @relation(fields: [tenantSubdomain], references: [subdomain])
+  tenant        Tenant             @relation(fields: [tenantId], references: [id])
   plan          Plan               @relation(fields: [planId], references: [id])
   payments      Payment[]
 }
@@ -188,8 +185,8 @@ model ThemeSettings {
   id              String   @id @default(cuid())
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
-  tenant          Tenant   @relation(fields: [tenantSubdomain], references: [subdomain])
-  tenantSubdomain String   @unique
+  tenant          Tenant   @relation(fields: [tenantId], references: [id])
+  tenantId String   @unique
 
   // Primary colors
   primary100 String

@@ -3,51 +3,54 @@
 import { revalidatePath, unstable_cache } from 'next/cache'
 
 import { ContentFormData } from '@/components/admin/pages/ContentForm'
-import { getTenantSubdomain, requireTenantSubdomain } from '@/lib/get-tenant'
+import { getTenantId, requireTenantId } from '@/lib/get-tenant'
 import { prisma } from '@/lib/prisma'
-import { getTenantTag, revalidateTenantTag } from '@/lib/utils/cache'
+import {
+  getTenantRelationTag,
+  revalidateTenantRelationTag,
+} from '@/lib/utils/cache'
 
 export async function createPage(data: PageFormData) {
-  const { tenantSubdomain } = await requireTenantSubdomain()
+  const { tenantId } = await requireTenantId()
 
   // If this is set as homepage, unset any existing homepage
   if (data.isHome) {
     await prisma.page.updateMany({
-      where: { isHome: true, tenantSubdomain },
+      where: { isHome: true, tenantId },
       data: { isHome: false },
     })
   }
 
   const page = await prisma.page.create({
-    data: { ...data, tenantSubdomain },
+    data: { ...data, tenantId },
   })
   revalidatePath('/[tenant]')
   return page
 }
 
 export async function updatePage(id: string, data: PageFormData) {
-  const { tenantSubdomain } = await requireTenantSubdomain()
+  const { tenantId } = await requireTenantId()
 
   // If this is set as homepage, unset any existing homepage
   if (data.isHome) {
     await prisma.page.updateMany({
-      where: { isHome: true, id: { not: id }, tenantSubdomain },
+      where: { isHome: true, id: { not: id }, tenantId },
       data: { isHome: false },
     })
   }
 
   const page = await prisma.page.update({
-    where: { id, tenantSubdomain },
-    data: { ...data, tenantSubdomain },
+    where: { id, tenantId },
+    data: { ...data, tenantId },
   })
   revalidatePath('/[tenant]')
   return page
 }
 
 export async function updatePageContent(id: string, data: ContentFormData) {
-  const { tenantSubdomain } = await requireTenantSubdomain()
+  const { tenantId } = await requireTenantId()
   const page = await prisma.page.findUnique({
-    where: { id, tenantSubdomain },
+    where: { id, tenantId },
     select: { authorId: true },
   })
   if (!page) throw new Error('Page not found')
@@ -62,7 +65,7 @@ export async function updatePageContent(id: string, data: ContentFormData) {
     body: string
   }[]
   const updatedPage = await prisma.page.update({
-    where: { id, tenantSubdomain },
+    where: { id, tenantId },
     data: {
       content: {
         updateMany: updateContent.map((content) => ({
@@ -72,28 +75,28 @@ export async function updatePageContent(id: string, data: ContentFormData) {
         create: createContent.map((content) => ({
           ...content,
           author: { connect: { id: page.authorId } },
-          tenant: { connect: { id: tenantSubdomain } },
+          tenant: { connect: { id: tenantId } },
         })),
       },
     },
     include: { content: true },
   })
-  await revalidateTenantTag(`${updatedPage.slug}`)
+  await revalidateTenantRelationTag(`${updatedPage.slug}-page`)
   return updatedPage
 }
 
 export async function deletePage(id: string) {
-  const { tenantSubdomain } = await requireTenantSubdomain()
+  const { tenantId } = await requireTenantId()
   await prisma.page.delete({
-    where: { id, tenantSubdomain },
+    where: { id, tenantId },
   })
   revalidatePath('/[tenant]')
 }
 
 export async function getPage(id: string) {
-  const { tenantSubdomain } = await requireTenantSubdomain()
+  const { tenantId } = await requireTenantId()
   return prisma.page.findUnique({
-    where: { id, tenantSubdomain },
+    where: { id, tenantId },
     include: {
       content: true,
       author: {
@@ -107,9 +110,9 @@ export async function getPage(id: string) {
 }
 
 export async function getPages() {
-  const { tenantSubdomain } = await requireTenantSubdomain()
+  const { tenantId } = await requireTenantId()
   return prisma.page.findMany({
-    where: { tenantSubdomain },
+    where: { tenantId },
     include: {
       content: true,
       author: {
@@ -123,40 +126,40 @@ export async function getPages() {
 }
 
 export async function getFeaturedPages() {
-  const { tenantSubdomain } = await requireTenantSubdomain()
+  const { tenantId } = await requireTenantId()
   return prisma.page.findMany({
-    where: { isFeatured: true, tenantSubdomain },
+    where: { isFeatured: true, tenantId },
     include: { content: true },
   })
 }
 
-export async function getPageBySlug(slug: string, tenantSubdomain: string) {
+export async function getPageBySlug(slug: string, tenantId: string) {
   return prisma.page.findUnique({
-    where: { slug_tenantSubdomain: { slug, tenantSubdomain } },
+    where: { slug_tenantId: { slug, tenantId } },
     include: { content: true },
   })
 }
 
 export const cachedGetPageBySlug = async (slug: string) => {
-  const tenantSubdomain = await getTenantSubdomain()
-  if (!tenantSubdomain) throw new Error('Tenant ID not found')
+  const tenantId = await getTenantId()
+  if (!tenantId) throw new Error('Tenant ID not found')
   return unstable_cache(getPageBySlug, ['page', slug], {
-    tags: [await getTenantTag(slug)],
-  })(slug, tenantSubdomain)
+    tags: [await getTenantRelationTag(`${slug}-page`)],
+  })(slug, tenantId)
 }
 
 export async function getHomepage() {
-  const { tenantSubdomain } = await requireTenantSubdomain()
+  const { tenantId } = await requireTenantId()
   return prisma.page.findFirst({
-    where: { isHome: true, tenantSubdomain },
+    where: { isHome: true, tenantId },
     include: { content: true },
   })
 }
 
 export async function getAllPages() {
-  const { tenantSubdomain } = await requireTenantSubdomain()
+  const { tenantId } = await requireTenantId()
   return prisma.page.findMany({
-    where: { tenantSubdomain },
+    where: { tenantId },
     orderBy: { createdAt: 'desc' },
     include: { content: true },
   })

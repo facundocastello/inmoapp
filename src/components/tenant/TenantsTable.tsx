@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
 
 import { Button } from '@/components/ui/Button'
 import {
@@ -14,9 +15,10 @@ import { deleteTenant, Tenants } from '@/lib/actions/tenant'
 
 interface TenantsTableProps {
   tenants: Tenants['data']
+  forceDelete?: string
 }
 
-export const TenantsTable = ({ tenants }: TenantsTableProps) => {
+export const TenantsTable = ({ tenants, forceDelete }: TenantsTableProps) => {
   return (
     <Table>
       <TableHeader>
@@ -57,11 +59,20 @@ export const TenantsTable = ({ tenants }: TenantsTableProps) => {
                 <form
                   action={async () => {
                     'use server'
-                    await deleteTenant(tenant.id)
+                    const deleteResult = await deleteTenant(
+                      tenant.id,
+                      forceDelete === tenant.id,
+                    )
+                    if (
+                      !deleteResult.success &&
+                      deleteResult.reason === 'Can only delete test tenants'
+                    ) {
+                      redirect(`/super-admin/tenants?forceDelete=${tenant.id}`)
+                    }
                   }}
                 >
                   <Button variant="outline" size="sm">
-                    Delete
+                    {forceDelete === tenant.id ? 'Force' : ''} Delete
                   </Button>
                   <Link
                     className={styles.visitLink}
