@@ -1,3 +1,4 @@
+import { UserRole } from '@prisma/client'
 import { compare } from 'bcryptjs'
 import type {
   GetServerSidePropsContext,
@@ -9,8 +10,6 @@ import { getServerSession } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 
 import { prisma } from '@/lib/prisma'
-
-import { UserRole } from '.prisma/shared'
 
 export const authOptions: NextAuthOptions = {
   providers: [

@@ -164,7 +164,6 @@ export async function getAllPages() {
     include: { content: true },
   })
 }
-
 export interface PageFormData {
   title: string
   slug: string

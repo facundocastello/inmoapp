@@ -1,9 +1,9 @@
+import { SubscriptionStatus } from '@prisma/client'
+
 import { ManualPaymentTable } from '@/components/payments/ManualPaymentTable'
 import MarkAsPaidButton from '@/components/payments/MarkAsPaidButton'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { prisma } from '@/lib/prisma'
-
-import { SubscriptionStatus } from '.prisma/shared'
 
 const getData = async () => {
   const pendingPayments = await prisma.payment.findMany({

@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils'
 
 interface InputProps extends HTMLAttributes<HTMLInputElement> {
   className?: string
+  shouldRegister?: boolean
   name: string
   label: string
   type?: 'text' | 'email' | 'password' | 'number'
@@ -16,6 +17,7 @@ interface InputProps extends HTMLAttributes<HTMLInputElement> {
 
 export const Input = ({
   className,
+  shouldRegister = true,
   name,
   helperText,
   label,
@@ -36,9 +38,10 @@ export const Input = ({
         id={name}
         type={type}
         className={cn(styles.input, error && styles.error, className)}
-        {...register(name, {
-          valueAsNumber: type === 'number',
-        })}
+        {...(shouldRegister &&
+          register(name, {
+            valueAsNumber: type === 'number',
+          }))}
         {...props}
       />
       {error && <p className={styles.errorMessage}>{error}</p>}

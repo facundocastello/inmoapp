@@ -1,6 +1,5 @@
+import { PrismaClient } from '@prisma/client/index.js'
 import { hash } from 'bcryptjs'
-
-import { PrismaClient } from '../../.prisma/shared/index.js'
 
 let prismaClient: PrismaClient
 
@@ -145,6 +144,134 @@ async function main() {
       },
     },
   })
+
+  // Create indexes
+  const indexes = [
+    {
+      id: 'index-ipc',
+      name: 'IPC',
+      currentValue: 11,
+      updateFrequency: 'MONTHLY',
+      source: 'INDEC',
+      isActive: true,
+      historyValues: [{ value: 11, date: new Date() }],
+    },
+    {
+      id: 'index-ripte',
+      name: 'RIPTE',
+      currentValue: 12,
+      updateFrequency: 'MONTHLY',
+      source: 'INDEC',
+      isActive: true,
+      historyValues: [{ value: 12, date: new Date() }],
+    },
+    {
+      id: 'index-uva',
+      name: 'UVA',
+      currentValue: 13,
+      updateFrequency: 'DAILY',
+      source: 'BCRA',
+      isActive: true,
+      historyValues: [{ value: 13, date: new Date() }],
+    },
+    {
+      id: 'index-ucl',
+      name: 'UCL',
+      currentValue: 14,
+      updateFrequency: 'DAILY',
+      source: 'BCRA',
+      isActive: true,
+      historyValues: [{ value: 14, date: new Date() }],
+    },
+  ]
+
+  for (const index of indexes) {
+    await prismaClient.index.upsert({
+      where: { id: index.id },
+      update: {},
+      create: {
+        ...index,
+        tenantId,
+      },
+    })
+  }
+
+  // Create currencies
+  const currencies = [
+    {
+      id: 'currency-usd',
+      type: 'USD',
+      name: 'Dólar Estadounidense',
+      description: 'Dólar estadounidense',
+      valueInPesos: 1000,
+      historyValues: [{ value: 1000, date: new Date() }],
+    },
+    {
+      id: 'currency-eur',
+      type: 'EUR',
+      name: 'Euro',
+      description: 'Euro',
+      valueInPesos: 1100,
+      historyValues: [{ value: 1100, date: new Date() }],
+    },
+    {
+      id: 'currency-soja',
+      type: 'SOJA',
+      name: 'Soja',
+      description: 'Precio de la soja',
+      valueInPesos: 500,
+      historyValues: [{ value: 500, date: new Date() }],
+    },
+    {
+      id: 'currency-carne',
+      type: 'CARNE',
+      name: 'Carne',
+      description: 'Precio del kilo de carne',
+      valueInPesos: 3000,
+      historyValues: [{ value: 3000, date: new Date() }],
+    },
+    {
+      id: 'currency-nafta',
+      type: 'NAFTA',
+      name: 'Nafta',
+      description: 'Precio del litro de nafta',
+      valueInPesos: 1500,
+      historyValues: [{ value: 1500, date: new Date() }],
+    },
+  ]
+
+  for (const currency of currencies) {
+    await prismaClient.currency.upsert({
+      where: { id: currency.id },
+      update: {},
+      create: {
+        ...currency,
+        tenantId,
+      },
+    })
+  }
+
+  // Create contract types
+  const contractTypes = [
+    {
+      id: 'contract-type-regular',
+      name: 'Regular',
+      description: 'Contrato de alquiler regular',
+      file: 'regular-contract.pdf',
+      jurisdiction: 'CABA',
+    },
+  ]
+
+  for (const contractType of contractTypes) {
+    await prismaClient.contractType.upsert({
+      where: { id: contractType.id },
+      update: {},
+      create: {
+        ...contractType,
+        tenantId,
+      },
+    })
+  }
 }
 main()
   .catch((e) => {

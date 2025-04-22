@@ -1,12 +1,12 @@
 'use client'
 
+import { Subscription } from '@prisma/client'
 import { useState } from 'react'
 
 import { Button } from '@/components/ui/Button'
 import { switchToAutomatedPayment } from '@/lib/actions/subscription'
 
 import { SwitchToAutomatedModal } from './SwitchToAutomatedModal'
-import { Subscription } from '.prisma/shared'
 
 interface SwitchToAutomatedButtonProps {
   subscription: Subscription

@@ -1,0 +1,231 @@
+I want to handle renting houses in Argentina. Help me define the data structure and functionality:
+
+## ✅ Entities (suggest more if needed) all of them will have tenantId
+
+### Person
+- Type of Document
+- Document
+- First Name
+- Last Name
+- Address
+- Phone Number
+- Email Address
+- Date of Birth
+- Tax Identification Number (CUIT/CUIL)
+- Emergency Contact
+- Guarantees
+- Payment History
+
+### Property
+- Address
+- Floor / Unit Number
+- Property Type (e.g. Apartment, House)
+- Contract (relation)
+- Owner (relation)
+- IsRented
+- Size
+- Number of Rooms
+- Services Included
+- Description
+- Rental Price
+- Availability Dates
+- Construction Year
+- Property ID or Cadastral ID
+- Latitude / Longitude
+- Photos
+
+### Contract
+- Price Calculation (relation)
+- Type of Contract (relation)
+- Payment Method (relation)
+- Payment History
+- Start Date
+- End Date
+- Duration (optional)
+- Owner (relation)
+- Occupant (relation)
+- Applicant (relation)
+- Guarantees (relation)
+- Status
+- Late Payment Penalty
+- Renewal Conditions
+- Early Termination Clause
+- Notes / Observations
+
+### Contract Type
+- Name
+- Description
+- File
+- Jurisdiction / Local Law
+
+### ContractStatus
+- Pending
+- Active
+- Terminated
+- Expired
+- Cancelled
+
+### OwnerContract
+- Property (relation)
+- Person (relation)
+
+### Index
+- Name (e.g. ICL, IPC, RIPTE, UVA)
+- Current Value
+- Update Frequency (e.g. monthly)
+- Source (e.g. BCRA, INDEC)
+- IsActive (boolean)
+- HistoryValues (array of value + date)
+
+### Currency
+- Type (kind [e.g. price of milk, gas] or country)
+- Name
+- Description
+- ValueInPesos
+- HistoryValues
+
+### Price Calculation
+- Update Price Period (in months)
+- InitialPrice
+- CurrentPrice
+- HistoryValues (array of value + date)
+- Index? (relation)
+- Currency? (relation)
+- FixedAmount
+- FixedPercentage
+- Currency Lock (boolean)
+
+### Guarantees
+- Type (e.g. salary, property, security bond)
+- Amount
+- Currency (relation)
+- Payment Date
+- Payment Status (relation)
+- Payment Method (relation)
+- Payment History
+- Guarantor Relation to Applicant (optional)
+- Expiration Date
+- Supporting Documents
+
+### PropertyPayment
+- Amount
+- Currency
+- Payment Date
+- Payment Status
+- Payment Method
+- Proof of Payment
+
+### Payment Method
+- Type (e.g. cash, bank transfer)
+- Account Number
+- Account Holder Name
+- Bank Name
+- Branch Code
+- Swift Code
+- IBAN
+- BIC/SWIFT
+- Bank Address
+- Bank Phone Number
+- Bank Email Address
+
+### Payment Status
+- Pending
+- Paid
+- Failed
+
+---
+
+## 🛠️ Pages to Build
+
+### CRUD Page: /admin/contract/settings
+- Index
+- Currency
+- Contract Type
+
+### Contract List: /admin/contracts
+- Display all contracts
+
+### Property CRUD Page
+- Manage properties
+
+### Person CRUD Page
+- Manage persons
+
+### Payments Page
+- Show all payments
+
+---
+
+## 📋 Contract Creation Flow (collapsible stepper):
+
+1. **Find or Create Property**
+   - Search by address
+   - If not found, create it
+
+2. **Find or Create Owner**
+   - Search by name
+   - If not found, create
+   - Validate if already set in property
+
+3. **Find or Create Applicant**
+
+4. **Ask if Applicant = Occupant**
+   - If not, find/create Occupant
+
+5. **Select Type of Contract**
+
+6. **Create Price Calculation**
+   - Select Index
+   - Update period
+   - Initial price
+   - Fixed amount / percentage
+   - Currency
+   - Currency lock option
+
+7. **Create Guarantees**
+   - Use useFieldArray to dynamically add items
+
+8. **Show Summary & Confirm**
+
+9. **Create Contract**
+   - With all selected data (property, owner, applicant, occupant, guarantees, price calc, type, method, payment history, dates, status, terms)
+
+---
+
+Important Information:
+Project Structure
+- Next.js project with TypeScript
+- Uses Tailwind CSS for styling (never inline classes, always style plain object on bottom)
+- Has Prisma for database management
+- Organized in a typical Next.js structure with src/ directory containing:
+  * app/ (Next.js app router)
+  * components/ (React components)
+  * lib/ (utility functions)
+  * hooks/ (custom React hooks)
+  * theme/ (theme-related code)
+
+UI Components:
+- Button.tsx - Generic button component
+- Card.tsx - Card layout component
+- Image.tsx - Image component
+- Loader.tsx - Loading spinner component
+- LoadingMessage.tsx - Loading state message component
+- Skeleton.tsx - Skeleton loading component
+- ThemeToggle.tsx - Theme switcher component
+- Form Components (in ui/forms/): Contains form-related components
+- Layout Components (in ui/layout/): Contains layout-related components
+- Table Components (in ui/table/): Contains table-related components
+Specialized Component Directories
+Your project also has several specialized component directories:
+ * admin/ - Admin-specific components
+ * plans/ - Plan-related components
+ * payments/ - Payment-related components
+ * billing/ - Billing-related components
+ * subscription/ - Subscription-related components
+ * tenant/ - Tenant-related components
+ * auth/ - Authentication components
+ * feedback/ - Feedback-related components
+ * forms/ - Form components
+ * section/ - Section components
+
+ ALWAYS USE SERVER ACTIONS src/lib/actions/tenant

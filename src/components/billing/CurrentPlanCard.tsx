@@ -1,9 +1,10 @@
+import { Plan, Subscription } from '@prisma/client'
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { cn } from '@/lib/utils'
 
 import { CheckSubscription } from './CheckSubscription'
 import { SwitchToAutomatedButton } from './SwitchToAutomatedButton'
-import { Plan, Subscription } from '.prisma/shared'
 
 interface CurrentPlanCardProps {
   plan: Plan | null

@@ -1,13 +1,12 @@
 'use server'
 
+import { PaymentMethod, PaymentStatus } from '@prisma/client'
 import { MercadoPagoConfig, Payment, PreApproval } from 'mercadopago'
 import { PaymentResponse } from 'mercadopago/dist/clients/payment/commonTypes'
 import { PreApprovalResponse } from 'mercadopago/dist/clients/preApproval/commonTypes'
 import { revalidatePath } from 'next/cache'
 
 import { prisma } from '@/lib/prisma'
-
-import { PaymentMethod, PaymentStatus } from '.prisma/shared'
 
 const client = new MercadoPagoConfig({
   accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN!,

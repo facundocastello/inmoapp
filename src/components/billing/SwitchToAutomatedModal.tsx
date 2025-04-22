@@ -1,6 +1,7 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Subscription } from '@prisma/client'
 import { useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import * as z from 'zod'
@@ -8,8 +9,6 @@ import * as z from 'zod'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/forms/Input'
 import { switchToAutomatedPayment } from '@/lib/actions/subscription'
-
-import { Subscription } from '.prisma/shared'
 
 const schema = z.object({
   email: z.string().email('Please enter a valid email address'),

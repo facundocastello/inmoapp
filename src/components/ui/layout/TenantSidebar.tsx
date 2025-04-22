@@ -22,6 +22,11 @@ const navigation = [
   { name: 'Users', href: '/admin/users', icon: 'Users' },
   { name: 'Pages', href: '/admin/pages', icon: 'FileText' },
   { name: 'Billing', href: '/admin/billing', icon: 'CreditCard' },
+  {
+    name: 'Contract Settings',
+    href: '/admin/contract/settings',
+    icon: 'Settings',
+  },
   { name: 'Settings', href: '/admin/settings', icon: 'Settings' },
 ]
 

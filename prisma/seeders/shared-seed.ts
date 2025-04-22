@@ -1,6 +1,5 @@
+import { PrismaClient } from '@prisma/client/index.js'
 import { hash } from 'bcryptjs'
-
-import { PrismaClient } from '../../.prisma/shared/index.js'
 
 let prismaClient: PrismaClient
 

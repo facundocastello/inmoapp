@@ -1,5 +1,6 @@
 'use client'
 
+import { Plan } from '@prisma/client'
 import Link from 'next/link'
 import { useState } from 'react'
 
@@ -13,8 +14,6 @@ import {
   TableRow,
 } from '@/components/ui/table/Table'
 import { deletePlan } from '@/lib/actions/plans'
-
-import { Plan } from '.prisma/shared'
 
 interface PlansTableProps {
   plans: Plan[]

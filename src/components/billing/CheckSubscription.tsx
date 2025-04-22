@@ -1,11 +1,10 @@
 'use client'
 
+import { Subscription } from '@prisma/client'
 import { useState } from 'react'
 
 import { Button } from '@/components/ui/Button'
 import { checkAutomatedSubscription } from '@/lib/actions/subscription'
-
-import { Subscription } from '.prisma/shared'
 
 interface CheckSubscriptionProps {
   subscription: Subscription

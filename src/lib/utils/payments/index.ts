@@ -1,4 +1,4 @@
-import { Plan, Subscription, Tenant } from '.prisma/shared'
+import { Plan, Subscription, Tenant } from '@prisma/client'
 
 interface GracePeriodStatus {
   isActive: boolean

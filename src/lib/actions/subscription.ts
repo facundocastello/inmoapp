@@ -1,5 +1,6 @@
 'use server'
 
+import { PaymentMethod, SubscriptionStatus } from '@prisma/client'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
@@ -9,7 +10,6 @@ import {
   createMercadoPagoSubscription,
   getMercadoPagoSubscription,
 } from '../utils/payments/mercadopago'
-import { PaymentMethod, SubscriptionStatus } from '.prisma/shared'
 
 interface ProcessPaymentResult {
   success: boolean

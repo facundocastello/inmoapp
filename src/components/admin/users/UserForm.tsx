@@ -1,6 +1,7 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
+import { User } from '@prisma/client'
 import { redirect } from 'next/navigation'
 import { FormProvider, useForm } from 'react-hook-form'
 import * as z from 'zod'
@@ -10,8 +11,6 @@ import { FileInput } from '@/components/ui/forms/FileInput'
 import { Input } from '@/components/ui/forms/Input'
 import { Select } from '@/components/ui/forms/Select'
 import { createUser, updateUser, type UserFormData } from '@/lib/actions/user'
-
-import { User } from '.prisma/shared'
 
 const userSchema = z.object({
   name: z.string().min(1, 'Name is required'),

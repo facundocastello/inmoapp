@@ -1,5 +1,11 @@
 'use server'
 
+import {
+  PaymentMethod,
+  PaymentStatus,
+  SubscriptionStatus,
+  Tenant as PrismaTenant,
+} from '@prisma/client'
 import { hash } from 'bcryptjs'
 import { randomBytes } from 'crypto'
 import { revalidatePath, unstable_cache } from 'next/cache'
@@ -14,12 +20,6 @@ import {
   revalidateTenantRelationTag,
 } from '../utils/cache'
 import { uploadFile } from './file'
-import {
-  PaymentMethod,
-  PaymentStatus,
-  SubscriptionStatus,
-  Tenant as PrismaTenant,
-} from '.prisma/shared'
 
 export type TenantFormData = {
   name: string

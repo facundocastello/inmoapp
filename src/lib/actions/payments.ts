@@ -1,5 +1,6 @@
 'use server'
 
+import { PaymentMethod, PaymentStatus } from '@prisma/client'
 import { revalidatePath } from 'next/cache'
 
 import { sendEmail } from '@/lib/email/send'
@@ -7,7 +8,6 @@ import { prisma } from '@/lib/prisma'
 
 import { getIsSuperAdmin } from '../auth'
 import { uploadFile } from './file'
-import { PaymentMethod, PaymentStatus } from '.prisma/shared'
 
 export async function markPaymentAsPaid(paymentId: string) {
   // check if user is super admin

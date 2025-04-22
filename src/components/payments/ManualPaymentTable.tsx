@@ -1,5 +1,6 @@
 'use client'
 
+import { Plan, Tenant } from '@prisma/client'
 import { useState } from 'react'
 
 import { Button } from '@/components/ui/Button'
@@ -13,8 +14,6 @@ import {
 } from '@/components/ui/table/Table'
 import { markPaymentAsPaid } from '@/lib/actions/payments'
 import { useToast } from '@/lib/hooks/useToast'
-
-import { Plan, Tenant } from '.prisma/shared'
 
 type Payment = {
   id: string

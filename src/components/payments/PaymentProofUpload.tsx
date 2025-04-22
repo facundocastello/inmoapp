@@ -1,6 +1,7 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Payment } from '@prisma/client'
 import { useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import * as z from 'zod'
@@ -10,7 +11,6 @@ import { updatePaymentProof } from '@/lib/actions/payments'
 import { useToast } from '@/lib/hooks/useToast'
 
 import { Button } from '../ui/Button'
-import { Payment } from '.prisma/shared'
 
 interface PaymentProofUploadProps {
   payment: Payment

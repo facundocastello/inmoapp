@@ -6,7 +6,6 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../.prisma/shared"
 }
 
 datasource db {
@@ -35,6 +34,18 @@ model Tenant {
   pages            Page[]
   subscriptionType SubscriptionType @default(MANUAL)
   subscription     Subscription?
+  
+  // Real Estate Management Relations
+  persons           Person[]
+  properties        Property[]
+  contracts         Contract[]
+  contractTypes     ContractType[]
+  indexes           Index[]
+  currencies        Currency[]
+  priceCalculations PriceCalculation[]
+  guarantees        Guarantee[]
+  paymentMethods    PaymentMethodDetails[]
+  paymentHistory    PaymentHistory[]
 }
 
 // User model for tenant-specific users
@@ -268,4 +279,243 @@ model ThemeSettings {
   error700 String
   error800 String
   error900 String
+}
+
+// Real Estate Management Models
+model Person {
+  id                String   @id @default(cuid())
+  tenantId          String
+  documentType      String
+  document          String
+  firstName         String
+  lastName          String
+  address           String
+  phoneNumber       String
+  email             String
+  dateOfBirth       DateTime
+  taxId             String?  // CUIT/CUIL
+  emergencyContact  String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  tenant            Tenant   @relation(fields: [tenantId], references: [id])
+  ownedProperties   Property[] @relation("PropertyOwner")
+  occupiedProperties Property[] @relation("PropertyOccupant")
+  appliedProperties Property[] @relation("PropertyApplicant")
+  guarantees        Guarantee[]
+  paymentHistory    PaymentHistory[]
+}
+
+model Property {
+  id              String   @id @default(cuid())
+  tenantId        String
+  address         String
+  floorUnit       String?
+  propertyType    String
+  isRented        Boolean  @default(false)
+  size            Float?
+  numberOfRooms   Int?
+  services        String?
+  description     String?
+  rentalPrice     Float
+  availableFrom   DateTime?
+  availableTo     DateTime?
+  constructionYear Int?
+  propertyId      String?
+  latitude        Float?
+  longitude       Float?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([address,floorUnit])
+  tenant          Tenant   @relation(fields: [tenantId], references: [id])
+  owner           Person   @relation("PropertyOwner", fields: [ownerId], references: [id])
+  ownerId         String
+  occupant        Person?  @relation("PropertyOccupant", fields: [occupantId], references: [id])
+  occupantId      String?
+  applicant       Person?  @relation("PropertyApplicant", fields: [applicantId], references: [id])
+  applicantId     String?
+  contracts       Contract[]
+  photos          PropertyPhoto[]
+}
+
+model PropertyPhoto {
+  id          String   @id @default(cuid())
+  propertyId  String
+  url         String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  property    Property @relation(fields: [propertyId], references: [id])
+}
+
+model Contract {
+  id                  String   @id @default(cuid())
+  tenantId            String
+  startDate           DateTime
+  endDate             DateTime
+  duration            Int?     // in months
+  latePaymentPenalty  Float?
+  renewalConditions   String?
+  earlyTermination    String?
+  notes               String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  status              ContractStatus @default(PENDING)
+  tenant              Tenant         @relation(fields: [tenantId], references: [id])
+  property            Property       @relation(fields: [propertyId], references: [id])
+  propertyId          String
+  contractType        ContractType   @relation(fields: [contractTypeId], references: [id])
+  contractTypeId      String
+  priceCalculation    PriceCalculation @relation(fields: [priceCalculationId], references: [id])
+  priceCalculationId  String
+  paymentMethod       PaymentMethodDetails @relation(fields: [paymentMethodId], references: [id])
+  paymentMethodId     String
+  guarantees          Guarantee[]
+  paymentHistory      PaymentHistory[]
+}
+
+model ContractType {
+  id            String   @id @default(cuid())
+  tenantId      String
+  name          String
+  description   String?
+  file          String?
+  jurisdiction  String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  tenant        Tenant   @relation(fields: [tenantId], references: [id])
+  contracts     Contract[]
+}
+
+enum ContractStatus {
+  PENDING
+  ACTIVE
+  TERMINATED
+  EXPIRED
+  CANCELLED
+}
+
+model Index {
+  id              String   @id @default(cuid())
+  tenantId        String
+  name            String
+  currentValue    Float
+  updateFrequency String
+  source          String
+  isActive        Boolean  @default(true)
+  historyValues   Json     // Array of {value: Float, date: DateTime}
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  tenant          Tenant   @relation(fields: [tenantId], references: [id])
+  priceCalculations PriceCalculation[]
+}
+
+model Currency {
+  id              String   @id @default(cuid())
+  tenantId        String
+  type            String
+  name            String
+  description     String?
+  valueInPesos    Float
+  historyValues   Json     // Array of {value: Float, date: DateTime}
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  tenant          Tenant   @relation(fields: [tenantId], references: [id])
+  priceCalculations PriceCalculation[]
+  guarantees        Guarantee[]
+}
+
+model PriceCalculation {
+  id                String   @id @default(cuid())
+  tenantId          String
+  updatePeriod      Int      // in months
+  initialPrice      Float
+  currentPrice      Float
+  historyValues     Json     // Array of {value: Float, date: DateTime}
+  fixedAmount       Float?
+  fixedPercentage   Float?
+  currencyLock      Boolean  @default(false)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  tenant            Tenant   @relation(fields: [tenantId], references: [id])
+  index             Index?   @relation(fields: [indexId], references: [id])
+  indexId           String?
+  currency          Currency? @relation(fields: [currencyId], references: [id])
+  currencyId        String?
+  contracts         Contract[]
+}
+
+model Guarantee {
+  id                String   @id @default(cuid())
+  tenantId          String
+  type              String
+  amount            Float
+  paymentDate       DateTime?
+  guarantorRelation String?
+  expirationDate    DateTime?
+  supportingDocs    String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  status            PaymentStatus @default(PENDING)
+  tenant            Tenant        @relation(fields: [tenantId], references: [id])
+  person            Person        @relation(fields: [personId], references: [id])
+  personId          String
+  currency          Currency      @relation(fields: [currencyId], references: [id])
+  currencyId        String
+  paymentMethod     PaymentMethodDetails @relation(fields: [paymentMethodId], references: [id])
+  paymentMethodId   String
+  contract          Contract?     @relation(fields: [contractId], references: [id])
+  contractId        String?
+  paymentHistory    PaymentHistory[]
+}
+
+model PaymentHistory {
+  id              String   @id @default(cuid())
+  tenantId        String
+  amount          Float
+  paymentDate     DateTime
+  proofOfPayment  String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  status          PaymentStatus
+  tenant          Tenant   @relation(fields: [tenantId], references: [id])
+  person          Person   @relation(fields: [personId], references: [id])
+  personId        String
+  contract        Contract? @relation(fields: [contractId], references: [id])
+  contractId      String?
+  guarantee       Guarantee? @relation(fields: [guaranteeId], references: [id])
+  guaranteeId     String?
+  paymentMethod   PaymentMethodDetails @relation(fields: [paymentMethodId], references: [id])
+  paymentMethodId String
+}
+
+model PaymentMethodDetails {
+  id              String   @id @default(cuid())
+  tenantId        String
+  type            String
+  accountNumber   String?
+  accountHolder   String?
+  bankName        String?
+  branchCode      String?
+  swiftCode       String?
+  iban            String?
+  bic             String?
+  bankAddress     String?
+  bankPhone       String?
+  bankEmail       String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  tenant          Tenant   @relation(fields: [tenantId], references: [id])
+  contracts       Contract[]
+  guarantees      Guarantee[]
+  paymentHistory  PaymentHistory[]
 }

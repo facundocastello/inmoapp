@@ -1,14 +1,15 @@
-import { sendEmail } from '@/lib/email/send'
-import { prisma } from '@/lib/prisma'
-
-import { getGracePeriodStatus } from './index'
 import {
   PaymentMethod,
   PaymentStatus,
   SubscriptionStatus,
   SubscriptionType,
   Tenant,
-} from '.prisma/shared'
+} from '@prisma/client'
+
+import { sendEmail } from '@/lib/email/send'
+import { prisma } from '@/lib/prisma'
+
+import { getGracePeriodStatus } from './index'
 
 interface CheckResult {
   success: boolean
