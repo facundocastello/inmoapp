@@ -34,7 +34,7 @@ model Tenant {
   pages            Page[]
   subscriptionType SubscriptionType @default(MANUAL)
   subscription     Subscription?
-  
+
   // Real Estate Management Relations
   persons           Person[]
   properties        Property[]
@@ -50,56 +50,56 @@ model Tenant {
 
 // User model for tenant-specific users
 model User {
-  id              String   @id @default(cuid())
-  email           String
-  password        String
-  name            String
-  avatar          String?
-  tenantId String
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id        String    @id @default(cuid())
+  email     String
+  password  String
+  name      String
+  avatar    String?
+  tenantId  String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  tenant    Tenant    @relation(fields: [tenantId], references: [id])
+  role      UserRole
+  content   Content[]
+  pages     Page[]
 
   @@unique([email, tenantId])
-  tenant  Tenant    @relation(fields: [tenantId], references: [id])
-  role    UserRole
-  content Content[]
-  pages   Page[]
 }
 
 // Content model for tenant-specific content
 model Content {
-  id              String   @id @default(cuid())
-  title           String
-  body            String
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  pageId          String
-  authorId        String
-  tenantId String
+  id        String   @id @default(cuid())
+  title     String
+  body      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  pageId    String
+  authorId  String
+  tenantId  String
+  page      Page     @relation(fields: [pageId], references: [id])
+  author    User     @relation(fields: [authorId], references: [id])
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
 
   @@unique([title, tenantId, pageId])
-  page   Page   @relation(fields: [pageId], references: [id])
-  author User   @relation(fields: [authorId], references: [id])
-  tenant Tenant @relation(fields: [tenantId], references: [id])
 }
 
 // Page model for tenant-specific pages
 model Page {
-  id              String  @id @default(cuid())
-  title           String
-  slug            String
-  isActive        Boolean @default(true)
-  isFeatured      Boolean @default(false)
-  isHome          Boolean @default(false)
-  authorId        String
-  tenantId String
+  id         String    @id @default(cuid())
+  title      String
+  slug       String
+  isActive   Boolean   @default(true)
+  isFeatured Boolean   @default(false)
+  isHome     Boolean   @default(false)
+  authorId   String
+  tenantId   String
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  content    Content[]
+  author     User      @relation(fields: [authorId], references: [id])
+  tenant     Tenant    @relation(fields: [tenantId], references: [id])
 
   @@unique([slug, tenantId])
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  content   Content[]
-  author    User      @relation(fields: [authorId], references: [id])
-  tenant    Tenant    @relation(fields: [tenantId], references: [id])
 }
 
 // Enum for user roles
@@ -111,12 +111,12 @@ enum UserRole {
 
 // Super Admin model for system-wide administration
 model SuperAdmin {
-  id              String   @id @default(cuid())
-  email           String   @unique
-  password        String
-  name            String
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Payment {
@@ -167,7 +167,7 @@ enum SubscriptionType {
 model Subscription {
   id              String    @id @default(cuid())
   externalId      String?   @unique
-  tenantId String    @unique
+  tenantId        String    @unique
   planId          String
   nextPaymentAt   DateTime?
   graceStartedAt  DateTime?
@@ -193,11 +193,11 @@ enum SubscriptionStatus {
 
 // Theme settings for tenant-specific color schemes
 model ThemeSettings {
-  id              String   @id @default(cuid())
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  tenant          Tenant   @relation(fields: [tenantId], references: [id])
-  tenantId String   @unique
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  tenantId  String   @unique
 
   // Primary colors
   primary100 String
@@ -283,111 +283,118 @@ model ThemeSettings {
 
 // Real Estate Management Models
 model Person {
-  id                String   @id @default(cuid())
-  tenantId          String
-  documentType      String
-  document          String
-  firstName         String
-  lastName          String
-  address           String
-  phoneNumber       String
-  email             String
-  dateOfBirth       DateTime
-  taxId             String?  // CUIT/CUIL
-  emergencyContact  String?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id               String   @id @default(cuid())
+  tenantId         String
+  documentType     String
+  document         String
+  firstName        String
+  lastName         String
+  address          String
+  phoneNumber      String
+  email            String
+  dateOfBirth      DateTime
+  taxId            String? // CUIT/CUIL
+  emergencyContact String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
-  tenant            Tenant   @relation(fields: [tenantId], references: [id])
-  ownedProperties   Property[] @relation("PropertyOwner")
-  occupiedProperties Property[] @relation("PropertyOccupant")
-  appliedProperties Property[] @relation("PropertyApplicant")
-  guarantees        Guarantee[]
-  paymentHistory    PaymentHistory[]
+  tenant             Tenant           @relation(fields: [tenantId], references: [id])
+  ownedProperties    Property[]       @relation("PropertyOwner")
+  occupiedProperties Property[]       @relation("PropertyOccupant")
+  appliedProperties  Property[]       @relation("PropertyApplicant")
+  guarantees         Guarantee[]
+  paymentHistory     PaymentHistory[]
 }
 
 model Property {
-  id              String   @id @default(cuid())
-  tenantId        String
-  address         String
-  floorUnit       String?
-  propertyType    String
-  isRented        Boolean  @default(false)
-  size            Float?
-  numberOfRooms   Int?
-  services        String?
-  description     String?
-  rentalPrice     Float
-  availableFrom   DateTime?
-  availableTo     DateTime?
-  constructionYear Int?
-  propertyId      String?
-  latitude        Float?
-  longitude       Float?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id            String    @id @default(cuid())
+  tenantId      String
+  name          String
+  address       String
+  city          String
+  state         String
+  zip           String
+  country       String
+  floorUnit     String?
+  propertyType  String?
+  isRented      Boolean   @default(false)
+  size          Float?
+  numberOfRooms Int?
+  services      String?
+  description   String?
+  rentalPrice   Float?
+  occupiedFrom  DateTime?
+  occupiedTo    DateTime?
+  propertyId    String?
+  latitude      Float?
+  longitude     Float?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
-  @@unique([address,floorUnit])
-  tenant          Tenant   @relation(fields: [tenantId], references: [id])
-  owner           Person   @relation("PropertyOwner", fields: [ownerId], references: [id])
-  ownerId         String
-  occupant        Person?  @relation("PropertyOccupant", fields: [occupantId], references: [id])
-  occupantId      String?
-  applicant       Person?  @relation("PropertyApplicant", fields: [applicantId], references: [id])
-  applicantId     String?
-  contracts       Contract[]
-  photos          PropertyPhoto[]
+  ownerId     String?
+  occupantId  String?
+  applicantId String?
+
+  tenant      Tenant          @relation(fields: [tenantId], references: [id])
+  owner       Person?         @relation("PropertyOwner", fields: [ownerId], references: [id])
+  occupant    Person?         @relation("PropertyOccupant", fields: [occupantId], references: [id])
+  applicant   Person?         @relation("PropertyApplicant", fields: [applicantId], references: [id])
+  contracts   Contract[]
+  photos      PropertyPhoto[]
+
+  @@unique([address, floorUnit])
 }
 
 model PropertyPhoto {
-  id          String   @id @default(cuid())
-  propertyId  String
-  url         String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id         String   @id @default(cuid())
+  propertyId String
+  url        String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
-  property    Property @relation(fields: [propertyId], references: [id])
+  property Property @relation(fields: [propertyId], references: [id])
 }
 
 model Contract {
-  id                  String   @id @default(cuid())
-  tenantId            String
-  startDate           DateTime
-  endDate             DateTime
-  duration            Int?     // in months
-  latePaymentPenalty  Float?
-  renewalConditions   String?
-  earlyTermination    String?
-  notes               String?
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
+  id                 String   @id @default(cuid())
+  startDate          DateTime
+  endDate            DateTime
+  duration           Int? // in months
+  latePaymentPenalty Float?
+  renewalConditions  String?
+  earlyTermination   String?
+  notes              String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 
-  status              ContractStatus @default(PENDING)
-  tenant              Tenant         @relation(fields: [tenantId], references: [id])
-  property            Property       @relation(fields: [propertyId], references: [id])
-  propertyId          String
-  contractType        ContractType   @relation(fields: [contractTypeId], references: [id])
-  contractTypeId      String
-  priceCalculation    PriceCalculation @relation(fields: [priceCalculationId], references: [id])
-  priceCalculationId  String
-  paymentMethod       PaymentMethodDetails @relation(fields: [paymentMethodId], references: [id])
-  paymentMethodId     String
-  guarantees          Guarantee[]
-  paymentHistory      PaymentHistory[]
+  tenantId           String
+  propertyId         String
+  contractTypeId     String
+  priceCalculationId String
+  paymentMethodId    String
+
+  status           ContractStatus       @default(PENDING)
+  tenant           Tenant               @relation(fields: [tenantId], references: [id])
+  property         Property             @relation(fields: [propertyId], references: [id])
+  contractType     ContractType         @relation(fields: [contractTypeId], references: [id])
+  priceCalculation PriceCalculation     @relation(fields: [priceCalculationId], references: [id])
+  paymentMethod    PaymentMethodDetails @relation(fields: [paymentMethodId], references: [id])
+  guarantees       Guarantee[]
+  paymentHistory   PaymentHistory[]
 }
 
 model ContractType {
-  id            String   @id @default(cuid())
-  tenantId      String
-  name          String
-  description   String?
-  file          String?
-  jurisdiction  String?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id           String   @id @default(cuid())
+  tenantId     String
+  name         String
+  description  String?
+  file         String?
+  jurisdiction String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
-  tenant        Tenant   @relation(fields: [tenantId], references: [id])
-  contracts     Contract[]
+  tenant    Tenant     @relation(fields: [tenantId], references: [id])
+  contracts Contract[]
 }
 
 enum ContractStatus {
@@ -406,53 +413,53 @@ model Index {
   updateFrequency String
   source          String
   isActive        Boolean  @default(true)
-  historyValues   Json     // Array of {value: Float, date: DateTime}
+  historyValues   Json // Array of {value: Float, date: DateTime}
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
-  tenant          Tenant   @relation(fields: [tenantId], references: [id])
+  tenant            Tenant             @relation(fields: [tenantId], references: [id])
   priceCalculations PriceCalculation[]
 }
 
 model Currency {
-  id              String   @id @default(cuid())
-  tenantId        String
-  type            String
-  name            String
-  description     String?
-  valueInPesos    Float
-  historyValues   Json     // Array of {value: Float, date: DateTime}
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id            String   @id @default(cuid())
+  tenantId      String
+  type          String
+  name          String
+  description   String?
+  valueInPesos  Float
+  historyValues Json // Array of {value: Float, date: DateTime}
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
-  tenant          Tenant   @relation(fields: [tenantId], references: [id])
+  tenant            Tenant             @relation(fields: [tenantId], references: [id])
   priceCalculations PriceCalculation[]
   guarantees        Guarantee[]
 }
 
 model PriceCalculation {
-  id                String   @id @default(cuid())
-  tenantId          String
-  updatePeriod      Int      // in months
-  initialPrice      Float
-  currentPrice      Float
-  historyValues     Json     // Array of {value: Float, date: DateTime}
-  fixedAmount       Float?
-  fixedPercentage   Float?
-  currencyLock      Boolean  @default(false)
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id              String   @id @default(cuid())
+  tenantId        String
+  updatePeriod    Int // in months
+  initialPrice    Float
+  currentPrice    Float
+  historyValues   Json // Array of {value: Float, date: DateTime}
+  fixedAmount     Float?
+  fixedPercentage Float?
+  currencyLock    Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
-  tenant            Tenant   @relation(fields: [tenantId], references: [id])
-  index             Index?   @relation(fields: [indexId], references: [id])
-  indexId           String?
-  currency          Currency? @relation(fields: [currencyId], references: [id])
-  currencyId        String?
-  contracts         Contract[]
+  tenant     Tenant     @relation(fields: [tenantId], references: [id])
+  index      Index?     @relation(fields: [indexId], references: [id])
+  indexId    String?
+  currency   Currency?  @relation(fields: [currencyId], references: [id])
+  currencyId String?
+  contracts  Contract[]
 }
 
 model Guarantee {
-  id                String   @id @default(cuid())
+  id                String    @id @default(cuid())
   tenantId          String
   type              String
   amount            Float
@@ -460,62 +467,62 @@ model Guarantee {
   guarantorRelation String?
   expirationDate    DateTime?
   supportingDocs    String?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
 
-  status            PaymentStatus @default(PENDING)
-  tenant            Tenant        @relation(fields: [tenantId], references: [id])
-  person            Person        @relation(fields: [personId], references: [id])
-  personId          String
-  currency          Currency      @relation(fields: [currencyId], references: [id])
-  currencyId        String
-  paymentMethod     PaymentMethodDetails @relation(fields: [paymentMethodId], references: [id])
-  paymentMethodId   String
-  contract          Contract?     @relation(fields: [contractId], references: [id])
-  contractId        String?
-  paymentHistory    PaymentHistory[]
+  status          PaymentStatus        @default(PENDING)
+  tenant          Tenant               @relation(fields: [tenantId], references: [id])
+  person          Person               @relation(fields: [personId], references: [id])
+  personId        String
+  currency        Currency             @relation(fields: [currencyId], references: [id])
+  currencyId      String
+  paymentMethod   PaymentMethodDetails @relation(fields: [paymentMethodId], references: [id])
+  paymentMethodId String
+  contract        Contract?            @relation(fields: [contractId], references: [id])
+  contractId      String?
+  paymentHistory  PaymentHistory[]
 }
 
 model PaymentHistory {
-  id              String   @id @default(cuid())
-  tenantId        String
-  amount          Float
-  paymentDate     DateTime
-  proofOfPayment  String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id             String   @id @default(cuid())
+  tenantId       String
+  amount         Float
+  paymentDate    DateTime
+  proofOfPayment String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   status          PaymentStatus
-  tenant          Tenant   @relation(fields: [tenantId], references: [id])
-  person          Person   @relation(fields: [personId], references: [id])
+  tenant          Tenant               @relation(fields: [tenantId], references: [id])
+  person          Person               @relation(fields: [personId], references: [id])
   personId        String
-  contract        Contract? @relation(fields: [contractId], references: [id])
+  contract        Contract?            @relation(fields: [contractId], references: [id])
   contractId      String?
-  guarantee       Guarantee? @relation(fields: [guaranteeId], references: [id])
+  guarantee       Guarantee?           @relation(fields: [guaranteeId], references: [id])
   guaranteeId     String?
   paymentMethod   PaymentMethodDetails @relation(fields: [paymentMethodId], references: [id])
   paymentMethodId String
 }
 
 model PaymentMethodDetails {
-  id              String   @id @default(cuid())
-  tenantId        String
-  type            String
-  accountNumber   String?
-  accountHolder   String?
-  bankName        String?
-  branchCode      String?
-  swiftCode       String?
-  iban            String?
-  bic             String?
-  bankAddress     String?
-  bankPhone       String?
-  bankEmail       String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id            String   @id @default(cuid())
+  tenantId      String
+  type          String
+  accountNumber String?
+  accountHolder String?
+  bankName      String?
+  branchCode    String?
+  swiftCode     String?
+  iban          String?
+  bic           String?
+  bankAddress   String?
+  bankPhone     String?
+  bankEmail     String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
-  tenant          Tenant   @relation(fields: [tenantId], references: [id])
-  contracts       Contract[]
-  guarantees      Guarantee[]
-  paymentHistory  PaymentHistory[]
+  tenant         Tenant           @relation(fields: [tenantId], references: [id])
+  contracts      Contract[]
+  guarantees     Guarantee[]
+  paymentHistory PaymentHistory[]
 }

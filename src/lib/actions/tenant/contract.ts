@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 
 import { requireTenantId } from '@/lib/get-tenant'
 import { prisma } from '@/lib/prisma'
+import errorHandler from '@/lib/utils/error'
 
 import { ContractForm } from './schemas'
 
@@ -16,7 +17,7 @@ export async function getContracts() {
     })
     return { success: true, data: contracts }
   } catch (error) {
-    return { success: false, error: 'Failed to fetch contracts' }
+    return errorHandler(error, 'Failed to fetch contracts')
   }
 }
 
@@ -31,7 +32,7 @@ export async function getContract({ id }: { id: string }) {
     }
     return { success: true, data: contract }
   } catch (error) {
-    return { success: false, error: 'Failed to fetch contract' }
+    return errorHandler(error, 'Failed to fetch contract')
   }
 }
 
@@ -47,7 +48,7 @@ export async function createContract({ data }: { data: ContractForm }) {
     revalidatePath('/admin/contracts')
     return { success: true, data: contract }
   } catch (error) {
-    return { success: false, error: 'Failed to create contract' }
+    return errorHandler(error, 'Failed to create contract')
   }
 }
 
@@ -67,7 +68,7 @@ export async function updateContract({
     revalidatePath('/admin/contracts')
     return { success: true, data: contract }
   } catch (error) {
-    return { success: false, error: 'Failed to update contract' }
+    return errorHandler(error, 'Failed to update contract')
   }
 }
 
@@ -80,7 +81,7 @@ export async function deleteContract({ id }: { id: string }) {
     revalidatePath('/admin/contracts')
     return { success: true }
   } catch (error) {
-    return { success: false, error: 'Failed to delete contract' }
+    return errorHandler(error, 'Failed to delete contract')
   }
 }
 
@@ -98,7 +99,7 @@ export async function searchContracts({ query }: { query: string }) {
     })
     return { success: true, data: contracts }
   } catch (error) {
-    return { success: false, error: 'Failed to search contracts' }
+    return errorHandler(error, 'Failed to search contracts')
   }
 }
 

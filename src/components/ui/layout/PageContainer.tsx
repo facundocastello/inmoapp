@@ -20,7 +20,7 @@ interface PageContainerProps extends HTMLAttributes<HTMLDivElement> {
  */
 export const PageContainer = ({
   className,
-  maxWidth = 'max-w-7xl',
+  maxWidth = 'md:max-w-7xl',
   center = true,
   ...props
 }: PageContainerProps) => {
@@ -33,6 +33,6 @@ export const PageContainer = ({
 }
 
 const styles = {
-  base: 'w-full px-4 sm:px-6 lg:px-8 py-5',
+  base: 'w-screen md:w-full px-4 sm:px-6 lg:px-8 py-5',
   center: 'mx-auto',
 }

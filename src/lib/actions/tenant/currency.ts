@@ -5,6 +5,7 @@ import {
   revalidateTenantSubdomainPath,
 } from '@/lib/get-tenant'
 import { prisma } from '@/lib/prisma'
+import errorHandler from '@/lib/utils/error'
 
 import { CurrencyForm } from './schemas'
 
@@ -17,7 +18,7 @@ export async function getCurrencies() {
     })
     return { success: true, data: currencies }
   } catch (error) {
-    return { success: false, error: 'Failed to fetch currencies' }
+    return errorHandler(error, 'Failed to fetch currencies')
   }
 }
 
@@ -32,7 +33,7 @@ export async function getCurrency({ id }: { id: string }) {
     }
     return { success: true, data: currency }
   } catch (error) {
-    return { success: false, error: 'Failed to fetch currency' }
+    return errorHandler(error, 'Failed to fetch currency')
   }
 }
 
@@ -48,7 +49,7 @@ export async function createCurrency({ data }: { data: CurrencyForm }) {
     revalidateTenantSubdomainPath('/admin/contract/settings')
     return { success: true, data: currency }
   } catch (error) {
-    return { success: false, error: 'Failed to create currency' }
+    return errorHandler(error, 'Failed to create currency')
   }
 }
 
@@ -68,7 +69,7 @@ export async function updateCurrency({
     revalidateTenantSubdomainPath('/admin/contract/settings')
     return { success: true, data: currency }
   } catch (error) {
-    return { success: false, error: 'Failed to update currency' }
+    return errorHandler(error, 'Failed to update currency')
   }
 }
 
@@ -81,7 +82,7 @@ export async function deleteCurrency({ id }: { id: string }) {
     revalidateTenantSubdomainPath('/admin/contract/settings')
     return { success: true }
   } catch (error) {
-    return { success: false, error: 'Failed to delete currency' }
+    return errorHandler(error, 'Failed to delete currency')
   }
 }
 
@@ -124,7 +125,7 @@ export async function searchCurrencies({ query }: { query: string }) {
     })
     return { success: true, data: currencies }
   } catch (error) {
-    return { success: false, error: 'Failed to search currencies' }
+    return errorHandler(error, 'Failed to search currencies')
   }
 }
 

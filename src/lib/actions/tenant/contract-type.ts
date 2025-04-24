@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 
 import { requireTenantId } from '@/lib/get-tenant'
 import { prisma } from '@/lib/prisma'
+import errorHandler from '@/lib/utils/error'
 
 import { ContractTypeForm } from './schemas'
 
@@ -16,7 +17,7 @@ export async function getContractTypes() {
     })
     return { success: true, data: contractTypes }
   } catch (error) {
-    return { success: false, error: 'Failed to fetch contract types' }
+    return errorHandler(error, 'Failed to fetch contract types')
   }
 }
 
@@ -31,7 +32,7 @@ export async function getContractType({ id }: { id: string }) {
     }
     return { success: true, data: contractType }
   } catch (error) {
-    return { success: false, error: 'Failed to fetch contract type' }
+    return errorHandler(error, 'Failed to fetch contract type')
   }
 }
 
@@ -47,7 +48,7 @@ export async function createContractType({ data }: { data: ContractTypeForm }) {
     revalidatePath('/admin/contract/settings')
     return { success: true, data: contractType }
   } catch (error) {
-    return { success: false, error: 'Failed to create contract type' }
+    return errorHandler(error, 'Failed to create contract type')
   }
 }
 
@@ -67,7 +68,7 @@ export async function updateContractType({
     revalidatePath('/admin/contract/settings')
     return { success: true, data: contractType }
   } catch (error) {
-    return { success: false, error: 'Failed to update contract type' }
+    return errorHandler(error, 'Failed to update contract type')
   }
 }
 
@@ -80,7 +81,7 @@ export async function deleteContractType({ id }: { id: string }) {
     revalidatePath('/admin/contract/settings')
     return { success: true }
   } catch (error) {
-    return { success: false, error: 'Failed to delete contract type' }
+    return errorHandler(error, 'Failed to delete contract type')
   }
 }
 
@@ -99,6 +100,6 @@ export async function searchContractTypes({ query }: { query: string }) {
     })
     return { success: true, data: contractTypes }
   } catch (error) {
-    return { success: false, error: 'Failed to search contract types' }
+    return errorHandler(error, 'Failed to search contract types')
   }
 }

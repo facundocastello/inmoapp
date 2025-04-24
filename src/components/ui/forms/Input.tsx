@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils'
 
 interface InputProps extends HTMLAttributes<HTMLInputElement> {
   className?: string
+  containerClassName?: string
   shouldRegister?: boolean
   name: string
   label: string
@@ -16,6 +17,7 @@ interface InputProps extends HTMLAttributes<HTMLInputElement> {
 }
 
 export const Input = ({
+  containerClassName,
   className,
   shouldRegister = true,
   name,
@@ -28,7 +30,7 @@ export const Input = ({
   const { register } = useFormContext()
 
   return (
-    <div className={styles.container}>
+    <div className={cn(styles.container, containerClassName)}>
       {label && (
         <label htmlFor={name} className={styles.label}>
           {label}

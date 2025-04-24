@@ -132,7 +132,7 @@ const styles = {
     bg-primary-200 border-r border-primary-300
     transition-all duration-300 ease-in-out
     md:relative md:translate-x-0
-    fixed left-0 top-0 z-40 -translate-x-full
+    fixed left-0 top-0 z-100 -translate-x-full
     will-change-transform
   `,
   mobileOpen: 'translate-x-0',

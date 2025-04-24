@@ -54,7 +54,7 @@ export default async function PublicLayout({
 const styles = {
   container: 'min-h-screen bg-secondary-200',
   nav: 'bg-secondary-100 shadow-sm',
-  navContainer: 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8',
+  navContainer: 'md:max-w-7xl mx-auto px-4 sm:px-6 lg:px-8',
   navContent: 'flex justify-between h-16',
   navContentLeft: 'flex-shrink-0 flex items-center',
   navContentRight: 'hidden sm:ml-6 sm:flex sm:space-x-8',

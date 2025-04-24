@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 
 import { requireTenantId } from '@/lib/get-tenant'
 import { prisma } from '@/lib/prisma'
+import errorHandler from '@/lib/utils/error'
 
 import { PropertyForm } from './schemas'
 
@@ -16,7 +17,7 @@ export async function getProperties() {
     })
     return { success: true, data: properties }
   } catch (error) {
-    return { success: false, error: 'Failed to fetch properties' }
+    return errorHandler(error, 'Failed to fetch properties')
   }
 }
 
@@ -31,7 +32,7 @@ export async function getProperty({ id }: { id: string }) {
     }
     return { success: true, data: property }
   } catch (error) {
-    return { success: false, error: 'Failed to fetch property' }
+    return errorHandler(error, 'Failed to fetch property')
   }
 }
 
@@ -47,7 +48,7 @@ export async function createProperty({ data }: { data: PropertyForm }) {
     revalidatePath('/admin/properties')
     return { success: true, data: property }
   } catch (error) {
-    return { success: false, error: 'Failed to create property' }
+    return errorHandler(error, 'Failed to create property')
   }
 }
 
@@ -67,7 +68,7 @@ export async function updateProperty({
     revalidatePath('/admin/properties')
     return { success: true, data: property }
   } catch (error) {
-    return { success: false, error: 'Failed to update property' }
+    return errorHandler(error, 'Failed to update property')
   }
 }
 
@@ -80,7 +81,7 @@ export async function deleteProperty({ id }: { id: string }) {
     revalidatePath('/admin/properties')
     return { success: true }
   } catch (error) {
-    return { success: false, error: 'Failed to delete property' }
+    return errorHandler(error, 'Failed to delete property')
   }
 }
 
@@ -100,7 +101,7 @@ export async function searchProperties({ query }: { query: string }) {
     })
     return { success: true, data: properties }
   } catch (error) {
-    return { success: false, error: 'Failed to search properties' }
+    return errorHandler(error, 'Failed to search properties')
   }
 }
 

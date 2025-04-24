@@ -45,7 +45,7 @@ const styles = {
   label: 'block text-sm font-medium text-primary-900',
   select: `
     block w-full rounded-md border border-primary-300
-    bg-primary-100 px-3 py-2 text-primary-900
+    bg-primary-100 px-3 py-2.5 text-primary-900
     focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500
     disabled:cursor-not-allowed disabled:opacity-50
   `,

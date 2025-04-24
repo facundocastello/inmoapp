@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 
 import { requireTenantId } from '@/lib/get-tenant'
 import { prisma } from '@/lib/prisma'
+import errorHandler from '@/lib/utils/error'
 
 import { PersonForm } from './schemas'
 
@@ -16,7 +17,7 @@ export async function getPeople() {
     })
     return { success: true, data: people }
   } catch (error) {
-    return { success: false, error: 'Failed to fetch people' }
+    return errorHandler(error, 'Failed to fetch people')
   }
 }
 
@@ -31,7 +32,7 @@ export async function getPerson({ id }: { id: string }) {
     }
     return { success: true, data: person }
   } catch (error) {
-    return { success: false, error: 'Failed to fetch person' }
+    return errorHandler(error, 'Failed to fetch person')
   }
 }
 
@@ -47,7 +48,7 @@ export async function createPerson({ data }: { data: PersonForm }) {
     revalidatePath('/admin/people')
     return { success: true, data: person }
   } catch (error) {
-    return { success: false, error: 'Failed to create person' }
+    return errorHandler(error, 'Failed to create person')
   }
 }
 
@@ -67,7 +68,7 @@ export async function updatePerson({
     revalidatePath('/admin/people')
     return { success: true, data: person }
   } catch (error) {
-    return { success: false, error: 'Failed to update person' }
+    return errorHandler(error, 'Failed to update person')
   }
 }
 
@@ -80,7 +81,7 @@ export async function deletePerson({ id }: { id: string }) {
     revalidatePath('/admin/people')
     return { success: true }
   } catch (error) {
-    return { success: false, error: 'Failed to delete person' }
+    return errorHandler(error, 'Failed to delete person')
   }
 }
 
@@ -101,6 +102,6 @@ export async function searchPeople({ query }: { query: string }) {
     })
     return { success: true, data: people }
   } catch (error) {
-    return { success: false, error: 'Failed to search people' }
+    return errorHandler(error, 'Failed to search people')
   }
 }

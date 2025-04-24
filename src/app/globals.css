@@ -18,7 +18,6 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-
 @keyframes skeleton-wave {
   0% {
     background-position: 200% 0;
@@ -40,6 +39,24 @@ body {
   }
 }
 
+@keyframes accordion-down {
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--radix-accordion-content-height);
+  }
+}
+
+@keyframes accordion-up {
+  from {
+    height: var(--radix-accordion-content-height);
+  }
+  to {
+    height: 0;
+  }
+}
+
 @layer utilities {
   .animate-skeleton-wave {
     animation: skeleton-wave 2s linear infinite;
@@ -47,6 +64,14 @@ body {
   
   .animate-skeleton-shine {
     animation: skeleton-shine 2s ease-in-out infinite;
+  }
+
+  .animate-accordion-down {
+    animation: accordion-down 0.2s ease-out;
+  }
+
+  .animate-accordion-up {
+    animation: accordion-up 0.2s ease-out;
   }
 }
 

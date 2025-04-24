@@ -12,6 +12,8 @@ interface DatePickerProps {
   label: string
   error?: string
   helperText?: string
+  maxYear?: number
+  minYear?: number
 }
 
 export const DatePicker = ({
@@ -19,6 +21,8 @@ export const DatePicker = ({
   label,
   error,
   helperText,
+  maxYear = new Date().getFullYear(),
+  minYear = new Date().getFullYear() - 100,
 }: DatePickerProps) => {
   const { register, setValue, watch } = useFormContext()
   const value = watch(name)
@@ -57,6 +61,8 @@ export const DatePicker = ({
   }
 
   const getFirstDayOfMonth = (year: number, month: number) => {
+    // getDay() returns 0-6 where 0 is Sunday
+    // We need to ensure we're getting the correct day of the week
     return new Date(year, month, 1).getDay()
   }
 
@@ -144,15 +150,27 @@ export const DatePicker = ({
               </button>
 
               <div className={styles.monthYearSelector}>
-                <span className={styles.monthLabel}>{getMonthName(month)}</span>
+                <span className={styles.monthLabel}>
+                  <select
+                    value={month}
+                    onChange={(e) => setMonth(parseInt(e.target.value))}
+                    className={styles.monthSelect}
+                  >
+                    {Array.from({ length: 12 }, (_, i) => i).map((m) => (
+                      <option key={m} value={m}>
+                        {getMonthName(m)}
+                      </option>
+                    ))}
+                  </select>
+                </span>
                 <select
                   value={year}
                   onChange={(e) => setYear(parseInt(e.target.value))}
                   className={styles.yearSelect}
                 >
                   {Array.from(
-                    { length: 10 },
-                    (_, i) => currentDate.getFullYear() - 5 + i,
+                    { length: maxYear - minYear + 1 },
+                    (_, i) => minYear + i,
                   ).map((yr) => (
                     <option key={yr} value={yr}>
                       {yr}
@@ -230,6 +248,7 @@ const styles = {
   monthLabel: 'mr-1',
   yearSelect: 'p-1 border-none text-sm bg-transparent',
   daysHeader: 'grid grid-cols-7 gap-1 mb-1',
+  monthSelect: 'p-1 border-none text-sm bg-transparent',
   dayHeaderCell:
     'h-8 w-8 flex items-center justify-center text-xs font-medium text-primary-500',
   daysGrid: 'grid grid-cols-7 gap-1',

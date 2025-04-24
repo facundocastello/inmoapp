@@ -59,7 +59,7 @@ export function IndexForm({ initialData }: IndexFormProps) {
             },
           })
 
-      if (!result.success) {
+      if (!result.success && 'error' in result) {
         throw new Error(result.error)
       }
 

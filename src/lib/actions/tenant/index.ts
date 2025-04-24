@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 
 import { requireTenantId } from '@/lib/get-tenant'
 import { prisma } from '@/lib/prisma'
+import errorHandler from '@/lib/utils/error'
 
 import { IndexForm } from './schemas'
 
@@ -16,7 +17,7 @@ export async function getIndexes() {
     })
     return { success: true, data: indexes }
   } catch (error) {
-    return { success: false, error: 'Failed to fetch indexes' }
+    return errorHandler(error, 'Failed to fetch indexes')
   }
 }
 
@@ -31,7 +32,7 @@ export async function getIndex({ id }: { id: string }) {
     }
     return { success: true, data: index }
   } catch (error) {
-    return { success: false, error: 'Failed to fetch index' }
+    return errorHandler(error, 'Failed to fetch index')
   }
 }
 
@@ -47,7 +48,7 @@ export async function createIndex({ data }: { data: IndexForm }) {
     revalidatePath('/admin/contract/settings')
     return { success: true, data: index }
   } catch (error) {
-    return { success: false, error: 'Failed to create index' }
+    return errorHandler(error, 'Failed to create index')
   }
 }
 
@@ -67,7 +68,7 @@ export async function updateIndex({
     revalidatePath('/admin/contract/settings')
     return { success: true, data: index }
   } catch (error) {
-    return { success: false, error: 'Failed to update index' }
+    return errorHandler(error, 'Failed to update index')
   }
 }
 
@@ -80,7 +81,7 @@ export async function deleteIndex({ id }: { id: string }) {
     revalidatePath('/admin/contract/settings')
     return { success: true }
   } catch (error) {
-    return { success: false, error: 'Failed to delete index' }
+    return errorHandler(error, 'Failed to delete index')
   }
 }
 
@@ -115,6 +116,6 @@ export async function addIndexValue({
     revalidatePath('/admin/contract/settings')
     return { success: true, data: updatedIndex }
   } catch (error) {
-    return { success: false, error: 'Failed to add index value' }
+    return errorHandler(error, 'Failed to add index value')
   }
 }
