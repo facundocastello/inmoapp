@@ -14,6 +14,19 @@ export async function getContracts() {
     const contracts = await prisma.contract.findMany({
       where: { tenantId },
       orderBy: { startDate: 'desc' },
+      include: {
+        property: {
+          include: {
+            owner: true,
+          },
+        },
+        occupant: true,
+        applicant: true,
+        contractType: true,
+        priceCalculation: true,
+        guarantees: true,
+        paymentHistory: true,
+      },
     })
     return { success: true, data: contracts }
   } catch (error) {
@@ -26,6 +39,30 @@ export async function getContract({ id }: { id: string }) {
     const { tenantId } = await requireTenantId()
     const contract = await prisma.contract.findUnique({
       where: { id, tenantId },
+      include: {
+        occupant: true,
+        applicant: true,
+        property: {
+          include: {
+            owner: true,
+          },
+        },
+        contractType: {
+          include: {
+            templates: true,
+          },
+        },
+        priceCalculation: true,
+        paymentMethod: true,
+        guarantees: {
+          include: {
+            property: true,
+            person: true,
+            company: true,
+          },
+        },
+        paymentHistory: true,
+      },
     })
     if (!contract) {
       return { success: false, error: 'Contract not found' }
@@ -35,6 +72,9 @@ export async function getContract({ id }: { id: string }) {
     return errorHandler(error, 'Failed to fetch contract')
   }
 }
+export type ContractWithRelations = NonNullable<
+  NonNullable<Awaited<ReturnType<typeof getContract>>>['data']
+>
 
 export async function createContract({ data }: { data: ContractForm }) {
   try {
@@ -69,6 +109,26 @@ export async function updateContract({
     return { success: true, data: contract }
   } catch (error) {
     return errorHandler(error, 'Failed to update contract')
+  }
+}
+
+export async function appendGuarantee({
+  id,
+  guaranteeId,
+}: {
+  id: string
+  guaranteeId: string
+}) {
+  try {
+    const { tenantId } = await requireTenantId()
+    const contract = await prisma.contract.update({
+      where: { id, tenantId },
+      data: { guarantees: { connect: { id: guaranteeId } } },
+    })
+    revalidatePath('/admin/contracts')
+    return { success: true, data: contract }
+  } catch (error) {
+    return errorHandler(error, 'Failed to append guarantee')
   }
 }
 
@@ -117,7 +177,6 @@ export async function listContracts(tenantId: string, page = 1, limit = 10) {
           property: {
             include: {
               owner: true,
-              occupant: true,
             },
           },
           contractType: true,
@@ -138,17 +197,16 @@ export async function listContracts(tenantId: string, page = 1, limit = 10) {
       },
     }
   } catch (error) {
-    console.error('Error listing contracts:', error)
-    return { success: false, error: 'Failed to list contracts' }
+    return errorHandler(error, 'Failed to list contracts')
   }
 }
 
 export async function updateContractStatus(
-  tenantId: string,
   id: string,
   status: 'PENDING' | 'ACTIVE' | 'TERMINATED' | 'EXPIRED' | 'CANCELLED',
 ) {
   try {
+    const { tenantId } = await requireTenantId()
     const contract = await prisma.contract.update({
       where: { id, tenantId },
       data: { status },
@@ -157,85 +215,6 @@ export async function updateContractStatus(
     revalidatePath('/admin/contracts')
     return { success: true, data: contract }
   } catch (error) {
-    console.error('Error updating contract status:', error)
-    return { success: false, error: 'Failed to update contract status' }
-  }
-}
-
-export async function addGuaranteeToContract(
-  tenantId: string,
-  contractId: string,
-  guaranteeData: {
-    type: string
-    amount: number
-    personId: string
-    currencyId: string
-    paymentMethodId: string
-    guarantorRelation?: string
-    expirationDate?: string
-    supportingDocs?: string
-  },
-) {
-  try {
-    const guarantee = await prisma.guarantee.create({
-      data: {
-        ...guaranteeData,
-        tenantId,
-        contractId,
-        status: 'PENDING',
-      },
-    })
-
-    revalidatePath('/admin/contracts')
-    return { success: true, data: guarantee }
-  } catch (error) {
-    console.error('Error adding guarantee to contract:', error)
-    return { success: false, error: 'Failed to add guarantee to contract' }
-  }
-}
-
-export async function removeGuaranteeFromContract(
-  tenantId: string,
-  guaranteeId: string,
-) {
-  try {
-    await prisma.guarantee.delete({
-      where: { id: guaranteeId },
-    })
-
-    revalidatePath('/admin/contracts')
-    return { success: true }
-  } catch (error) {
-    console.error('Error removing guarantee from contract:', error)
-    return { success: false, error: 'Failed to remove guarantee from contract' }
-  }
-}
-
-export async function addPaymentToContract(
-  tenantId: string,
-  contractId: string,
-  paymentData: {
-    amount: number
-    personId: string
-    paymentMethodId: string
-    paymentDate: string
-    proofOfPayment?: string
-  },
-) {
-  try {
-    const payment = await prisma.paymentHistory.create({
-      data: {
-        ...paymentData,
-        tenantId,
-        contractId,
-        status: 'COMPLETED',
-      },
-    })
-
-    revalidatePath('/admin/contracts')
-    return { success: true, data: payment }
-  } catch (error) {
-    console.error('Error adding payment to contract:', error)
-    return { success: false, error: 'Failed to add payment to contract' }
+    return errorHandler(error, 'Failed to update contract status')
   }
 }

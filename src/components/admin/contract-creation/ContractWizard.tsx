@@ -1,15 +1,7 @@
 'use client'
 
-import {
-  Contract,
-  ContractType,
-  Guarantee,
-  Person,
-  PriceCalculation,
-  Property,
-} from '@prisma/client'
 import { ArrowLeftIcon, ArrowRightIcon } from 'lucide-react'
-import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 
 import {
   Accordion,
@@ -18,133 +10,32 @@ import {
   CustomAccordionTrigger,
 } from '@/components/ui/Accordion'
 import { Button } from '@/components/ui/Button'
-import { ContractForm } from '@/lib/actions/tenant/schemas'
+import { updateContractStatus } from '@/lib/actions/tenant/contract'
+import {
+  ContractWizardProps,
+  contractWizardSections,
+  useContractWizard,
+} from '@/lib/hooks/contracts/useContractWizard'
+import { getStepValidation } from '@/lib/hooks/contracts/useContractWizard'
 import { cn } from '@/lib/utils'
 
-import { PersonStep } from './steps/PersonStep'
-import { PropertyStep } from './steps/PropertyStep'
-
-interface ContractWizardProps {
-  _mode: 'create' | 'edit'
-  _defaultValues?: Partial<ContractForm>
-  _contractId?: string
-  _onComplete?: (contract: Contract) => void
-}
-
-export const ContractWizard = ({
-  _mode,
-  _defaultValues,
-  _contractId,
-  _onComplete,
-}: ContractWizardProps) => {
-  const [property, setProperty] = useState<Property | null>(null)
-  const [owner, setOwner] = useState<Person | null>(null)
-  const [applicant, setApplicant] = useState<Person | null>(null)
-  const [occupant, setOccupant] = useState<Person | null>(null)
-  const [contractType] = useState<ContractType | null>(null)
-  const [priceCalculation] = useState<PriceCalculation | null>(null)
-  const [guarantees] = useState<Guarantee[]>([])
-  const [currentStep, setCurrentStep] = useState(0)
-  const [isLoading] = useState(false)
-
-  const handleSetProperty = (property: Property | null) => {
-    setProperty(property)
-    if (!property) return
-    setCurrentStep(currentStep + 1)
-  }
-
-  const handleSetOwner = (owner: Person | null) => {
-    setOwner(owner)
-    if (!owner) return
-    setCurrentStep(currentStep + 1)
-  }
-
-  const handleSetApplicant = (applicant: Person | null) => {
-    setApplicant(applicant)
-    if (!applicant) return
-    if (!occupant) setOccupant(applicant)
-    setCurrentStep(currentStep + 1)
-  }
-
-  const handleSetOccupant = (occupant: Person | null) => {
-    setOccupant(occupant)
-    if (!occupant) return
-    setCurrentStep(currentStep + 1)
-  }
-
-  const sections = [
-    {
-      id: 'property',
-      title: 'Property',
-      content: (
-        <PropertyStep property={property} setProperty={handleSetProperty} />
-      ),
-    },
-    {
-      id: 'owner',
-      title: 'Owner',
-      content: (
-        <PersonStep person={owner} setPerson={handleSetOwner} title="Owner" />
-      ),
-    },
-    {
-      id: 'applicant',
-      title: 'Applicant',
-      content: (
-        <PersonStep
-          person={applicant}
-          setPerson={handleSetApplicant}
-          title="Applicant"
-        />
-      ),
-    },
-    {
-      id: 'occupant',
-      title: 'Occupant',
-      content: (
-        <PersonStep
-          person={occupant}
-          setPerson={handleSetOccupant}
-          title="Occupant"
-        />
-      ),
-    },
-    {
-      id: 'contract-type',
-      title: 'Contract Type',
-      content: <div>Contract Type Step</div>,
-    },
-    {
-      id: 'price-calculation',
-      title: 'Price Calculation',
-      content: <div>Price Calculation Step</div>,
-    },
-    {
-      id: 'guarantees',
-      title: 'Guarantees',
-      content: <div>Guarantees Step</div>,
-    },
-    { id: 'summary', title: 'Summary', content: <div>Summary Step</div> },
-  ]
-
-  const buttonIsDisabledReasonMap = [
-    !property && 'Please select a property',
-    !owner && 'Please select an owner',
-    !applicant
-      ? 'Please select an applicant'
-      : applicant?.id === owner?.id && 'Applicant cannot be the same as owner',
-    !occupant && 'Please select an occupant',
-    !contractType && 'Please select a contract type',
-    !priceCalculation && 'Please select a price calculation',
-    !guarantees && 'Please select guarantees',
-  ]
-
-  const handlePreviousStep = () => {
-    setCurrentStep((prev) => prev - 1)
-  }
-
-  const handleNextStep = () => {
-    setCurrentStep((prev) => prev + 1)
+export const ContractWizard = (props: ContractWizardProps) => {
+  const router = useRouter()
+  const contractWizardHandlers = useContractWizard(props)
+  const {
+    state,
+    currentStep,
+    setCurrentStep,
+    isLoading,
+    handlePreviousStep,
+    handleNextStep,
+  } = contractWizardHandlers
+  const validationMessages = getStepValidation(state)
+  console.log(props.defaultValues?.status)
+  const handleCreateContract = async () => {
+    if (!props.contractId) return
+    await updateContractStatus(props.contractId, 'PENDING')
+    router.push(`/admin/contracts`)
   }
 
   return (
@@ -163,13 +54,12 @@ export const ContractWizard = ({
             <ArrowLeftIcon className="w-4 h-4" />
           </Button>
           <div className={styles.progress}>
-            {sections.map((section, index) => (
+            {contractWizardSections.map((section, index) => (
               <div
                 key={section.id}
                 className={cn(
                   styles.progressDot,
-                  buttonIsDisabledReasonMap[index] &&
-                    styles.progressDotDisabled,
+                  validationMessages[index] && styles.progressDotDisabled,
                   index === currentStep
                     ? 'bg-primary-500'
                     : index < currentStep
@@ -187,31 +77,44 @@ export const ContractWizard = ({
 
       <Accordion
         className="w-full"
-        value={currentStep === -1 ? '' : sections[currentStep].id}
+        value={currentStep === -1 ? '' : contractWizardSections[currentStep].id}
         onValueChange={(value: string) => {
-          const index = sections.findIndex((section) => section.id === value)
+          const index = contractWizardSections.findIndex(
+            (section) => section.id === value,
+          )
           setCurrentStep(index)
         }}
       >
-        {sections.map((section, index) => (
+        {contractWizardSections.map((section, index) => (
           <CustomAccordionItem key={section.id} value={section.id}>
             <CustomAccordionTrigger>
               <div className="flex items-center space-x-2">
                 <span className="text-sm font-medium">{section.title}</span>
-                {buttonIsDisabledReasonMap[index] && (
+                {section.subtitle && (
+                  <span className="text-xs text-gray-500">
+                    ({section.subtitle(state)?.toString()})
+                  </span>
+                )}
+                {validationMessages[index] && (
                   <span className="text-xs text-red-500">
-                    ({buttonIsDisabledReasonMap[index]})
+                    ({validationMessages[index]})
                   </span>
                 )}
               </div>
             </CustomAccordionTrigger>
-            <CustomAccordionContent>{section.content}</CustomAccordionContent>
+            <CustomAccordionContent>
+              {section.content(state, contractWizardHandlers, isLoading)}
+            </CustomAccordionContent>
           </CustomAccordionItem>
         ))}
       </Accordion>
 
       <div className={styles.footer}>
-        <Button type="submit" disabled={isLoading}>
+        <Button
+          onClick={handleCreateContract}
+          type="submit"
+          disabled={isLoading}
+        >
           {isLoading ? 'Saving...' : 'Create Contract'}
         </Button>
       </div>

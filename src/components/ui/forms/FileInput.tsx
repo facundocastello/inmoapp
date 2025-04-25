@@ -13,7 +13,7 @@ interface FileInputProps
   error?: string
   accept?: string
   multiple?: boolean
-  defaultValue?: string | null
+  defaultValue?: string | null | File | (string | File)[]
   disabled?: boolean
 }
 
@@ -39,9 +39,13 @@ export const FileInput = ({
   }, [defaultValue, name, setValue])
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      setValue(name, file, { shouldValidate: true })
+    const files = Array.from(e.target.files || [])
+    if (files.length > 0) {
+      if (multiple) {
+        setValue(name, files, { shouldValidate: true })
+      } else {
+        setValue(name, files[0], { shouldValidate: true })
+      }
     } else {
       setValue(name, null, { shouldValidate: true })
     }
@@ -60,10 +64,89 @@ export const FileInput = ({
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault()
     setIsDragging(false)
-    const file = e.dataTransfer.files[0]
-    if (file) {
-      setValue(name, file, { shouldValidate: true })
+    const files = Array.from(e.dataTransfer.files)
+    if (files.length > 0) {
+      if (multiple) {
+        setValue(name, files, { shouldValidate: true })
+      } else {
+        setValue(name, files[0], { shouldValidate: true })
+      }
     }
+  }
+
+  const removeFile = (index: number) => {
+    if (Array.isArray(value)) {
+      const newFiles = [...value]
+      newFiles.splice(index, 1)
+      setValue(name, newFiles.length > 0 ? newFiles : null, {
+        shouldValidate: true,
+      })
+    } else {
+      setValue(name, null, { shouldValidate: true })
+    }
+  }
+
+  const renderPreview = (file: File | string, index: number) => {
+    return (
+      <div key={index} className={styles.previewContainer}>
+        {(file instanceof File && file.type === 'application/pdf') ||
+        (typeof file === 'string' && file.includes('.pdf')) ? (
+          <div className="w-full h-full flex flex-col items-center justify-center bg-primary-50 p-4">
+            <svg
+              className="w-16 h-16 text-primary-800"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={1.5}
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              />
+            </svg>
+            <span className="text-sm text-primary-800 mt-2 text-center break-all">
+              {file instanceof File ? file.name : file.split('/').pop()}
+            </span>
+          </div>
+        ) : file instanceof File ? (
+          <img
+            src={URL.createObjectURL(file)}
+            alt={`Preview ${index + 1}`}
+            className={styles.preview}
+          />
+        ) : (
+          <Image
+            fileKey={file as string}
+            alt={`Preview ${index + 1}`}
+            className={styles.preview}
+          />
+        )}
+        {!disabled && (
+          <button
+            type="button"
+            className={styles.removeButton}
+            onClick={() => removeFile(index)}
+          >
+            <svg
+              className={styles.removeIcon}
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+        )}
+      </div>
+    )
   }
 
   return (
@@ -95,7 +178,7 @@ export const FileInput = ({
           disabled={disabled}
           {...props}
         />
-        {!value && (
+        {(!value || (Array.isArray(value) && value.length === 0)) && (
           <div className={styles.placeholder}>
             <svg
               className={cn(
@@ -122,49 +205,17 @@ export const FileInput = ({
             >
               {disabled
                 ? 'File upload disabled'
-                : 'Drag and drop your file here, or click to select'}
+                : multiple
+                  ? 'Drag and drop your files here, or click to select'
+                  : 'Drag and drop your file here, or click to select'}
             </p>
           </div>
         )}
         {value && (
-          <div className={styles.previewContainer}>
-            {value instanceof File ? (
-              <img
-                src={URL.createObjectURL(value)}
-                alt="Preview"
-                className={styles.preview}
-              />
-            ) : (
-              <Image
-                fileKey={value as string}
-                alt="Preview"
-                className={styles.preview}
-              />
-            )}
-            {!disabled && (
-              <button
-                type="button"
-                className={styles.removeButton}
-                onClick={() => {
-                  setValue(name, null, { shouldValidate: true })
-                }}
-              >
-                <svg
-                  className={styles.removeIcon}
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
-            )}
+          <div className={styles.previewGrid}>
+            {Array.isArray(value)
+              ? value.map((file, index) => renderPreview(file, index))
+              : renderPreview(value, 0)}
           </div>
         )}
       </div>
@@ -177,7 +228,7 @@ const styles = {
   container: 'space-y-2',
   label: 'block text-sm font-medium text-primary-900',
   dropzone: `
-    relative flex items-center justify-center w-full h-64
+    relative flex items-center justify-center w-full min-h-[16rem]
     border-2 border-dashed rounded-lg 
     border-primary-800 hover:bg-primary-50
     transition-colors duration-200 ease-in-out
@@ -194,8 +245,10 @@ const styles = {
   placeholderIconDisabled: 'text-neutral-400',
   placeholderText: 'text-sm text-primary-800 text-center',
   placeholderTextDisabled: 'text-neutral-400',
-  previewContainer: 'relative w-full h-full',
-  preview: 'w-full h-full object-contain rounded-lg',
+  previewGrid:
+    'grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4 w-full',
+  previewContainer: 'relative aspect-square',
+  preview: 'w-full h-full object-cover rounded-lg',
   removeButton: `
     absolute top-2 right-2 p-1
     bg-primary-900/50 hover:bg-primary-900/75

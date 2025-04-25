@@ -27,6 +27,13 @@ export type UploadOptions = {
   optimizationOptions?: ImageOptimizationOptions
 }
 
+export async function uploadFiles(
+  files: File[],
+  options: UploadOptions = {},
+): Promise<FileKey[]> {
+  return Promise.all(files.map((file) => uploadFile(file, options)))
+}
+
 export async function uploadFile(
   file: File,
   options: UploadOptions = {},
@@ -38,7 +45,7 @@ export async function uploadFile(
     fileToUpload = await optimizeImage(file, options.optimizationOptions)
   }
 
-  const key = `${Date.now()}-${fileToUpload.name}`
+  const key = `${process.env.STORAGE_CUSTOM_FOLDER || ''}/${Date.now()}-${fileToUpload.name}`
 
   const command = new PutObjectCommand({
     Bucket: process.env.STORAGE_BUCKET!,

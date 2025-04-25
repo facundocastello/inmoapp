@@ -12,10 +12,12 @@ export const PersonStep = ({
   person,
   setPerson,
   title,
+  ignorePersonIds,
 }: {
   person: Person | null
   setPerson: (person: Person | null) => void
   title: string
+  ignorePersonIds?: string[]
 }) => {
   const [shouldCreateNewPerson, setShouldCreateNewPerson] = useState(false)
   const handleSetPerson = (person: Person | null) => {
@@ -54,6 +56,7 @@ export const PersonStep = ({
           onSelect={(person) => handleSetPerson(person)}
           selectedItem={person}
           handleSearch={searchPeople}
+          ignoreIds={ignorePersonIds}
           renderItem={(person) => (
             <div>
               <h3>

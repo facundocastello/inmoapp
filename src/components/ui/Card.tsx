@@ -1,28 +1,65 @@
-import { forwardRef, HTMLAttributes } from 'react'
+import {
+  DetailedHTMLProps,
+  DetailsHTMLAttributes,
+  forwardRef,
+  HTMLAttributes,
+} from 'react'
 
 import { cn } from '@/lib/utils'
 
-const Card = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => (
-    <div
-      ref={ref}
-      className={cn(
-        'rounded-lg border bg-card text-card-foreground shadow-sm',
-        className,
-      )}
-      {...props}
-    />
-  ),
+interface CardProps extends HTMLAttributes<HTMLDivElement> {
+  collapsible?: boolean
+  customTitle?: string | React.ReactNode
+}
+
+const Card = forwardRef<HTMLDivElement, CardProps>(
+  ({ className, collapsible, customTitle, children, ...props }, ref) => {
+    if (collapsible) {
+      return (
+        <details
+          ref={ref as unknown as React.RefObject<HTMLDetailsElement>}
+          className={cn(
+            'group rounded-lg border bg-card text-card-foreground shadow-sm',
+            className,
+          )}
+          {...(props as DetailedHTMLProps<
+            DetailsHTMLAttributes<HTMLDetailsElement>,
+            HTMLDetailsElement
+          >)}
+        >
+          {customTitle && (
+            <summary className="list-none">{customTitle}</summary>
+          )}
+          {children}
+        </details>
+      )
+    }
+
+    return (
+      <div
+        ref={ref}
+        className={cn(
+          'rounded-lg border bg-card text-card-foreground shadow-sm',
+          className,
+        )}
+        {...props}
+      >
+        {children}
+      </div>
+    )
+  },
 )
 Card.displayName = 'Card'
 
 const CardHeader = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => (
+  ({ className, children, ...props }, ref) => (
     <div
       ref={ref}
       className={cn('flex flex-col space-y-1.5 p-6', className)}
       {...props}
-    />
+    >
+      {children}
+    </div>
   ),
 )
 CardHeader.displayName = 'CardHeader'

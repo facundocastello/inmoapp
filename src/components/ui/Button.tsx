@@ -55,8 +55,8 @@ const styles = {
     text: 'text-primary-900 hover:text-primary-800',
   },
   sizes: {
-    default: 'h-10 px-4 py-2',
-    sm: 'h-9 rounded-md px-3',
-    lg: 'h-11 rounded-md px-8',
+    default: 'min-h-10 px-4 py-2',
+    sm: 'min-h-9 rounded-md px-3',
+    lg: 'min-h-11 rounded-md px-8',
   },
 }

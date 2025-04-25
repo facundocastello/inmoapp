@@ -9,15 +9,22 @@ interface SelectOption {
   label: string
 }
 
-interface SelectProps {
+interface SelectProps  {
+  shouldRegister?: boolean
   name: string
   label: string
   options: SelectOption[]
   error?: string
 }
 
-export const Select = ({ name, label, options, error }: SelectProps) => {
-  const { register } = useFormContext()
+export const Select = ({
+  name,
+  label,
+  options,
+  error,
+  shouldRegister = true,
+}: SelectProps) => {
+  const { register } = shouldRegister ? useFormContext() : { register: () => {} }
 
   return (
     <div className={styles.container}>
@@ -27,7 +34,7 @@ export const Select = ({ name, label, options, error }: SelectProps) => {
       <select
         id={name}
         className={cn(styles.select, error && styles.error)}
-        {...register(name)}
+        {...(shouldRegister ? register(name) : {})}
       >
         {options.map((option) => (
           <option key={option.value} value={option.value}>

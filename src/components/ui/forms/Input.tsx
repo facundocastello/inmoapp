@@ -1,33 +1,41 @@
 'use client'
 
 import { HTMLAttributes } from 'react'
-import { useFormContext } from 'react-hook-form'
+import { RegisterOptions, useFormContext } from 'react-hook-form'
 
 import { cn } from '@/lib/utils'
 
 interface InputProps extends HTMLAttributes<HTMLInputElement> {
   className?: string
   containerClassName?: string
+  registerOptions?: RegisterOptions
   shouldRegister?: boolean
   name: string
   label: string
   type?: 'text' | 'email' | 'password' | 'number'
   error?: string
   helperText?: string
+  disabled?: boolean
+  defaultValue?: string
+  value?: string
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void
 }
 
 export const Input = ({
   containerClassName,
   className,
+  registerOptions,
   shouldRegister = true,
   name,
   helperText,
   label,
   type = 'text',
   error,
+  disabled,
+  defaultValue,
   ...props
 }: InputProps) => {
-  const { register } = useFormContext()
+  const { register } = shouldRegister ? useFormContext() : { register: () => {} }
 
   return (
     <div className={cn(styles.container, containerClassName)}>
@@ -42,9 +50,13 @@ export const Input = ({
         className={cn(styles.input, error && styles.error, className)}
         {...(shouldRegister &&
           register(name, {
+            ...registerOptions,
+            //@ts-ignore
             valueAsNumber: type === 'number',
           }))}
         {...props}
+        disabled={disabled}
+        defaultValue={defaultValue}
       />
       {error && <p className={styles.errorMessage}>{error}</p>}
       {helperText && <p className={styles.helperText}>{helperText}</p>}

@@ -49,13 +49,15 @@ const Accordion = ({
         if (React.isValidElement<CustomAccordionItemProps>(child)) {
           return React.cloneElement(child, {
             isOpen: value === child.props.value,
-            onOpenChange: (isOpen) => {
-              if (isOpen) {
-                onValueChange?.(child.props.value)
-              } else {
-                onValueChange?.('')
-              }
-            },
+            onOpenChange: onValueChange
+              ? (isOpen) => {
+                  if (isOpen) {
+                    onValueChange(child.props.value)
+                  } else {
+                    onValueChange('')
+                  }
+                }
+              : undefined,
           })
         }
         return child
@@ -70,10 +72,10 @@ const CustomAccordionItem = ({
   isOpen: controlledIsOpen,
   onOpenChange,
 }: CustomAccordionItemProps) => {
+  const isControlled = onOpenChange !== undefined
   const [localIsOpen, setLocalIsOpen] = React.useState(false)
-  const isOpen = controlledIsOpen ?? localIsOpen
-  const setIsOpen = onOpenChange ?? setLocalIsOpen
-
+  const isOpen = isControlled ? !!controlledIsOpen : localIsOpen
+  const setIsOpen = isControlled ? onOpenChange : setLocalIsOpen
   return (
     <AccordionContext.Provider value={{ isOpen, setIsOpen }}>
       <div className={cn('mb-0.5', className)}>{children}</div>
@@ -88,7 +90,12 @@ const CustomAccordionTrigger = ({
   const { isOpen, setIsOpen } = React.useContext(AccordionContext)
 
   return (
-    <div className="sticky top-18 z-10 bg-primary-200 px-2 rounded-lg">
+    <div
+      className={cn(
+        'top-16 z-10 bg-primary-200 px-2 rounded-lg',
+        isOpen && 'bg-primary-300 sticky',
+      )}
+    >
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
@@ -122,24 +129,14 @@ const CustomAccordionContent = ({
   className,
 }: CustomAccordionContentProps) => {
   const { isOpen } = React.useContext(AccordionContext)
-  const contentRef = React.useRef<HTMLDivElement>(null)
-  const [height, setHeight] = React.useState(0)
-
-  React.useEffect(() => {
-    if (contentRef.current) {
-      setHeight(isOpen ? contentRef.current.scrollHeight : 0)
-    }
-  }, [isOpen])
 
   return (
     <div
-      ref={contentRef}
-      style={{
-        height: `${height}px`,
-        transition: 'height 0.2s ease-in-out',
-        overflow: 'hidden',
-      }}
-      className={cn('text-sm px-1', isOpen && 'py-3', className)}
+      className={cn(
+        styles.contentContainer,
+        isOpen ? styles.contentIsOpen : styles.contentIsClose,
+        className,
+      )}
     >
       <div className="pb-4 pt-0">{children}</div>
     </div>
@@ -151,4 +148,11 @@ export {
   CustomAccordionContent,
   CustomAccordionItem,
   CustomAccordionTrigger,
+}
+
+const styles = {
+  contentContainer:
+    'text-sm px-1 opacity-0 h-0 transition-all transition-duration-1000 -top-full -translate-y-full',
+  contentIsOpen: 'py-3 opacity-100 h-auto translate-y-0',
+  contentIsClose: 'overflow-hidden',
 }

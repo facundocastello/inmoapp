@@ -8,6 +8,9 @@ export default async function LandingPage() {
       <header className={styles.header}>
         <div className={styles.headerContainer}>
           <h1 className={styles.title}>InmoApp Platform</h1>
+          <Link href="/super-admin" className={styles.secondaryLink}>
+            Super Admin
+          </Link>
         </div>
       </header>
       <main className={styles.main}>

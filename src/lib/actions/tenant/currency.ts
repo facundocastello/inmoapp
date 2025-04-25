@@ -96,7 +96,6 @@ export async function listCurrencies() {
         _count: {
           select: {
             priceCalculations: true,
-            guarantees: true,
           },
         },
       },

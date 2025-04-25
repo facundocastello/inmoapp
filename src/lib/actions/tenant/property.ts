@@ -39,6 +39,7 @@ export async function getProperty({ id }: { id: string }) {
 export async function createProperty({ data }: { data: PropertyForm }) {
   try {
     const { tenantId } = await requireTenantId()
+    console.log({ tenantId })
     const property = await prisma.property.create({
       data: {
         ...data,
@@ -117,8 +118,6 @@ export async function listProperties(tenantId: string, page = 1, limit = 10) {
         orderBy: { createdAt: 'desc' },
         include: {
           owner: true,
-          occupant: true,
-          applicant: true,
         },
       }),
       prisma.property.count({ where: { tenantId } }),

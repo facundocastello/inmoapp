@@ -74,35 +74,44 @@ export const propertySchema = z.object({
 export type PropertyForm = z.infer<typeof propertySchema>
 
 export const contractSchema = z.object({
-  propertyId: z.string(),
-  ownerId: z.string(),
-  tenantId: z.string(),
-  contractTypeId: z.string(),
-  priceCalculationId: z.string(),
-  paymentMethodId: z.string(),
-
-  startDate: z.string(),
-  endDate: z.string(),
-  monthlyRent: z.number(),
-  deposit: z.number(),
-  isActive: z.boolean(),
+  name: z.string().min(1),
+  propertyId: z.string().optional(),
+  ownerId: z.string().optional(),
+  tenantId: z.string().optional(),
+  contractTypeId: z.string().optional(),
+  priceCalculationId: z.string().optional(),
+  paymentMethodId: z.string().optional(),
+  applicantId: z.string().optional(),
+  occupantId: z.string().optional(),
+  startDate: z.string().optional(),
+  endDate: z.string().optional(),
+  duration: z.number().optional(),
+  latePaymentPenalty: z.number().optional(),
+  renewalConditions: z.string().optional(),
+  earlyTermination: z.string().optional(),
+  notes: z.string().optional(),
+  status: z
+    .enum(['DRAFT', 'PENDING', 'ACTIVE', 'TERMINATED', 'EXPIRED', 'CANCELLED'])
+    .optional(),
 })
 
 export type ContractForm = z.infer<typeof contractSchema>
 
 export const priceCalculationSchema = z.object({
+  name: z.string().min(1, 'Name is required'),
   updatePeriod: z.number(),
   initialPrice: z.number(),
   currentPrice: z.number(),
   historyValues: z.array(
     z.object({
       value: z.number(),
-      date: z.string().transform((str) => new Date(str)),
+      date: z.date(),
+      // date: z.string().transform((str) => new Date(str)),
     }),
   ),
-  fixedAmount: z.number().optional(),
-  fixedPercentage: z.number().optional(),
-  currencyLock: z.boolean().default(false),
+  fixedAmount: z.number(),
+  fixedPercentage: z.number(),
+  currencyLock: z.boolean(),
   indexId: z.string().optional(),
   currencyId: z.string().optional(),
 })
@@ -111,8 +120,31 @@ export type PriceCalculationForm = z.infer<typeof priceCalculationSchema>
 
 export const contractTypeSchema = z.object({
   name: z.string().min(1),
+  templateIds: z.array(z.string()).optional(),
   description: z.string().optional(),
   isActive: z.boolean(),
 })
 
 export type ContractTypeForm = z.infer<typeof contractTypeSchema>
+
+export const guaranteeSchema = z.object({
+  type: z.enum(['SALARY_GUARANTEE', 'PROPERTY_GUARANTEE', 'COMPANY_BOND']),
+  amount: z.number().min(0, 'Amount must be positive'),
+  supportingDocs: z.array(z.union([z.string(), z.instanceof(File)])),
+  personId: z.string().optional(),
+  propertyId: z.string().optional(),
+  companyId: z.string().optional(),
+  contractId: z.string().optional(),
+  guaranteeId: z.string().optional(),
+})
+
+export type GuaranteeForm = z.infer<typeof guaranteeSchema>
+
+export const contractTemplateSchema = z.object({
+  name: z.string().min(1),
+  template: z.string().min(1),
+  isPublic: z.boolean(),
+  contractTypeIds: z.array(z.string()).optional(),
+})
+
+export type ContractTemplateForm = z.infer<typeof contractTemplateSchema>

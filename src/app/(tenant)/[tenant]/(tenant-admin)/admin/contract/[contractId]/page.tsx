@@ -1,24 +1,26 @@
 import { notFound, redirect } from 'next/navigation'
 
+import DownloadTemplates from '@/components/admin/contract/DownloadTemplates'
 import { ContractWizard } from '@/components/admin/contract-creation/ContractWizard'
 import { getContract } from '@/lib/actions/tenant/contract'
 
-export default async function NewContractPage({
-  searchParams,
+export default async function ContractPage({
+  params,
 }: {
-  searchParams: Promise<{ contractId?: string }>
+  params: Promise<{ contractId?: string }>
 }) {
-  const { contractId } = await searchParams
+  const { contractId } = await params
   const contract = contractId ? await getContract({ id: contractId }) : null
   if (contractId && !contract) return notFound()
 
-  if (contract?.data?.status === 'PENDING')
-    redirect(`/admin/contract/${contractId}`)
+  if (contract?.data?.status === 'DRAFT')
+    redirect(`/admin/contract/new?contractId=${contractId}`)
+
   return (
     <div className={styles.container}>
-      <h1 className={styles.title}>Create New Contract</h1>
+      <h1 className={styles.title}>Edit Contract</h1>
       <ContractWizard
-        mode={contractId ? 'draft' : 'create'}
+        mode="edit"
         contractId={contractId}
         defaultValues={
           contract?.data
@@ -36,6 +38,15 @@ export default async function NewContractPage({
             : undefined
         }
       />
+      <div className="p-4">
+        {contract?.data && (
+          <DownloadTemplates
+            contractName={contract?.data?.name || ''}
+            templates={contract?.data?.contractType?.templates || []}
+            contract={contract?.data}
+          />
+        )}
+      </div>
     </div>
   )
 }

@@ -85,7 +85,13 @@ export async function deletePerson({ id }: { id: string }) {
   }
 }
 
-export async function searchPeople({ query }: { query: string }) {
+export async function searchPeople({
+  query,
+  ignoreIds,
+}: {
+  query: string
+  ignoreIds?: string[]
+}) {
   try {
     const { tenantId } = await requireTenantId()
     const people = await prisma.person.findMany({
@@ -97,6 +103,7 @@ export async function searchPeople({ query }: { query: string }) {
           { document: { contains: query, mode: 'insensitive' } },
           { email: { contains: query, mode: 'insensitive' } },
         ],
+        id: { notIn: ignoreIds },
       },
       take: 10,
     })
